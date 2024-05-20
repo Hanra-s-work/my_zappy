@@ -8,7 +8,6 @@
 *.gcda
 vgcore.*
 *tmp*
-# !bonus/**
 zappy_ai
 zappy_gui
 zappy_server
