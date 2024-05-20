@@ -1,0 +1,14 @@
+.vscode/
+*.o
+*.a
+*.so
+*.out
+*.log
+*.gcno
+*.gcda
+vgcore.*
+*tmp*
+# !bonus/**
+zappy_ai
+zappy_gui
+zappy_server
