@@ -15,7 +15,7 @@ env:
   EXECUTABLES: "zappy_ai zappy_gui zappy_server"
   NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
   NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-  CODING_STYLE_CONTAINER: marvinette
+  CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
 
 jobs:
 
@@ -26,7 +26,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: getting the latest version of $CODING_STYLE_CONTAINER (coding-style)
-      run: docker pull -t $CODING_STYLE_CONTAINER ghcr.io/epitech/coding-style-checker:latest
+      run: docker pull ghcr.io/epitech/coding-style-checker:latest
     - name: run $CODING_STYLE_CONTAINER
       run: |
         CODING_STYLE=coding_style_data
