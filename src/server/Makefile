@@ -7,23 +7,19 @@
 
 SRC_MAIN	=	./src/main.c
 
-SRC	=	
+SRC	=	./src/sub_main.c
 
 CC	=	gcc
 
 RM	=	rm -rf
 
-OBJ	=	$(SRC:.cpp=.o)
+OBJ	=	$(SRC:.c=.o)
 
-OBJ_MAIN	=	$(SRC_MAIN:.cpp=.o)
+OBJ_MAIN	=	$(SRC_MAIN:.c=.o)
 
 CFLAGS	=	-Wall -Wextra
 
 CPPFLAGS	=	-iquote ./include
-
-LDLIBS	=	-lsfml
-
-LDFLAGS	=	-L.
 
 NAME	=	zappy_server
 
@@ -32,7 +28,7 @@ NAME_TEST	=	$(NAME)_test
 all: 		$(NAME)
 
 $(NAME):		$(OBJ) $(OBJ_MAIN)
-	$(CC) $(OBJ_MAIN) $(OBJ) -o $(NAME) $(LDFLAGS) $(LDLIBS)
+	$(CC) $(OBJ_MAIN) $(OBJ) -o $(NAME)
 
 clean:
 	$(RM) $(OBJ_MAIN)
