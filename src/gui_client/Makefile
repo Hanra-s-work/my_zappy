@@ -7,7 +7,7 @@
 
 SRC_MAIN	=	./src/main.cpp
 
-SRC	=	
+SRC	=	./src/sub_main.cpp
 
 CXX	=	g++
 
@@ -21,7 +21,7 @@ CXXFLAGS	=	-Wall -Wextra
 
 CPPFLAGS	=	-iquote ./include
 
-LDLIBS	=	-lsfml
+LDLIBS	=	-lsfml-audio
 
 LDFLAGS	=	-L.
 
