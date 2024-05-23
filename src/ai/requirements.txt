@@ -1,0 +1,5 @@
+# For cosmetics purposes
+colourise-output == 1.1.3
+
+# For compilation purposes
+pyinstaller == 6.5.0
