@@ -46,7 +46,7 @@ BINARY_LOCATION	=	./dist/
 
 BINARY_DESTINATION_ONE	=	./
 
-BINARY_DESTINATION_TWO	=	../
+BINARY_DESTINATION_TWO	=	../../
 
 # The python binary that is available on the system
 

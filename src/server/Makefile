@@ -29,8 +29,10 @@ all: 		$(NAME)
 
 $(NAME):		$(OBJ) $(OBJ_MAIN)
 	$(CC) $(OBJ_MAIN) $(OBJ) -o $(NAME)
+	cp $(NAME) ../../$(NAME)
 
 clean:
+	$(RM) ../../$(NAME)
 	$(RM) $(OBJ_MAIN)
 	$(RM) $(OBJ)
 	$(RM) *.gcno

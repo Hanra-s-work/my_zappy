@@ -33,8 +33,10 @@ all: 		$(NAME)
 
 $(NAME):		$(OBJ) $(OBJ_MAIN)
 	$(CXX) $(OBJ_MAIN) $(OBJ) -o $(NAME) $(LDFLAGS) $(LDLIBS)
+	cp $(NAME) ../../$(NAME)
 
 clean:
+	$(RM) ../../$(NAME)
 	$(RM) $(OBJ_MAIN)
 	$(RM) $(OBJ)
 	$(RM) *.gcno
