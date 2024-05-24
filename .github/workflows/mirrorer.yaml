@@ -56,8 +56,6 @@ jobs:
 
   check_program_compilation:
     runs-on: ubuntu-latest
-    needs: check_coding_style
-    if: success()
     timeout-minutes: 8
     steps:
     - uses: actions/checkout@v4
@@ -67,12 +65,16 @@ jobs:
       run: docker pull epitechcontent/epitest-docker
     - name: Compile code
       run: |
-        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker -c "cd /home && make" || \
+        DOCKER_NAME=compiler
+        sudo docker run -v "$(pwd)":"/home/" -i --name $DOCKER_NAME epitechcontent/epitest-docker 
+        sudo docker exec -i $DOCKER_NAME /bin/bash -c "cd /home && make" || \
         curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
         exit 1
     - name: Clean code
       run: |
-        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker -c "cd /home && make clean" || \
+        DOCKER_NAME=cleaner
+        docker run -v "$(pwd)":"/home/" -i --name "$DOCKER_NAME" epitechcontent/epitest-docker 
+        docker exect -i $DOCKER_NAME /bin/bash -c "cd /home && make clean" || \
         curl -H "Title: clean failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The clean failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
         exit 1
     - name: Check if present and executable
@@ -91,6 +93,8 @@ jobs:
   push_to_mirror:
     runs-on: ubuntu-latest
     needs: check_program_compilation
+    if: success()
+    needs: check_coding_style
     if: success()
     steps:
     - uses: actions/checkout@v4
