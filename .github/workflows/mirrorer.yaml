@@ -65,14 +65,20 @@ jobs:
       run: docker pull epitechcontent/epitest-docker
     - name: Compile code
       run: |
-        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker /bin/bash -c "cd /home && make ; STATUS=?; echo status is $STATUS; exit $STATUS" || \
-        curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} && \
-        exit 1
+        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker /bin/bash -c "cd /home && make"
+        if [ $? -ne 0 ]
+        then
+            curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+        fi
     - name: Clean code
       run: |
-        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker /bin/bash -c "cd /home && make clean ; STATUS=$? ; echo status is $STATUS ; exit $STATUS" || \
-        curl -H "Title: clean failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The clean failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} && \
-        exit 1
+        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker /bin/bash -c "cd /home && make clean"
+        if [ $? -ne 0 ]
+        then
+            curl -H "Title: clean failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The clean failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+        fi
     - name: Check if present and executable
       run: |
         IFS=',' read -ra VARS <<< "${EXECUTABLES}"
