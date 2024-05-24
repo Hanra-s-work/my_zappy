@@ -1,4 +1,5 @@
-name: rush3
+
+name: mirrorer
 
 on:
   push:
@@ -64,15 +65,15 @@ jobs:
       with:
         fetch-depth: 0
     - name: Pull Docker image
-      run: sudo docker pull epitechcontent/epitest-docker
+      run: docker pull epitechcontent/epitest-docker
     - name: Compile code
       run: |
-        docker run -v "$(pwd)":"/home/" -i -d epitechcontent/epitest-docker -c "cd /home && make" || \
+        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker -c "cd /home && make" || \
         curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
         exit 1
     - name: Clean code
       run: |
-        docker run -v "$(pwd)":"/home/" -i -d epitechcontent/epitest-docker -c "cd /home && make clean" || \
+        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker -c "cd /home && make clean" || \
         curl -H "Title: clean failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The clean failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
         exit 1
     - name: Check if present and executable
@@ -84,7 +85,7 @@ jobs:
                 curl -H "Title: No binary found" -H "Priority: high" -H 'Tags: warning,skull' -d "'$EXE' not found or not executable for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
                 exit 1
             else
-                echo "üëç $EXE is executable"
+                echo "üë $EXE is executable"
             fi
         done
 
@@ -101,3 +102,4 @@ jobs:
       with:
         target_repo_url: git@github.com:${{ env.MIRROR_URL }}.git
         ssh_private_key: ${{ env.GITHUB_SSH_KEY }}
+
