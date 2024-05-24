@@ -37,7 +37,7 @@ jobs:
         CONTENT="$(cat coding_style_data/coding-style-reports.log)"
         ILLEGAL_FILES_FOUND=0
         if [ "$CONTENT" == "" ]; then
-            echo "âœ…ï¸ no errors were found"
+            echo "No errors were found"
             exit 0
         fi
         while IFS= read -r LINE; do
@@ -84,7 +84,7 @@ jobs:
                 curl -H "Title: No binary found" -H "Priority: high" -H 'Tags: warning,skull' -d "'$EXE' not found or not executable for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
                 exit 1
             else
-                echo "ðŸ‘ $EXE is executable"
+                echo "$EXE is executable"
             fi
         done
 
