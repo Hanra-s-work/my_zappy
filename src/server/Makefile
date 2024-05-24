@@ -25,14 +25,15 @@ NAME	=	zappy_server
 
 NAME_TEST	=	$(NAME)_test
 
-all: 		$(NAME)
+all: 		$(NAME) update_binary_location
 
 $(NAME):		$(OBJ) $(OBJ_MAIN)
 	$(CC) $(OBJ_MAIN) $(OBJ) -o $(NAME)
-	cp $(NAME) ../../$(NAME)
+
+update_binary_location:
+	cp -vf $(NAME) ../../$(NAME)
 
 clean:
-	$(RM) ../../$(NAME)
 	$(RM) $(OBJ_MAIN)
 	$(RM) $(OBJ)
 	$(RM) *.gcno
@@ -40,6 +41,7 @@ clean:
 
 fclean: 	clean
 	$(RM) $(NAME)
+	$(RM) ../../$(NAME)
 	$(RM) $(NAME_TEST)
 
 re:	fclean all
@@ -60,4 +62,4 @@ coverage:	tests_run
 	gcovr --exclude ./tests
 	gcovr --exclude ./tests --branches
 
-.PHONY:	all clean fclean re debug tests_run coverage
+.PHONY:	all clean fclean re debug tests_run coverage update_binary_location

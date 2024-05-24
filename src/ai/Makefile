@@ -253,4 +253,5 @@ run: clean install_dependencies
 
 .PHONY: all create_environement install_dependencies activate_environement \
 		activate build_binary update_binary_location clean clean_env \
-		clean_coverage fclean tests_run coverage debug re noop silent run
+		clean_coverage fclean tests_run coverage debug re noop silent run \
+		my_all
