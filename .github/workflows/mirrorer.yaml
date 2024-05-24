@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: check_coding_style
     if: success()
-    timeout-minutes: 2
+    timeout-minutes: 8
     steps:
     - uses: actions/checkout@v4
       with:
