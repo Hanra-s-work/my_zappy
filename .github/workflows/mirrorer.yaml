@@ -65,16 +65,12 @@ jobs:
       run: docker pull epitechcontent/epitest-docker
     - name: Compile code
       run: |
-        DOCKER_NAME=compiler
-        sudo docker run -v "$(pwd)":"/home/" -i --name $DOCKER_NAME epitechcontent/epitest-docker 
-        sudo docker exec -i $DOCKER_NAME /bin/bash -c "cd /home && make" || \
+        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker /bin/bash -c "cd /home && make" || \
         curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
         exit 1
     - name: Clean code
       run: |
-        DOCKER_NAME=cleaner
-        docker run -v "$(pwd)":"/home/" -i --name "$DOCKER_NAME" epitechcontent/epitest-docker 
-        docker exect -i $DOCKER_NAME /bin/bash -c "cd /home && make clean" || \
+        docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker /bin/bash -c "cd /home && make clean" || \
         curl -H "Title: clean failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The clean failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
         exit 1
     - name: Check if present and executable
