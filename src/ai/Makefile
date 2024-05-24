@@ -86,7 +86,9 @@ C_RESET	=	\033[0m$(C_BACKGROUND)
 C_YELLOW	=	\033[38;5;226m$(C_BACKGROUND)
 
 # Compile the project
-all: install_dependencies build_binary update_binary_location
+all: install_dependencies build_binary update_binary_location clean
+
+my_all: create_environement install_dependencies build_binary update_binary_location clean
 
 # Create the python environement
 create_environement:
@@ -94,7 +96,7 @@ create_environement:
 	$(SILENT) $(CC) -m venv $(ENV_NAME)
 
 # Install the python dependencies
-install_dependencies: create_environement
+install_dependencies:
 	$(SILENT) echo -e "$(C_CYAN)Upgrading pip$(C_RESET)" &&\
 	$(CC) -m pip install --upgrade pip && \
 	. $(ENV_NAME)/bin/activate && \
