@@ -25,18 +25,19 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: getting the latest version of ${{env.CODING_STYLE_CONTAINER}} (coding-style)
+    - name: Getting the latest version of ${{env.CODING_STYLE_CONTAINER}} (coding-style)
       run: docker pull ghcr.io/epitech/coding-style-checker:latest
-    - name: run ${{env.CODING_STYLE_CONTAINER}}
+    - name: Run ${{env.CODING_STYLE_CONTAINER}}
       run: |
         CODING_STYLE=coding_style_data
         mkdir -p $CODING_STYLE
         docker run --rm -i -v "$(pwd)/src/server":/mnt/delivery -v "$(pwd)/$CODING_STYLE":/mnt/reports $CODING_STYLE_CONTAINER "/mnt/delivery" "/mnt/reports"
-    - name: checking the results
+    - name: Checking the results
       run: |
         CONTENT="$(cat coding_style_data/coding-style-reports.log)"
         ILLEGAL_FILES_FOUND=0
         if [ "$CONTENT" == "" ]; then
+            echo "✅️ no errors were found"
             exit 0
         fi
         while IFS= read -r LINE; do
@@ -64,17 +65,17 @@ jobs:
         fetch-depth: 0
     - name: Pull Docker image
       run: sudo docker pull epitechcontent/epitest-docker
-    - name: compile code
+    - name: Compile code
       run: |
         make || \
         curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
-        exit 1"
-    - name: clean code
+        exit 1
+    - name: Clean code
       run: |
         make clean || \
         curl -H "Title: clean failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The clean failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}} ; \
-        exit 1"
-    - name: check if present and executable
+        exit 1
+    - name: Check if present and executable
       run: |
         IFS=',' read -ra VARS <<< "${EXECUTABLES}"
         for EXE in $EXECUTABLES; do
@@ -82,6 +83,8 @@ jobs:
                 echo "::error file=$EXE,line=1,endLine=0,title='NOT FOUND' ::The file '$EXE' does not exist"
                 curl -H "Title: No binary found" -H "Priority: high" -H 'Tags: warning,skull' -d "'$EXE' not found or not executable for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
                 exit 1
+            else
+                echo "👍 $EXE is executable"
             fi
         done
 
