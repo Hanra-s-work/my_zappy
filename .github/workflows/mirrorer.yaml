@@ -27,11 +27,11 @@ jobs:
         fetch-depth: 0
     - name: getting the latest version of $CODING_STYLE_CONTAINER (coding-style)
       run: docker pull ghcr.io/epitech/coding-style-checker:latest
-    - name: run $CODING_STYLE_CONTAINER
+    - name: run ${{CODING_STYLE_CONTAINER}}
       run: |
         CODING_STYLE=coding_style_data
         mkdir -p $CODING_STYLE
-        docker run --rm -it -v "$(pwd)/src/server":/mnt/delivery -v "$(pwd)/$CODING_STYLE":/mnt/reports $CODING_STYLE_CONTAINER "/mnt/delivery" "/mnt/reports"
+        docker run --rm -i -v "$(pwd)/src/server":/mnt/delivery -v "$(pwd)/$CODING_STYLE":/mnt/reports $CODING_STYLE_CONTAINER "/mnt/delivery" "/mnt/reports"
     - name: checking the results
       run: |
         CONTENT="$(cat coding_style_data/coding-style-reports.log)"
