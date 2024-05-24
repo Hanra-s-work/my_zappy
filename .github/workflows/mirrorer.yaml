@@ -1,4 +1,4 @@
-name: mirrorer
+name: my_mirrorer
 
 on:
   push:
