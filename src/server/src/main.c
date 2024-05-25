@@ -8,7 +8,8 @@
 #include "src.h"
 
 /**
- * @brief This is the function the compiler calls to successfully compile the program
+ * @brief This is the function the compiler calls to successfully
+ * compile the program
  *
  * @param argc
  * @param argv

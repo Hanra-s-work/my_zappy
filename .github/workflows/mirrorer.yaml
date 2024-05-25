@@ -1,4 +1,4 @@
-name: CodeTester
+name: code_checker_and_mirrorer
 
 on:
   push:
@@ -49,6 +49,7 @@ jobs:
             ILLEGAL_FILES_FOUND=1
         done <<<"$CONTENT"
         if [ $ILLEGAL_FILES_FOUND -eq 1 ]; then
+            curl -H "Title: Coding style errors" -H "Priority: medium" -H 'Tags: warning' -d "The coding style reported errors for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
         else
             exit 0
