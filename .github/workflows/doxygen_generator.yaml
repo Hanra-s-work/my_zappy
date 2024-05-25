@@ -1,0 +1,124 @@
+name: doxygen_generator
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# The environment variables used for generation and upload
+env:
+    DOXYGEN_VERSION: 1.8.20
+    DOCKER_NAME: hanralatalliard/doxygen
+    DOXYFILE: bonus/doxygen_docker/Doxyfile
+    OUTPUT_GENERATION: documentation
+    HTML_GENERATION: html
+    NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
+    NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+    CACHE_KEY: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)
+
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# The jobs in charge of building everything
+jobs:
+    build_doxygen:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+        - name: Build doxygen docker
+          run: |
+            docker pull ${{env.DOCKER_NAME}}
+        - name: Create required folders
+          run: |
+            mkdir -p ${{env.OUTPUT_GENERATION}} ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
+        - name: Create dummy page for html renders
+          run: |
+            HTML_CONTENT='<!DOCTYPE html><html lang="en"><head>'
+            HTML_CONTENT+=" <meta charset='UTF-8'>"
+            HTML_CONTENT+=" <meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+            HTML_CONTENT+=" <title>Dummy Page</title>"
+            HTML_CONTENT+=" <style>"
+            HTML_CONTENT+="   body {font-family: Arial, sans-serif;background-color: #f8f9fa;color: #333;margin: 0;padding: 0;display: flex;justify-content: center;align-items: center;height: 100vh;}"
+            HTML_CONTENT+="   .container {text-align: center;padding: 20px;background: #fff;border: 1px solid #ddd;border-radius: 8px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);}"
+            HTML_CONTENT+="   h1 {color: #007bff;}"
+            HTML_CONTENT+="   p {font-size: 1.1em;}"
+            HTML_CONTENT+="   a {color: #007bff;text-decoration: none;}"
+            HTML_CONTENT+="   a:hover {text-decoration: underline;}"
+            HTML_CONTENT+=" </style>"
+            HTML_CONTENT+="</head><body>"
+            HTML_CONTENT+="<body>"
+            HTML_CONTENT+=" <div class='container'>"
+            HTML_CONTENT+="   <h1>Welcome to the Dummy Documentation</h1>"
+            HTML_CONTENT+="   <p>This is a placeholder page for generated documentation.<br>If you see this is that the doxyfile in the action did not generate html content (or generated it in the wrong place)</p>"
+            HTML_CONTENT+="   <p>To learn more, visit <a href="https://www.doxygen.org/">Doxygen</a>.</p>"
+            HTML_CONTENT+=" </div>"
+            HTML_CONTENT+="</body></html>"
+            echo -e "$HTML_CONTENT" > ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}/index.html
+        - name: Run doxygen docker
+          run: |
+            RUN_COMMAND="cd /app && doxygen ${{env.OUTPUT_GENERATION}} ; exit $?"
+            docker run -i -v "$(pwd)":"/app" -v "$(pwd)/${{env.OUTPUT_GENERATION}}":"/${{env.OUTPUT_GENERATION}}" ${{env.DOCKER_NAME}} /bin/bash -c "$RUN_COMMAND"
+            if [ $? -ne 0 ]
+            then
+              curl -H "Title: Build failed" -H "Priority: medium" -H 'Tags: warning' -d "The documentation generation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
+        - name: Save cache
+          id: cache-save
+          uses: actions/cache@v4
+          with:
+            path: ${{env.OUTPUT_GENERATION}}
+            key: ${{env.CACHE_KEY}}
+
+    export_html_if_present:
+      # environment variables that are for the github pages
+      environment:
+        name: github-pages
+        url: ${{ steps.deployment.outputs.page_url }}
+      # The system on which we are running the actions
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+
+        - name: Get generated documentation
+          id: html-cache-restore
+          uses: actions/cache@v4
+          with:
+            path: ${{ env.OUTPUT_GENERATION }}
+            key: ${{ env.CACHE_KEY }}
+            restore-keys: |
+              doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+
+        - name: Setup Pages
+          uses: actions/configure-pages@v5
+
+        - name: Upload artifact
+          uses: actions/upload-pages-artifact@v3
+          with:
+            # Upload selected content
+            path: ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
+
+        - name: Deploy to GitHub Pages
+          id: deployment
+          uses: actions/deploy-pages@v4
