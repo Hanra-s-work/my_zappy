@@ -25,7 +25,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: Getting the latest version of ${{env.CODING_STYLE_CONTAINER}} (coding-style)
+    - name: Getting the latest version of (coding-style) ${{env.CODING_STYLE_CONTAINER}}
       run: docker pull ghcr.io/epitech/coding-style-checker:latest
     - name: Run ${{env.CODING_STYLE_CONTAINER}}
       run: |
