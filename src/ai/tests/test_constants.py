@@ -4,12 +4,14 @@
 # File description:
 # test_constants.py
 ##
+"""! @brief Example program for running unit tests variables """
 
+# Imports
 import unittest
 
 
 class CI:
-    """ Just a dummy class with data """
+    """! Just a dummy class with data """
     ERR = 84
     ERROR = ERR
     SUCCESS = 0
@@ -32,20 +34,25 @@ class CI:
     }
 
 
+# Initialisation of the dummy class CI
 C = CI()
 
 
 class TestConstants(unittest.TestCase):
-    """ Test the constants """
+    """! Test the constants from the dummy class CI """
 
     def test_status_codes(self) -> None:
-        """ Check the status codes """
+        """! Check the status codes 
+        @param self The self function of the program
+        """
         self.assertEqual(C.ERR, 84)
         self.assertEqual(C.ERROR, C.ERR)
         self.assertEqual(C.SUCCESS, 0)
 
     def test_colour_codes(self) -> None:
-        """ Check the colour codes """
+        """! Check the colour codes 
+        @param self The self function of the program
+        """
         expected_colours = {
             "default": "0A",
             "prompt": "0B",
