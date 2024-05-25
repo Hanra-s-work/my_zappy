@@ -3,10 +3,11 @@ name: doxygen_generator
 on:
   push:
     branches:
-      - master
+      - main
+      - doxygen_generation
   pull_request:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 
@@ -134,3 +135,16 @@ jobs:
           uses: actions/checkout@v4
           with:
             fetch-depth: 0
+
+        - name: Get generated documentation
+          id: html-cache-restore
+          uses: actions/cache@v4
+          with:
+            path: ${{ env.OUTPUT_GENERATION }}
+            key: ${{ env.CACHE_KEY }}
+            restore-keys: |
+              doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+
+        - name: List directory content
+          run: |
+            ls -a
