@@ -172,6 +172,9 @@ clean_coverage:
 	$(SILENT) rm -rf .coverage
 	@echo -e "$(C_GREEN)Coverage cleaned$(C_RESET)"
 
+# Proceed to removing the python environement
+fclean_env: clean_env
+
 # Proceed to a full environement wipe (
 #	ex: usefull when changing python version
 # )
@@ -254,4 +257,4 @@ run: clean install_dependencies
 .PHONY: all create_environement install_dependencies activate_environement \
 		activate build_binary update_binary_location clean clean_env \
 		clean_coverage fclean tests_run coverage debug re noop silent run \
-		my_all
+		my_all fclean_env
