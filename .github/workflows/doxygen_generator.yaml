@@ -659,4 +659,17 @@ jobs:
     steps:
       - name: Delete Created cache
         run: |
-          rm -rf ${{env.CACHE_KEY}} ${{env.LINUX_CACHE_KEY_BUILD}} ${{env.MAC_MONE_CACHE_KEY_BUILD}} ${{env.MAC_INTEL_CACHE_KEY_BUILD}}
+          CACHES=$(gh cache list)
+          echo "$CACHES" | while read -r line; do
+            CACHE_ID=$(echo "$line" | awk '{print $1}')
+  
+            if [[ -n "$CACHE_ID" && "$CACHE_ID" =~ ^[0-9]+$ ]]; then
+              echo "Removing cache: $CACHE_ID"
+              gh cache delete "$CACHE_ID"
+              if [ $? -eq 0 ]; then
+                echo "Removed cache: $CACHE_ID"
+              else
+                echo "Failed to remove cache: $CACHE_ID"
+              fi
+            fi
+          done
