@@ -639,21 +639,40 @@ jobs:
         run: |
           TAG_NAME="$(cat ${{env.TAG_FILE}})"
           COMMIT_TITLE=$(git tag -l --format='%(subject)' $TAG_NAME)
+          if [ $COMMIT_TITLE == "" ]
+          then
+            COMMIT_TITLE="There is no title"
+          fi
           echo "Commit title: $COMMIT_TITLE"
           echo "COMMIT_TITLE=$COMMIT_TITLE" >> $GITHUB_ENV
 
       - name: Extract Tag Info
         id: extract_tag_info
         run: |
-          TAG_NAME="$(cat ${{env.TAG_FILE}})"
+          if [ ! -e ${{env.TAG_FILE}} ]
+          then
+            echo "Tag name not found"
+            TAG_NAME="v0.0.0"
+          else
+            TAG_NAME="$(cat ${{env.TAG_FILE}})"
+          fi
+          echo "TAG NAME content = $TAG_NAME"
           COMMIT_MESSAGE=$(git tag -l --format='%(contents)' $TAG_NAME)
+          echo "Commit message content = $COMMIT_MESSAGE"
           if [[ -n "$COMMIT_MESSAGE" ]]; then
-            echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          COMMIT_MESSAGE=$COMMIT_MESSAGE
           else
             COMMIT_TITLE=$(git log --format=%s -n 1)
-            echo "COMMIT_MESSAGE=$COMMIT_TITLE" >> $GITHUB_ENV
+            COMMIT_MESSAGE=$COMMIT_TITLE
           fi
-          echo "COMMIT_MESSAGE=\"${COMMIT_MESSAGE}\n$(cat ./README.md)\"" >> $GITHUB_ENV
+          if [ $COMMIT_MESSAGE == "" ]
+          then
+            COMMIT_MESSAGE='There is no message'
+          else
+            COMMIT_MESSAGE="${COMMIT_MESSAGE}\n$(cat ./README.md)"
+          fi
+          echo "Commit message final content = $COMMIT_MESSAGE"
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
