@@ -242,6 +242,10 @@ jobs:
                   echo "$LEXE" >> ${{env.LINUX_BINARIES_FILE_STORER}}
               fi
           done
+      
+      - name: listing created binaries
+        run: |
+          ls
 
       - name: Save cache
         id: cache-save
@@ -347,6 +351,9 @@ jobs:
                   echo "$MEXE" >> ${{env.MAC_MONE_BINARIES_FILE_STORER}}
               fi
           done
+      - name: listing created binaries
+        run: |
+          ls
 
       - name: Save cache
         id: cache-save
@@ -452,6 +459,9 @@ jobs:
                   echo "$MEXE" >> ${{env.MAC_INTEL_BINARIES_FILE_STORER}}
               fi
           done
+      - name: listing created binaries
+        run: |
+          ls
 
       - name: Save cache
         id: cache-save
@@ -629,3 +639,11 @@ jobs:
           body: ${{ env.COMMIT_MESSAGE }}
           draft: false
           prerelease: false
+
+  clean_created_cache:
+    runs-on: ubuntu-latest
+    needs: [export_other_formats_when_present, publish_html ]
+    steps:
+      - name: Delete Created cache
+        run: |
+          rm -rf ${{env.CACHE_KEY}} ${{env.LINUX_CACHE_KEY_BUILD}} ${{env.MAC_MONE_CACHE_KEY_BUILD}} ${{env.MAC_INTEL_CACHE_KEY_BUILD}}
