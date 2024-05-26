@@ -237,7 +237,8 @@ jobs:
       
       - name: listing created binaries
         run: |
-          ls
+          ls -a
+          ls -a ${{env.LINUX_BINARY_FOLDER}}
 
       - name: Save cache
         id: cache-save
@@ -350,7 +351,8 @@ jobs:
           done
       - name: listing created binaries
         run: |
-          ls
+          ls -a
+          ls -a ${{env.MAC_MONE_BINARY_FOLDER}}
 
       - name: Save cache
         id: cache-save
@@ -462,7 +464,8 @@ jobs:
           done
       - name: listing created binaries
         run: |
-          ls
+          ls -a
+          ls -a ${{env.MAC_INTEL_BINARY_FOLDER}}
 
       - name: Save cache
         id: cache-save
@@ -471,7 +474,7 @@ jobs:
           key: ${{env.MAC_INTEL_CACHE_KEY_BUILD}}
           enableCrossOsArchive: true
           path: |
-            ${{env.MAC_MONE_BINARY_FOLDER}}
+            ${{env.MAC_INTEL_BINARY_FOLDER}}
 
   export_other_formats_when_present:
     runs-on: ubuntu-latest
