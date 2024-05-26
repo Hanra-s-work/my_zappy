@@ -34,10 +34,10 @@ env:
   DOXYFILE: bonus/doxygen_docker/Doxyfile
   CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
   NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-  CACHE_KEY: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)
-  LINUX_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-linux
-  MAC_MONE_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-mone
-  MAC_INTEL_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-intel
+  CACHE_KEY: doxygen-cache-key
+  LINUX_CACHE_KEY_BUILD: linux-cache-key
+  MAC_MONE_CACHE_KEY_BUILD: mac-mone-cache-key
+  MAC_INTEL_CACHE_KEY_BUILD: mac-intel-cache-key
   EXECUTABLES: "./zappy_ai ./zappy_gui ./zappy_server"
   EXECUTABLES_LINUX: "./zappy_linux_ai ./zappy_linux_gui ./zappy_linux_server"
   EXECUTABLES_MAC_INTEL: "./zappy_mac_intel_ai ./zappy_mac_intel_gui ./zappy_mac_intel_server"
@@ -52,8 +52,27 @@ concurrency:
 
 # The jobs in charge of building everything
 jobs:
+  generate_hashes:
+    runs-on: ubuntu-latest
+    steps:
+      # CACHE_KEY: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)
+  # LINUX_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-linux
+  # MAC_MONE_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-mone
+  # MAC_INTEL_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-intel
+  
+      - name: Generate cache key for doxygen
+        run: echo "CACHE_KEY=doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)" >> $GITHUB_ENV
+      - name: Generate cache key for linux build
+        run: echo "LINUX_CACHE_KEY_BUILD=doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-linux" >> $GITHUB_ENV
+      - name: Generate cache key for mac apple silicon chips
+        run: echo "MAC_MONE_CACHE_KEY_BUILD=doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-mone" >> $GITHUB_ENV
+      - name: Generate cache key for mac intel chips
+        run: echo "MAC_INTEL_CACHE_KEY_BUILD=doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-intel" >> $GITHUB_ENV
+  
   check_coding_style:
     runs-on: ubuntu-latest
+    needs: generate_hashes
+    if: success()
     steps:
     - uses: actions/checkout@v4
       with:
