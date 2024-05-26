@@ -2,6 +2,8 @@ name: doxygen_generator
 
 on:
   push:
+    tags:
+      - "v*.*.*"
     branches:
       # - main
       - doxygen_generation
@@ -241,11 +243,16 @@ jobs:
           fetch-depth: 0
       - name: Install Xcode Command Line Tools (for c and cpp)
         run: |
-          xcode-select --install
-          if [ $? -ne 0 ]
-          then
-            curl -H "Title: xcode installation failed" -H "Priority: default" -H 'Tags: warning,apple,arrow_down_small' -d "The xcode installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
-            exit 1
+          xcode-select --print-path
+          if [ $? -eq 0 ]; then
+            echo "Command line tools are already installed."
+          else
+            # Install command line tools
+            xcode-select --install
+            if [ $? -ne 0 ]; then
+              curl -H "Title: xcode installation failed" -H "Priority: default" -H 'Tags: warning,apple,arrow_down_small' -d "The xcode installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
           fi
       - name: Install SFML and CSFML via Homebrew
         run: |
@@ -332,11 +339,16 @@ jobs:
           fetch-depth: 0
       - name: Install Xcode Command Line Tools (for c and cpp)
         run: |
-          xcode-select --install
-          if [ $? -ne 0 ]
-          then
-            curl -H "Title: xcode installation failed" -H "Priority: default" -H 'Tags: warning,apple,arrow_down_small' -d "The xcode installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
-            exit 1
+          xcode-select --print-path
+          if [ $? -eq 0 ]; then
+            echo "Command line tools are already installed."
+          else
+            # Install command line tools
+            xcode-select --install
+            if [ $? -ne 0 ]; then
+              curl -H "Title: xcode installation failed" -H "Priority: default" -H 'Tags: warning,apple,arrow_down_small' -d "The xcode installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
           fi
       - name: Install SFML and CSFML via Homebrew
         run: |
@@ -494,6 +506,6 @@ jobs:
             ./mac_intel_binaries
             ./mac_apple_chip_binaries
           name: ${{ env.COMMIT_TITLE }}
-          body: "$(cat ./README.md)"
+          body: ${{ env.COMMIT_MESSAGE }}
           draft: false
           prerelease: false
