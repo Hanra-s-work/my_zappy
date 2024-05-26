@@ -288,9 +288,18 @@ jobs:
             curl -H "Title: Env removal failed" -H "Priority: default" -H 'Tags: warning,apple,snake,new' -d "The environement creation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
           fi
+      - name: Delete existing compilation
+        run: |
+          make fclean
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Clean failed" -H "Priority: high" -H 'Tags: warning' -d "The cleaning of existing compilations failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+          
       - name: Compile code
         run: |
-          make fclean && make && make clean
+          make && make clean
           if [ $? -ne 0 ]
           then
             curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
@@ -384,9 +393,18 @@ jobs:
             curl -H "Title: Env removal failed" -H "Priority: default" -H 'Tags: warning,apple,snake,new' -d "The environement creation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
           fi
+      - name: Delete existing compilation
+        run: |
+          make fclean
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Clean failed" -H "Priority: high" -H 'Tags: warning' -d "The cleaning of existing compilations failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+          
       - name: Compile code
         run: |
-          make fclean && make && make clean
+          make && make clean
           if [ $? -ne 0 ]
           then
             curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
