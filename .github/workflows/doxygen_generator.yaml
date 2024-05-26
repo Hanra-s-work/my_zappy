@@ -644,10 +644,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ./doxygen_documentation
-            ./linux_binaries
-            ./mac_intel_binaries
-            ./mac_apple_chip_binaries
+            ${{env.OUTPUT_GENERATION}}
+            ${{env.LINUX_BINARY_FOLDER}}
+            ${{env.MAC_INTEL_BINARY_FOLDER}}
+            ${{env.MAC_MONE_BINARY_FOLDER}}
           name: ${{ env.COMMIT_TITLE }}
           body: ${{ env.COMMIT_MESSAGE }}
           draft: false
