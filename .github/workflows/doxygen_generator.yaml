@@ -42,6 +42,9 @@ env:
   EXECUTABLES_LINUX: "./zappy_linux_ai ./zappy_linux_gui ./zappy_linux_server"
   EXECUTABLES_MAC_INTEL: "./zappy_mac_intel_ai ./zappy_mac_intel_gui ./zappy_mac_intel_server"
   EXECUTABLES_MAC_MONE: "./zappy_mac_apple_chip_ai ./zappy_mac_apple_chip_gui ./zappy_mac_apple_chip_server"
+  LINUX_BINARY_FOLDER: "./linux_binaries"
+  MAC_MONE_BINARY_FOLDER: "./mac_mone_binaries"
+  MAC_INTEL_BINARY_FOLDER: "./mac_intel_binaries"
 
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
@@ -230,6 +233,9 @@ jobs:
               exit 1
           fi
 
+          BIN_FOLD=${{env.LINUX_BINARY_FOLDER}}
+          mkdir -p $BIN_FOLD
+
           for i in "${!EXE_ARRAY[@]}"; do
               EXE="${EXE_ARRAY[$i]}"
               LEXE="${LINUX_EXE_ARRAY[$i]}"
@@ -238,8 +244,8 @@ jobs:
                   echo "::error file=$EXE,line=1,endLine=0,title='NOT FOUND' ::The file '$EXE' does not exist"
                   exit 1
               else
-                  mv $EXE $LEXE
-                  echo "$LEXE" >> ${{env.LINUX_BINARIES_FILE_STORER}}
+                  mv $EXE $BIN_FOLD/$LEXE
+                  echo "$BIN_FOLD/$LEXE" >> ${{env.LINUX_BINARIES_FILE_STORER}}
               fi
           done
       
@@ -252,7 +258,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            $(cat ${{env.LINUX_BINARIES_FILE_STORER}})
+            ${{env.LINUX_BINARY_FOLDER}}
           key: ${{env.LINUX_CACHE_KEY_BUILD}}
   
   build_project_mac_apple_chip:
@@ -261,6 +267,7 @@ jobs:
     if: success()
     env:
       MAC_MONE_BINARIES_FILE_STORER: "cache_paths.txt"
+      MAC_BINARY_FOLDER: mac_bin
       MAC_PYTHON_VERSION: 3.11
     steps:
       - name: Checkout code
@@ -339,6 +346,9 @@ jobs:
               exit 1
           fi
 
+          BIN_FOLD=${{env.MAC_MONE_BINARY_FOLDER}}
+          mkdir -p $BIN_FOLD
+
           for i in "${!EXE_ARRAY[@]}"; do
               EXE="${EXE_ARRAY[$i]}"
               MEXE="${MAC_MONE_EXE_ARRAY[$i]}"
@@ -347,8 +357,8 @@ jobs:
                   echo "::error file=$EXE,line=1,endLine=0,title='NOT FOUND' ::The file '$EXE' does not exist"
                   exit 1
               else
-                  mv $EXE $MEXE
-                  echo "$MEXE" >> ${{env.MAC_MONE_BINARIES_FILE_STORER}}
+                  mv $EXE $BIN_FOLD/$MEXE
+                  echo "$BIN_FOLD/$MEXE" >> ${{env.MAC_MONE_BINARIES_FILE_STORER}}
               fi
           done
       - name: listing created binaries
@@ -360,7 +370,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            $(cat ${{env.MAC_MONE_BINARIES_FILE_STORER}})
+            ${{env.MAC_MONE_BINARY_FOLDER}}
           key: ${{env.MAC_MONE_CACHE_KEY_BUILD}}
 
   build_project_mac_intel_chip:
@@ -447,6 +457,9 @@ jobs:
               exit 1
           fi
 
+          BIN_FOLD=${{env.MAC_INTEL_BINARY_FOLDER}}
+          mkdir -p $BIN_FOLD
+
           for i in "${!EXE_ARRAY[@]}"; do
               EXE="${EXE_ARRAY[$i]}"
               MEXE="${EXECUTABLES_MAC_INTEL[$i]}"
@@ -455,8 +468,8 @@ jobs:
                   echo "::error file=$EXE,line=1,endLine=0,title='NOT FOUND' ::The file '$EXE' does not exist"
                   exit 1
               else
-                  mv $EXE $MEXE
-                  echo "$MEXE" >> ${{env.MAC_INTEL_BINARIES_FILE_STORER}}
+                  mv $EXE $BIN_FOLD/$MEXE
+                  echo "$BIN_FOLD/$MEXE" >> ${{env.MAC_INTEL_BINARIES_FILE_STORER}}
               fi
           done
       - name: listing created binaries
@@ -468,7 +481,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            $(cat ${{env.MAC_INTEL_BINARIES_FILE_STORER}})
+            ${{env.MAC_MONE_BINARY_FOLDER}}
           key: ${{env.MAC_INTEL_CACHE_KEY_BUILD}}
 
   export_other_formats_when_present:
