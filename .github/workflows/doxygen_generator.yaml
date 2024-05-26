@@ -3,11 +3,11 @@ name: doxygen_generator
 on:
   push:
     branches:
-      - main
+      # - main
       - doxygen_generation
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 
@@ -19,14 +19,24 @@ permissions:
 
 # The environment variables used for generation and upload
 env:
-    DOXYGEN_VERSION: 1.8.20
-    DOCKER_NAME: hanralatalliard/doxygen
-    DOXYFILE: bonus/doxygen_docker/Doxyfile
-    OUTPUT_GENERATION: documentation
-    HTML_GENERATION: html
-    NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
-    NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-    CACHE_KEY: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)
+  HTML_GENERATION: html
+  DOXYGEN_VERSION: 1.8.20
+  NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
+  OUTPUT_GENERATION: documentation
+  COMMIT_TITLE: "There is no title"
+  COMMIT_MESSAGE: "There is no message"
+  DOCKER_NAME: hanralatalliard/doxygen
+  DOXYFILE: bonus/doxygen_docker/Doxyfile
+  CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
+  NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+  CACHE_KEY: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)
+  LINUX_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-linux
+  MAC_MONE_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-mone
+  MAC_INTEL_CACHE_KEY_BUILD: doxygen-${GITHUB_REPOSITORY}-${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}-$(openssl rand -hex 12)-mac-intel
+  EXECUTABLES: "./zappy_ai ./zappy_gui ./zappy_server"
+  EXECUTABLES_LINUX: "./zappy_linux_ai ./zappy_linux_gui ./zappy_linux_server"
+  EXECUTABLES_MAC_INTEL: "./zappy_mac_intel_ai ./zappy_mac_intel_gui ./zappy_mac_intel_server"
+  EXECUTABLES_MAC_MONE: "./zappy_mac_apple_chip_ai ./zappy_mac_apple_chip_gui ./zappy_mac_apple_chip_server"
 
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
@@ -37,114 +47,453 @@ concurrency:
 
 # The jobs in charge of building everything
 jobs:
-    build_doxygen:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-        - name: Build doxygen docker
-          run: |
-            docker pull ${{env.DOCKER_NAME}}
-        - name: Create required folders
-          run: |
-            mkdir -p ${{env.OUTPUT_GENERATION}} ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
-        - name: Create dummy page for html renders
-          run: |
-            HTML_CONTENT='<!DOCTYPE html><html lang="en"><head>'
-            HTML_CONTENT+=" <meta charset='UTF-8'>"
-            HTML_CONTENT+=" <meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-            HTML_CONTENT+=" <title>Dummy Page</title>"
-            HTML_CONTENT+=" <style>"
-            HTML_CONTENT+="   body {font-family: Arial, sans-serif;background-color: #f8f9fa;color: #333;margin: 0;padding: 0;display: flex;justify-content: center;align-items: center;height: 100vh;}"
-            HTML_CONTENT+="   .container {text-align: center;padding: 20px;background: #fff;border: 1px solid #ddd;border-radius: 8px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);}"
-            HTML_CONTENT+="   h1 {color: #007bff;}"
-            HTML_CONTENT+="   p {font-size: 1.1em;}"
-            HTML_CONTENT+="   a {color: #007bff;text-decoration: none;}"
-            HTML_CONTENT+="   a:hover {text-decoration: underline;}"
-            HTML_CONTENT+=" </style>"
-            HTML_CONTENT+="</head><body>"
-            HTML_CONTENT+="<body>"
-            HTML_CONTENT+=" <div class='container'>"
-            HTML_CONTENT+="   <h1>Welcome to the Dummy Documentation</h1>"
-            HTML_CONTENT+="   <p>This is a placeholder page for generated documentation.<br>If you see this is that the doxyfile in the action did not generate html content (or generated it in the wrong place)</p>"
-            HTML_CONTENT+="   <p>To learn more, visit <a href="https://www.doxygen.org/">Doxygen</a>.</p>"
-            HTML_CONTENT+=" </div>"
-            HTML_CONTENT+="</body></html>"
-            echo -e "$HTML_CONTENT" > ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}/index.html
-        - name: Run doxygen docker
-          run: |
-            RUN_COMMAND="cd /app && doxygen ${{env.OUTPUT_GENERATION}} ; exit $?"
-            docker run -i -v "$(pwd)":"/app" -v "$(pwd)/${{env.OUTPUT_GENERATION}}":"/${{env.OUTPUT_GENERATION}}" ${{env.DOCKER_NAME}} /bin/bash -c "$RUN_COMMAND"
-            if [ $? -ne 0 ]
-            then
-              curl -H "Title: Build failed" -H "Priority: medium" -H 'Tags: warning' -d "The documentation generation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+  check_coding_style:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Getting the latest version of (coding-style) ${{env.CODING_STYLE_CONTAINER}}
+      run: docker pull ghcr.io/epitech/coding-style-checker:latest
+    - name: Run ${{env.CODING_STYLE_CONTAINER}}
+      run: |
+        CODING_STYLE=coding_style_data
+        mkdir -p $CODING_STYLE
+        docker run --rm -i -v "$(pwd)/src/server":/mnt/delivery -v "$(pwd)/$CODING_STYLE":/mnt/reports $CODING_STYLE_CONTAINER "/mnt/delivery" "/mnt/reports"
+    - name: Checking the results
+      run: |
+        CONTENT="$(cat coding_style_data/coding-style-reports.log)"
+        ILLEGAL_FILES_FOUND=0
+        if [ "$CONTENT" == "" ]; then
+            echo "No errors were found"
+            exit 0
+        fi
+        while IFS= read -r LINE; do
+            FILE=$(echo $LINE | cut -d ':' -f 1)
+            LINE_NUMBER=$(echo $LINE | cut -d ':' -f 2)
+            LEVEL=$(echo $LINE | cut -d ':' -f 3 | cut -d ' ' -f 2)
+            ERROR_CODE=$(echo $LINE | cut -d ':' -f 4)
+            echo "::error file=$FILE,line=$LINE_NUMBER,endLine=0,title=$LEVEL coding style error::$ERROR_CODE"
+            ILLEGAL_FILES_FOUND=1
+        done <<<"$CONTENT"
+        if [ $ILLEGAL_FILES_FOUND -eq 1 ]; then
+            curl -H "Title: Coding style errors" -H "Priority: default" -H 'Tags: warning' -d "The coding style reported errors for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+        else
+            exit 0
+        fi
+
+  build_doxygen:
+    runs-on: ubuntu-latest
+    needs: check_coding_style
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build doxygen docker
+        run: |
+          docker pull ${{env.DOCKER_NAME}}
+      - name: Create required folders
+        run: |
+          mkdir -p ${{env.OUTPUT_GENERATION}} ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
+      - name: Create dummy page for html renders
+        run: |
+          HTML_CONTENT='<!DOCTYPE html><html lang="en"><head>'
+          HTML_CONTENT+=" <meta charset='UTF-8'>"
+          HTML_CONTENT+=" <meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+          HTML_CONTENT+=" <title>Dummy Page</title>"
+          HTML_CONTENT+=" <style>"
+          HTML_CONTENT+="   body {font-family: Arial, sans-serif;background-color: #f8f9fa;color: #333;margin: 0;padding: 0;display: flex;justify-content: center;align-items: center;height: 100vh;}"
+          HTML_CONTENT+="   .container {text-align: center;padding: 20px;background: #fff;border: 1px solid #ddd;border-radius: 8px;box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);}"
+          HTML_CONTENT+="   h1 {color: #007bff;}"
+          HTML_CONTENT+="   p {font-size: 1.1em;}"
+          HTML_CONTENT+="   a {color: #007bff;text-decoration: none;}"
+          HTML_CONTENT+="   a:hover {text-decoration: underline;}"
+          HTML_CONTENT+=" </style>"
+          HTML_CONTENT+="</head><body>"
+          HTML_CONTENT+="<body>"
+          HTML_CONTENT+=" <div class='container'>"
+          HTML_CONTENT+="   <h1>Welcome to the Dummy Documentation</h1>"
+          HTML_CONTENT+="   <p>This is a placeholder page for generated documentation.<br>If you see this is that the doxyfile in the action did not generate html content (or generated it in the wrong place)</p>"
+          HTML_CONTENT+="   <p>To learn more, visit <a href="https://www.doxygen.org/">Doxygen</a>.</p>"
+          HTML_CONTENT+=" </div>"
+          HTML_CONTENT+="</body></html>"
+          echo -e "$HTML_CONTENT" > ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}/index.html
+      - name: Run doxygen docker
+        run: |
+          RUN_COMMAND="cd /app && doxygen ${{env.OUTPUT_GENERATION}} ; exit $?"
+          docker run -i -v "$(pwd)":"/app" -v "$(pwd)/${{env.OUTPUT_GENERATION}}":"/${{env.OUTPUT_GENERATION}}" ${{env.DOCKER_NAME}} /bin/bash -c "$RUN_COMMAND"
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Build failed" -H "Priority: default" -H 'Tags: warning' -d "The documentation generation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Save cache
+        id: cache-save
+        uses: actions/cache@v4
+        with:
+          path: ${{env.OUTPUT_GENERATION}}
+          key: ${{env.CACHE_KEY}}
+
+  publish_html:
+    # environment variables that are for the github pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # The system on which we are running the actions
+    runs-on: ubuntu-latest
+    needs: build_doxygen
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get generated documentation
+        id: html-cache-restore
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.OUTPUT_GENERATION }}
+          key: ${{ env.CACHE_KEY }}
+          restore-keys: |
+            doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload selected content
+          path: ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  build_project_linux:
+    runs-on: ubuntu-latest
+    needs: check_coding_style
+    if: success()
+    env:
+      LINUX_BINARIES_FILE_STORER: "cache_paths.txt"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Pull Docker image
+        run: docker pull epitechcontent/epitest-docker
+      - name: Compile code
+        run: |
+          docker run -v "$(pwd)":"/home/" -i epitechcontent/epitest-docker /bin/bash -c "cd /home && make && make clean"
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning,skull' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+
+      - name: Rename binaries
+        run: |
+          IFS=' ' read -r -a EXE_ARRAY <<<"${{env.EXECUTABLES}}"
+          IFS=' ' read -r -a LINUX_EXE_ARRAY <<<"${{env.EXECUTABLES_LINUX}}"
+
+          if [ ${#EXE_ARRAY[@]} -ne ${#LINUX_EXE_ARRAY[@]} ]; then
+              echo "::error ::Mismatch between the number of executables in EXECUTABLES and EXECUTABLES_LINUX"
               exit 1
-            fi
-        - name: Save cache
-          id: cache-save
-          uses: actions/cache@v4
-          with:
-            path: ${{env.OUTPUT_GENERATION}}
-            key: ${{env.CACHE_KEY}}
+          fi
 
-    export_html_if_present:
-      # environment variables that are for the github pages
-      environment:
-        name: github-pages
-        url: ${{ steps.deployment.outputs.page_url }}
-      # The system on which we are running the actions
-      runs-on: ubuntu-latest
-      needs: build_doxygen
-      if: success()
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
+          for i in "${!EXE_ARRAY[@]}"; do
+              EXE="${EXE_ARRAY[$i]}"
+              LEXE="${LINUX_EXE_ARRAY[$i]}"
 
-        - name: Get generated documentation
-          id: html-cache-restore
-          uses: actions/cache@v4
-          with:
-            path: ${{ env.OUTPUT_GENERATION }}
-            key: ${{ env.CACHE_KEY }}
-            restore-keys: |
-              doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+              if [ ! -e "$EXE" ]; then
+                  echo "::error file=$EXE,line=1,endLine=0,title='NOT FOUND' ::The file '$EXE' does not exist"
+                  exit 1
+              else
+                  mv $EXE $LEXE
+                  echo "$LEXE" >> ${{env.LINUX_BINARIES_FILE_STORER}}
+              fi
+          done
 
-        - name: Setup Pages
-          uses: actions/configure-pages@v5
+      - name: Save cache
+        id: cache-save
+        uses: actions/cache@v4
+        with:
+          path: |
+            $(cat ${{env.LINUX_BINARIES_FILE_STORER}})
+          key: ${{env.LINUX_CACHE_KEY_BUILD}}
+  
+  build_project_mac_apple_chip:
+    runs-on: macos-latest
+    needs: check_coding_style
+    if: success()
+    env:
+      MAC_MONE_BINARIES_FILE_STORER: "cache_paths.txt"
+      MAC_PYTHON_VERSION: 3.11
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Xcode Command Line Tools (for c and cpp)
+        run: |
+          xcode-select --install
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: xcode installation failed" -H "Priority: default" -H 'Tags: warning,apple,arrow_down_small' -d "The xcode installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Install SFML and CSFML via Homebrew
+        run: |
+          brew install sfml csfml
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: SFML and CSFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The sfml and csfml installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Install python ${{env.MAC_PYTHON_VERSION}}
+        run: |
+          brew install python@${{env.MAC_PYTHON_VERSION}} python-tk@${{env.MAC_PYTHON_VERSION}}
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Python installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,snake,arrow_down_small' -d "The python installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Re-create the python environement
+        run: |
+          cd src/ai
+          make noisy fclean_env
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Env removal failed" -H "Priority: default" -H 'Tags: warning,apple,snake,wastebasket' -d "The environement removal failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+          make noisy create_environement install_dependencies
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Env removal failed" -H "Priority: default" -H 'Tags: warning,apple,snake,new' -d "The environement creation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Compile code
+        run: |
+          make fclean && make && make clean
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
 
-        - name: Upload artifact
-          uses: actions/upload-pages-artifact@v3
-          with:
-            # Upload selected content
-            path: ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
+      - name: Rename binaries
+        run: |
+          IFS=' ' read -r -a EXE_ARRAY <<<"${{env.EXECUTABLES}}"
+          IFS=' ' read -r -a MAC_MONE_EXE_ARRAY <<<"${{env.EXECUTABLES_MAC_MONE}}"
 
-        - name: Deploy to GitHub Pages
-          id: deployment
-          uses: actions/deploy-pages@v4
+          if [ ${#EXE_ARRAY[@]} -ne ${#MAC_MONE_EXE_ARRAY[@]} ]; then
+              echo "::error ::Mismatch between the number of executables in EXECUTABLES and EXECUTABLES_MAC_MONE"
+              exit 1
+          fi
 
-    export_other_formats_when_present:
-      runs-on: ubuntu-latest
-      needs: build_doxygen
-      if: success()
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
+          for i in "${!EXE_ARRAY[@]}"; do
+              EXE="${EXE_ARRAY[$i]}"
+              MEXE="${MAC_MONE_EXE_ARRAY[$i]}"
 
-        - name: Get generated documentation
-          id: html-cache-restore
-          uses: actions/cache@v4
-          with:
-            path: ${{ env.OUTPUT_GENERATION }}
-            key: ${{ env.CACHE_KEY }}
-            restore-keys: |
-              doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+              if [ ! -e "$EXE" ]; then
+                  echo "::error file=$EXE,line=1,endLine=0,title='NOT FOUND' ::The file '$EXE' does not exist"
+                  exit 1
+              else
+                  mv $EXE $MEXE
+                  echo "$MEXE" >> ${{env.MAC_MONE_BINARIES_FILE_STORER}}
+              fi
+          done
 
-        - name: List directory content
-          run: |
-            ls -a
+      - name: Save cache
+        id: cache-save
+        uses: actions/cache@v4
+        with:
+          path: |
+            $(cat ${{env.MAC_MONE_BINARIES_FILE_STORER}})
+          key: ${{env.MAC_MONE_CACHE_KEY_BUILD}}
+
+  build_project_mac_intel_chip:
+    runs-on: macos-12
+    needs: check_coding_style
+    if: success()
+    env:
+      MAC_INTEL_BINARIES_FILE_STORER: "cache_paths.txt"
+      MAC_PYTHON_VERSION: 3.11
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Xcode Command Line Tools (for c and cpp)
+        run: |
+          xcode-select --install
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: xcode installation failed" -H "Priority: default" -H 'Tags: warning,apple,arrow_down_small' -d "The xcode installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Install SFML and CSFML via Homebrew
+        run: |
+          brew install sfml csfml
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: SFML and CSFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The sfml and csfml installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Install python ${{env.MAC_PYTHON_VERSION}}
+        run: |
+          brew install python@${{env.MAC_PYTHON_VERSION}} python-tk@${{env.MAC_PYTHON_VERSION}}
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Python installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,snake,arrow_down_small' -d "The python installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Re-create the python environement
+        run: |
+          cd src/ai
+          make noisy fclean_env
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Env removal failed" -H "Priority: default" -H 'Tags: warning,apple,snake,wastebasket' -d "The environement removal failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+          make noisy create_environement install_dependencies
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Env removal failed" -H "Priority: default" -H 'Tags: warning,apple,snake,new' -d "The environement creation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+      - name: Compile code
+        run: |
+          make fclean && make && make clean
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: Build failed" -H "Priority: high" -H 'Tags: warning' -d "The build failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+
+      - name: Rename binaries
+        run: |
+          IFS=' ' read -r -a EXE_ARRAY <<<"${{env.EXECUTABLES}}"
+          IFS=' ' read -r -a EXECUTABLES_MAC_INTEL <<<"${{env.EXECUTABLES_MAC_INTEL}}"
+
+          if [ ${#EXE_ARRAY[@]} -ne ${#EXECUTABLES_MAC_INTEL[@]} ]; then
+              echo "::error ::Mismatch between the number of executables in EXECUTABLES and EXECUTABLES_MAC_INTEL"
+              exit 1
+          fi
+
+          for i in "${!EXE_ARRAY[@]}"; do
+              EXE="${EXE_ARRAY[$i]}"
+              MEXE="${EXECUTABLES_MAC_INTEL[$i]}"
+
+              if [ ! -e "$EXE" ]; then
+                  echo "::error file=$EXE,line=1,endLine=0,title='NOT FOUND' ::The file '$EXE' does not exist"
+                  exit 1
+              else
+                  mv $EXE $MEXE
+                  echo "$MEXE" >> ${{env.MAC_INTEL_BINARIES_FILE_STORER}}
+              fi
+          done
+
+      - name: Save cache
+        id: cache-save
+        uses: actions/cache@v4
+        with:
+          path: |
+            $(cat ${{env.MAC_INTEL_BINARIES_FILE_STORER}})
+          key: ${{env.MAC_INTEL_CACHE_KEY_BUILD}}
+
+  export_other_formats_when_present:
+    runs-on: ubuntu-latest
+    needs: [build_doxygen, build_project_linux, build_project_mac_apple_chip, build_project_mac_intel_chip]
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get generated documentation
+        id: cache-documentation-restore
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.OUTPUT_GENERATION }}
+          key: ${{ env.CACHE_KEY }}
+          restore-keys: |
+            doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+      
+      - name: Get linux binaries
+        id: cache-linux-restore
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.OUTPUT_GENERATION }}
+          key: ${{ env.LINUX_CACHE_KEY_BUILD }}
+          restore-keys: |
+            doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+      
+      - name: Get generated mac apple chip binaries
+        id: cache-mac-apple-chip-restore
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.OUTPUT_GENERATION }}
+          key: ${{ env.MAC_MONE_CACHE_KEY_BUILD }}
+          restore-keys: |
+            doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+      
+      - name: Get generated mac intell binaries
+        id: cache-mac-intel-restore
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.OUTPUT_GENERATION }}
+          key: ${{ env.MAC_INTEL_CACHE_KEY_BUILD }}
+          restore-keys: |
+            doxygen-${{ github.repository }}-${{ github.head_ref || github.ref_name }}-
+
+      - name: List directory content
+        run: |
+          ls -a
+
+      - name: Update author
+        run: |
+          git config --local user.name "${{secrets.USER_NAME_E}}"
+          git config --local user.email "${{secrets.USER_EMAIL_E}}"
+
+      - name: Get tag title
+        run: |
+          TAG_NAME=${{ github.ref }}
+          COMMIT_TITLE=$(git tag -l --format='%(subject)' $TAG_NAME)
+          echo "Commit title: $COMMIT_TITLE"
+          echo "COMMIT_TITLE=$COMMIT_TITLE" >> $GITHUB_ENV
+
+      - name: Extract Tag Info
+        id: extract_tag_info
+        run: |
+          TAG_NAME=${{ github.ref }}
+          COMMIT_MESSAGE=$(git tag -l --format='%(contents)' $TAG_NAME)
+          if [[ -n "$COMMIT_MESSAGE" ]]; then
+            echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          else
+            COMMIT_TITLE=$(git log --format=%s -n 1)
+            echo "COMMIT_MESSAGE=$COMMIT_TITLE" >> $GITHUB_ENV
+          fi
+          echo "COMMIT_MESSAGE=\"${COMMIT_MESSAGE}\n$(cat ./README.md)\"" >> $GITHUB_ENV
+
+      - name: Publish binary as GitHub release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            ./doxygen_documentation
+            ./linux_binaries
+            ./mac_intel_binaries
+            ./mac_apple_chip_binaries
+          name: ${{ env.COMMIT_TITLE }}
+          body: "$(cat ./README.md)"
+          draft: false
+          prerelease: false
