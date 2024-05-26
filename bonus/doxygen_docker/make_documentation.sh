@@ -133,7 +133,10 @@ FALSE=0
 SUDO=/bin/sudo
 
 # Docker container stuff
-CONTAINER_NAME="raytracer_doc"
+CONTAINER_NAME="doxygen"
+CONTAINER_TAG="v$(date +"%Y-%m-%d")"
+CONTAINER_PATH_NAME="hanralatalliard/${CONTAINER_NAME}"
+CONTAINER_FINAL_NAME="${CONTAINER_PATH_NAME}:${CONTAINER_TAG}"
 DOCKERFILE_PATH="bonus/doxygen_generation/"
 
 # Docker volume management
@@ -236,13 +239,16 @@ HIDE_UNDOC_CLASSES     = $HIDE_UNDOC_CLASSES
 "
 
 # Debug mode (for development purposes)
-DEBUG=$FALSE
+DEBUG=$TRUE
+
+# Publish container (for updating purposes)
+PUBLISH=$FALSE
 
 function run_command_in_container() {
     time $SUDO docker exec -it $CONTAINER_NAME /bin/bash -c "$1"
     STATUS=$?
     if [ $STATUS -ne $SUCCESS ]; then
-        echo "Error while running '$1' in '$CONTAINER_NAME', ERROR CODE: $STATUS"
+        echo "Error while running '$1' in '$CONTAINER_PATH_NAME', ERROR CODE: $STATUS"
         exit $ERROR
     fi
 }
@@ -258,21 +264,30 @@ if [ $DEBUG -eq $TRUE ]; then
     $SUDO docker image prune -f
     $SUDO docker system prune -f
 fi
-time $SUDO docker build -t $CONTAINER_NAME $DOCKERFILE_PATH
+time $SUDO docker build -t $CONTAINER_PATH_NAME $DOCKERFILE_PATH
 STATUS=$?
 if [ $STATUS -ne $SUCCESS ]; then
     echo "Error while building the image, ERROR CODE: $STATUS"
     exit $ERROR
 fi
-time $SUDO docker run -d -it -v "$DOCUMENTATION_FOLDER":"$CONTAINER_DOCUMENTATION_FOLDER" -v "$REPOSITORY_PATH":"$REPOSITORY_DESTINATION" --name $CONTAINER_NAME $CONTAINER_NAME
+if [ $PUBLISH -eq $TRUE ]; then
+    time $SUDO docker build -t $CONTAINER_FINAL_NAME $DOCKERFILE_PATH
+    time $SUDO docker push "${CONTAINER_FINAL_NAME}"
+    time $SUDO docker push "$CONTAINER_PATH_NAME:latest"
+    STATUS=$?
+    if [ $STATUS -ne $SUCCESS ]; then
+        echo "Error while publishing the container image '$CONTAINER_FINAL_NAME' '$CONTAINER_PATH_NAME', ERROR CODE: $STATUS"
+    fi
+fi
+time $SUDO docker run -d -it -v "$DOCUMENTATION_FOLDER":"$CONTAINER_DOCUMENTATION_FOLDER" -v "$REPOSITORY_PATH":"$REPOSITORY_DESTINATION" --name $CONTAINER_NAME "${CONTAINER_PATH_NAME}:latest"
 STATUS=$?
 if [ $STATUS -ne $SUCCESS ]; then
     echo "Error while spinning up the container, ERROR CODE: $STATUS"
     exit $ERROR
 fi
 
+run_command_in_container "cd /app && echo \"$DOXYGEN_CONFIGURATION\" > Doxyfile"
 if [ $DEBUG -eq $FALSE ]; then
-    run_command_in_container "cd /app && echo \"$DOXYGEN_CONFIGURATION\" > Doxyfile"
 
     if [ $GENERATE_HTML == $YES ]; then
         run_command_in_container "cd /app && echo \"$HTML_HEADER_CONTENT\" > $HTML_HEADER"
