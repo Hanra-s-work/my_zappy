@@ -238,6 +238,7 @@ jobs:
       - name: listing created binaries
         run: |
           ls -a
+          echo "Contents of : ${{env.LINUX_BINARY_FOLDER}}"
           ls -a ${{env.LINUX_BINARY_FOLDER}}
 
       - name: Save cache
@@ -275,44 +276,81 @@ jobs:
               exit 1
             fi
           fi
-      - name: Install SFML the old way
+      - name: Install SFML (the old way)
         run: |
           SFML_FOLDER="my_sfml.tar.gz"
           SFML_DESTINATION="$(pwd)/extracted_sfml"
           curl -L https://www.sfml-dev.org/files/SFML-2.1-osx-gcc-universal.tar.gz -o $SFML_FOLDER
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: SFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The sfml installation failed for ${{env.NOTIFY_LOCATION}}: Failed to download the SFML archive" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
           ls
           mkdir -p $SFML_DESTINATION
           tar -xvf "$SFML_FOLDER" -C "$SFML_DESTINATION"
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: SFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The sfml installation failed for ${{env.NOTIFY_LOCATION}}: Failed to extract the SFML archivexs" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
           cd $SFML_DESTINATION
           cd *
           sudo ./install.sh
           if [ $? -ne 0 ]
           then
-          curl -H "Title: SFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The sfml installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
-          exit 1
+            curl -H "Title: SFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The sfml installation failed for ${{env.NOTIFY_LOCATION}}: Failed to run the install.sh script" ${{env.NOTIFY_CHANNEL}}
+            exit 1
           fi
       - name: Install CSFML via Homebrew
         run: |
-          
-          brew install csfml
-          if [ $? -ne 0 ]
-          then
-            curl -H "Title: CSFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The csfml installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
-            exit 1
+          if brew ls --versions csfml > /dev/null; then
+            echo "csfml is installed"
+          else
+            DEPENDENCIES="csfml"
+            echo "csfml is not installed"
+            brew install $DEPENDENCIES
+            if [ $? -ne 0 ]
+            then
+              curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
           fi
-          DEPENDENCIES="openal-soft pkg-config"
-          brew reinstall $DEPENDENCIES
-          if [ $? -ne 0 ]
-          then
-            curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
-            exit 1
+          if brew ls --versions openal-soft > /dev/null; then
+            echo "openal-soft is installed"
+          else
+            DEPENDENCIES="openal-soft"
+            echo "openal-soft is not installed"
+            brew install $DEPENDENCIES
+            if [ $? -ne 0 ]
+            then
+              curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
           fi
-          DEPENDENCIES="cmake --cask"
-          brew reinstall $DEPENDENCIES
-          if [ $? -ne 0 ]
-          then
-            curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
-            exit 1
+          if brew ls --versions pkg-config > /dev/null; then
+            echo "pkg-config is installed"
+          else
+            DEPENDENCIES="pkg-config"
+            echo "pkg-config is not installed"
+            brew install $DEPENDENCIES
+            if [ $? -ne 0 ]
+            then
+              curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
+          fi
+          if brew ls --versions cmake > /dev/null; then
+            echo "cmake is installed"
+          else
+            DEPENDENCIES="cmake --cask"
+            echo "cmake is not installed"
+            brew install $DEPENDENCIES
+            if [ $? -ne 0 ]
+            then
+              curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
           fi
       - name: Update paths for dependecy builds
         run: |
@@ -394,6 +432,7 @@ jobs:
       - name: listing created binaries
         run: |
           ls -a
+          echo "Contents of : ${{env.MAC_MONE_BINARY_FOLDER}}"
           ls -a ${{env.MAC_MONE_BINARY_FOLDER}}
 
       - name: Save cache
@@ -507,6 +546,7 @@ jobs:
       - name: listing created binaries
         run: |
           ls -a
+          echo "Contents of : ${{env.MAC_INTEL_BINARY_FOLDER}}"
           ls -a ${{env.MAC_INTEL_BINARY_FOLDER}}
 
       - name: Save cache
