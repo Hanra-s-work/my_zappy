@@ -301,14 +301,14 @@ jobs:
             exit 1
           fi
           DEPENDENCIES="openal-soft pkg-config"
-          brew install $DEPENDENCIES
+          brew reinstall $DEPENDENCIES
           if [ $? -ne 0 ]
           then
             curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
           fi
           DEPENDENCIES="cmake --cask"
-          brew install $DEPENDENCIES
+          brew reinstall $DEPENDENCIES
           if [ $? -ne 0 ]
           then
             curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
