@@ -513,8 +513,7 @@ jobs:
 
   export_other_formats_when_present:
     runs-on: ubuntu-latest
-    # build_project_mac_apple_chip,
-    needs: [build_doxygen, build_project_linux,  build_project_mac_intel_chip]
+    needs: [build_doxygen, build_project_linux, build_project_mac_apple_chip, build_project_mac_intel_chip]
     if: success()
     steps:
       - name: Checkout code
@@ -695,19 +694,17 @@ jobs:
           COMMIT_MESSAGE=$(git tag -l --format='%(contents)' $TAG_NAME)
           echo "Commit message content = $COMMIT_MESSAGE"
           if [[ -n "$COMMIT_MESSAGE" ]]; then
-            COMMIT_MESSAGE=$COMMIT_MESSAGE
-          else
-            COMMIT_TITLE=$(git log --format=%s -n 1)
-            COMMIT_MESSAGE=$COMMIT_TITLE
+            COMMIT_MESSAGE=$(git log --format=%s -n 1)
           fi
           if [ "$COMMIT_MESSAGE" = "" ]
           then
-            COMMIT_MESSAGE='There is no message'
+            COMMIT_MESSAGE="There is no message\n$(cat ./README.md)"
           else
             COMMIT_MESSAGE="${COMMIT_MESSAGE}\n$(cat ./README.md)"
           fi
           echo "Commit message final content = '$COMMIT_MESSAGE'"
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+          COMMIT_MESSAGE_ESCAPED=$(echo "$COMMIT_MESSAGE" | awk '{printf "%s\\n", $0}')
+          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE_ESCAPED" >> $GITHUB_ENV
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
