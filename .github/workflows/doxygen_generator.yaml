@@ -360,11 +360,29 @@ jobs:
           export PKG_CONFIG_PATH="/opt/homebrew/opt/openal-soft/lib/pkgconfig"
       - name: Install python ${{env.MAC_PYTHON_VERSION}}
         run: |
-          brew install python@${{env.MAC_PYTHON_VERSION}} python-tk@${{env.MAC_PYTHON_VERSION}}
-          if [ $? -ne 0 ]
-          then
-            curl -H "Title: Python installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,snake,arrow_down_small' -d "The python installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
-            exit 1
+          if brew ls --versions python@${{env.MAC_PYTHON_VERSION}} > /dev/null; then
+            echo "python@${{env.MAC_PYTHON_VERSION}} is installed"
+          else
+            DEPENDENCIES="python@${{env.MAC_PYTHON_VERSION}}"
+            echo "python@${{env.MAC_PYTHON_VERSION}} is not installed"
+            brew install $DEPENDENCIES
+            if [ $? -ne 0 ]
+            then
+              curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
+          fi
+          if brew ls --versions python-tk@${{env.MAC_PYTHON_VERSION}} > /dev/null; then
+            echo "python-tk@${{env.MAC_PYTHON_VERSION}} is installed"
+          else
+            DEPENDENCIES="python-tk@${{env.MAC_PYTHON_VERSION}}"
+            echo "python-tk@${{env.MAC_PYTHON_VERSION}} is not installed"
+            brew install $DEPENDENCIES
+            if [ $? -ne 0 ]
+            then
+              curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+              exit 1
+            fi
           fi
       - name: Re-create the python environement
         run: |
