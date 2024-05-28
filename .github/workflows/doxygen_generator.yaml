@@ -300,7 +300,14 @@ jobs:
             curl -H "Title: CSFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The csfml installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
           fi
-          DEPENDENCIES="openal-soft pkg-config cmake"
+          DEPENDENCIES="openal-soft pkg-config"
+          brew install $DEPENDENCIES
+          if [ $? -ne 0 ]
+          then
+            curl -H "Title: $DEPENDENCIES installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The $DEPENDENDCIES installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
+            exit 1
+          fi
+          DEPENDENCIES="cmake --cask"
           brew install $DEPENDENCIES
           if [ $? -ne 0 ]
           then
@@ -720,7 +727,7 @@ jobs:
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
-        # if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             ${{env.OUTPUT_GENERATION}}
