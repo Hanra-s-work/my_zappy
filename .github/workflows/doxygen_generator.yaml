@@ -816,7 +816,13 @@ jobs:
     runs-on: ubuntu-latest
     # , publish_html 
     needs: [export_other_formats_when_present]
+    env:
+      GH_TOKEN: ${{ github.MIRROR_KEY }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Delete Created cache
         run: |
           CACHES=$(gh cache list)
