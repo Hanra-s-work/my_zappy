@@ -21,6 +21,7 @@ permissions:
 
 # The environment variables used for generation and upload
 env:
+  GH_TOKEN: ${{ github.TOKEN_ORG }}
   SETUP_FILE: setup.py
   TAG_FILE: version.txt
   IS_RELEASE: is_release.txt
@@ -823,8 +824,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Delete Created cache
-        env:
-          GH_TOKEN: ${{ github.MIRROR_KEY }}
         run: |
           CACHES=$(gh cache list)
           echo "$CACHES" | while read -r line; do
