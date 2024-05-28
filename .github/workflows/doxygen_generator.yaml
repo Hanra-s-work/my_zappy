@@ -289,7 +289,7 @@ jobs:
             curl -H "Title: CSFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The csfml installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
           fi
-          DEPENDENCIES="openal-soft"
+          DEPENDENCIES="openal-soft pkg-config cmake"
           brew install $DEPENDENCIES
           if [ $? -ne 0 ]
           then
@@ -689,7 +689,7 @@ jobs:
             COMMIT_TITLE=$(git log --format=%s -n 1)
             COMMIT_MESSAGE=$COMMIT_TITLE
           fi
-          if [ $COMMIT_MESSAGE == "" ]
+          if [ "$COMMIT_MESSAGE" = "" ]
           then
             COMMIT_MESSAGE='There is no message'
           else
