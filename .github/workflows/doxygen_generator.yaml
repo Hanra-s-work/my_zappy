@@ -275,14 +275,25 @@ jobs:
               exit 1
             fi
           fi
-      - name: Install SFML and CSFML via Homebrew
+      - name: Install SFML the old way
         run: |
-          brew install sfml
+          SFML_FOLDER="my_sfml.tar.gz"
+          SFML_DESTINATION="$(pwd)/extracted_sfml"
+          curl -L https://www.sfml-dev.org/files/SFML-2.1-osx-gcc-universal.tar.gz -o $SFML_FOLDER
+          ls
+          mkdir -p $SFML_DESTINATION
+          tar -xvf "$SFML_FOLDER" -C "$SFML_DESTINATION"
+          cd $SFML_DESTINATION
+          cd *
+          sudo ./install.sh
           if [ $? -ne 0 ]
           then
           curl -H "Title: SFML installation failed" -H "Priority: default" -H 'Tags: warning,apple,beer,desktop_computer,arrow_down_small' -d "The sfml installation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
           exit 1
           fi
+      - name: Install CSFML via Homebrew
+        run: |
+          
           brew install csfml
           if [ $? -ne 0 ]
           then
