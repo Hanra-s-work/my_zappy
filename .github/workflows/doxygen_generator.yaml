@@ -27,13 +27,16 @@ env:
   HTML_GENERATION: html
   DOXYGEN_VERSION: 1.8.20
   NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
-  OUTPUT_GENERATION: documentation
   COMMIT_TITLE: "There is no title"
   COMMIT_MESSAGE: "There is no message"
   DOCKER_NAME: hanralatalliard/doxygen
   DOXYFILE: bonus/doxygen_docker/Doxyfile
   CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
   NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+  OUTPUT_GENERATION: documentation
+  LINUX_BINARY_FOLDER: "./linux_binaries"
+  MAC_MONE_BINARY_FOLDER: "./mac_mone_binaries"
+  MAC_INTEL_BINARY_FOLDER: "./mac_intel_binaries"
   CACHE_KEY: doxygen-cache-key
   LINUX_CACHE_KEY_BUILD: linux-cache-key
   MAC_MONE_CACHE_KEY_BUILD: mac-mone-cache-key
@@ -42,9 +45,6 @@ env:
   EXECUTABLES_LINUX: "./zappy_linux_ai ./zappy_linux_gui ./zappy_linux_server"
   EXECUTABLES_MAC_INTEL: "./zappy_mac_intel_ai ./zappy_mac_intel_gui ./zappy_mac_intel_server"
   EXECUTABLES_MAC_MONE: "./zappy_mac_apple_chip_ai ./zappy_mac_apple_chip_gui ./zappy_mac_apple_chip_server"
-  LINUX_BINARY_FOLDER: "./linux_binaries"
-  MAC_MONE_BINARY_FOLDER: "./mac_mone_binaries"
-  MAC_INTEL_BINARY_FOLDER: "./mac_intel_binaries"
 
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
@@ -247,8 +247,7 @@ jobs:
         with:
           key: ${{env.LINUX_CACHE_KEY_BUILD}}
           enableCrossOsArchive: true
-          path: |
-            ${{env.LINUX_BINARY_FOLDER}}
+          path: ${{env.LINUX_BINARY_FOLDER}}
   
   build_project_mac_apple_chip:
     runs-on: macos-latest
@@ -459,8 +458,7 @@ jobs:
         with:
           key: ${{env.MAC_MONE_CACHE_KEY_BUILD}}
           enableCrossOsArchive: true
-          path: |
-            ${{env.MAC_MONE_BINARY_FOLDER}}
+          path: ${{env.MAC_MONE_BINARY_FOLDER}}
 
   build_project_mac_intel_chip:
     runs-on: macos-12
@@ -573,8 +571,7 @@ jobs:
         with:
           key: ${{env.MAC_INTEL_CACHE_KEY_BUILD}}
           enableCrossOsArchive: true
-          path: |
-            ${{env.MAC_INTEL_BINARY_FOLDER}}
+          path: ${{env.MAC_INTEL_BINARY_FOLDER}}
 
   export_other_formats_when_present:
     runs-on: ubuntu-latest
@@ -605,7 +602,7 @@ jobs:
         with:
           key: ${{ env.LINUX_CACHE_KEY_BUILD }}
           enableCrossOsArchive: true
-          path: ${{ env.OUTPUT_GENERATION }}
+          path: ${{ env.LINUX_BINARY_FOLDER }}
           restore-keys: |
             linux-cache-key
             cache-key-linux
@@ -618,7 +615,7 @@ jobs:
         with:
           key: ${{ env.MAC_MONE_CACHE_KEY_BUILD }}
           enableCrossOsArchive: true
-          path: ${{ env.OUTPUT_GENERATION }}
+          path: ${{ env.MAC_MONE_BINARY_FOLDER }}
           restore-keys: |
             mac-mone-cache-key
             cache-key-mac-mone
@@ -635,7 +632,7 @@ jobs:
         with:
           key: ${{ env.MAC_INTEL_CACHE_KEY_BUILD }}
           enableCrossOsArchive: true
-          path: ${{ env.OUTPUT_GENERATION }}
+          path: ${{ env.MAC_INTEL_BINARY_FOLDER }}
           restore-keys: |
             mac-intel-cache-key
             cache-key-mac-intel
