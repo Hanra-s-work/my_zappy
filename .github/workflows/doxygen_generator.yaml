@@ -171,7 +171,7 @@ jobs:
     needs: build_doxygen
     if: success()
     env:
-      TEMPORARY_FOLDER: /tmp/dg
+      TEMPORARY_FOLDER: /tmp/dg/
       ICON_PATH: bonus/doxygen_docker/favicon/
     steps:
       - name: Checkout code
@@ -193,8 +193,12 @@ jobs:
       - name: Making temporary folder permanent
         run: |
             ls -a
+            echo "Content of: ${{ env.TEMPORARY_FOLDER }}/"
+            ls -a ${{ env.TEMPORARY_FOLDER }}/
             echo "Content of: ${{ env.OUTPUT_GENERATION }}/"
             ls -a ${{ env.OUTPUT_GENERATION }}/
+            echo "Content of: ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/"
+            ls -a ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/
             mkdir -p ${{ env.TEMPORARY_FOLDER}}
             echo "Copying content of ${{ env.OUTPUT_GENERATION }} to ${{env.TEMPORARY_FOLDER}}"
             cp -rf ${{ env.OUTPUT_GENERATION }} ${{env.TEMPORARY_FOLDER}}
