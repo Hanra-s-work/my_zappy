@@ -132,7 +132,7 @@ jobs:
           echo -e "$HTML_CONTENT" > ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}/index.html
       - name: Run doxygen docker
         run: |
-          RUN_COMMAND="cd /app && doxygen ${{env.OUTPUT_GENERATION}} ; exit $?"
+          RUN_COMMAND="cd /app && cp ./bonus/doxygen_docker/Doxyfile ./Doxyfile && doxygen ${{env.OUTPUT_GENERATION}} ; exit $?"
           docker run -i -v "$(pwd)":"/app" -v "$(pwd)/${{env.OUTPUT_GENERATION}}":"/${{env.OUTPUT_GENERATION}}" ${{env.DOCKER_NAME}} /bin/bash -c "$RUN_COMMAND"
           if [ $? -ne 0 ]
           then
