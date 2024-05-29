@@ -108,6 +108,11 @@ jobs:
       - name: Create required folders
         run: |
           mkdir -p ${{env.OUTPUT_GENERATION}} ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
+      - name: Clean repository
+        run: |
+          make fclean
+          cd ./src/ai/
+          make fclean_env
       - name: Create dummy page for html renders
         run: |
           HTML_CONTENT='<!DOCTYPE html><html lang="en"><head>'
@@ -188,16 +193,19 @@ jobs:
       - name: Making temporary folder permanent
         run: |
             ls -a
-            echo "Content of: ${{ env.OUTPUT_GENERATION }}/*"
-            ls -a ${{ env.OUTPUT_GENERATION }}/*
+            echo "Content of: ${{ env.OUTPUT_GENERATION }}/"
+            ls -a ${{ env.OUTPUT_GENERATION }}/
             mkdir -p ${{ env.TEMPORARY_FOLDER}}
-            cp -rvf ${{ env.OUTPUT_GENERATION }} ${{env.TEMPORARY_FOLDER}}
+            echo "Copying content of ${{ env.OUTPUT_GENERATION }} to ${{env.TEMPORARY_FOLDER}}"
+            cp -rf ${{ env.OUTPUT_GENERATION }} ${{env.TEMPORARY_FOLDER}}
+      - name: Listing content of temporary folder
+        run: |
             echo "Contents os ${{env.TEMPORARY_FOLDER}}"
             ls -a 
       - name: Copy the icons to the generated documentation
         run: |
           echo "Content of temporary folder: ${{ env.TEMPORARY_FOLDER }}"
-          DOCUMENTATION=$'find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 0 -type d)
+          DOCUMENTATION=$(find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 0 -type d)
           for i in ${DOCUMETATION[@]}
           do
             FINAL_PATH="$i/files/icon"
