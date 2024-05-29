@@ -139,6 +139,13 @@ jobs:
             curl -H "Title: Build failed" -H "Priority: default" -H 'Tags: warning' -d "The documentation generation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
           fi
+      - name: Display generated content
+        run: |
+          ls -a
+          echo "Displaying the content of: ${{env.OUTPUT_GENERATION}}"
+          ls -a ${{env.OUTPUT_GENERATION}}
+          echo "Displaying the content of: ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}"
+          ls -a ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}
       - name: Save cache
         id: cache-save
         uses: actions/cache@v4
@@ -823,6 +830,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: token length
+        run: |
+          echo "Listing token length"
+          echo "Token length : ${#${{env.GH_TOKEN}}}"
       - name: Delete Created cache
         run: |
           CACHES=$(gh cache list)
