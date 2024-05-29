@@ -205,9 +205,10 @@ jobs:
       - name: Copy the icons to the generated documentation
         run: |
           echo "Content of temporary folder: ${{ env.TEMPORARY_FOLDER }}"
-          DOCUMENTATION=$(find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 0 -type d)
+          DOCUMENTATION=$(find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 1 -type d)
           for i in ${DOCUMETATION[@]}
           do
+            echo "\$i = '$i'"
             FINAL_PATH="$i/files/icon"
             echo "Final path = $FINAL_PATH"
             mkdir -p "$FINAL_PATH"
