@@ -1,3 +1,10 @@
+##
+## EPITECH PROJECT, 2024
+## my_zappy
+## File description:
+## Dockerfile
+##
+
 # Use a base image with necessary dependencies
 FROM fedora:34
 

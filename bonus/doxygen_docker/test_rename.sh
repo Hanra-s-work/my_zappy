@@ -1,4 +1,11 @@
 #!/bin/bash
+##
+## EPITECH PROJECT, 2024
+## my_zappy
+## File description:
+## test_rename.sh
+##
+
 EXECUTABLES=("./zappy_ai" "./zappy_gui" "./zappy_server")
 EXECUTABLES_LINUX=("./zappy_linux_ai" "./zappy_linux_gui" "./zappy_linux_server")
 EXECUTABLES_MAC=("./zappy_mac_ai" "./zappy_mac_gui" "./zappy_mac_server")

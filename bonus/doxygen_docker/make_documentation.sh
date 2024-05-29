@@ -1,6 +1,6 @@
 #!/bin/bash
 ##
-## EPITECH PROJECT, 2023
+## EPITECH PROJECT, 2024
 ## B-OOP-400-PAR-4-1-raytracer-harleen.singh-kaur
 ## File description:
 ## make_documentation.sh
