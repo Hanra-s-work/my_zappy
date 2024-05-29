@@ -26,6 +26,7 @@ env:
   TAG_FILE: version.txt
   IS_RELEASE: is_release.txt
   HTML_GENERATION: html
+  MAN_INSTALL_PATH: bonus/doxygen_docker/man/installer.sh
   DOXYGEN_VERSION: 1.8.20
   NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
   COMMIT_TITLE: "There is no title"
@@ -63,7 +64,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Getting the latest version of (coding-style) ${{env.CODING_STYLE_CONTAINER}}
-      run: docker pull ghcr.io/epitech/coding-style-checker:latest
+      run: docker pull ${{env.CODING_STYLE_CONTAINER}}
     - name: Run ${{env.CODING_STYLE_CONTAINER}}
       run: |
         CODING_STYLE=coding_style_data
@@ -132,12 +133,49 @@ jobs:
           echo -e "$HTML_CONTENT" > ${{env.OUTPUT_GENERATION}}/${{env.HTML_GENERATION}}/index.html
       - name: Run doxygen docker
         run: |
-          RUN_COMMAND="cd /app && cp ./bonus/doxygen_docker/Doxyfile ./Doxyfile && doxygen ${{env.OUTPUT_GENERATION}} ; exit $?"
+          RUN_COMMAND="cd /app && cp ${{env.DOXYFILE}} ./Doxyfile && doxygen ; exit $?"
           docker run -i -v "$(pwd)":"/app" -v "$(pwd)/${{env.OUTPUT_GENERATION}}":"/${{env.OUTPUT_GENERATION}}" ${{env.DOCKER_NAME}} /bin/bash -c "$RUN_COMMAND"
           if [ $? -ne 0 ]
           then
             curl -H "Title: Build failed" -H "Priority: default" -H 'Tags: warning' -d "The documentation generation failed for ${{env.NOTIFY_LOCATION}}" ${{env.NOTIFY_CHANNEL}}
             exit 1
+          fi
+      - name: Reclaim ownership
+        run: |
+          echo "Owning the generated content (replacing root by the current user account)"
+          sudo chown $USER:$USER -Rv ${{env.OUTPUT_GENERATION}}
+          echo "Granting all users read-write rights on the files"
+          chmod a+rw -Rv ${{env.OUTPUT_GENERATION}}
+      - name: Copy the icons to the generated documentation
+        run: |
+          DOCUMENTATION=$'find documentation/* -maxdepth 0 -type d)
+          for i in ${DOCUMETATION[@]}
+          do
+            FINAL_PATH="$i/files/icon"
+            mkdir -p "$FINAL_PATH"
+            cp -r bonus/doxygen_docker/favicon/* "$FINAL_PATH"
+            ls -a -ls --color=auto "$FINAL_PATH"
+          done
+      - name: Generate latex if present
+        run: |
+          if [ -e "${{env.OUTPUT_GENERATION}}/latex" ]; then
+            cd "${{env.OUTPUT_GENERATION}}/latex"
+            if [ -e "Makefile" ]; then
+              make
+            else
+              echo "No Makefile found, not generating anything"
+            fi
+          else
+            echo "No latex folder found, not generating anything"
+          fi
+      - name: Inject install file if man is present
+        run: |
+          if [ -e "${{env.OUTPUT_GENERATION}}/man" ]; then
+            CWD=$(pwd)
+            FILE_NAME="install_man.sh"
+            cd "${{env.OUTPUT_GENERATION}}/man"
+            cp $CWD/${{env.MAN_INSTALL_PATH}} ./$FILE_NAME
+            chmod a+x $FILE_NAME
           fi
       - name: Display generated content
         run: |
