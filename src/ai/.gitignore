@@ -1,5 +1,6 @@
 ./build/**
 ./dist/**
 ./coverage_data/**
+__pycache__/**
 .coveragerc
 *.spec
