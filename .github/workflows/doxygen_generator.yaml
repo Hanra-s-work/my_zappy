@@ -913,6 +913,8 @@ jobs:
 
   clean_created_cache:
     name: Clear the cache generated during the build time
+    permissions: write-all
+    # environment: dev
     runs-on: ubuntu-latest
     # , publish_html 
     needs: [export_other_formats_when_present]
@@ -923,7 +925,7 @@ jobs:
           fetch-depth: 0
       - name: Delete Created cache
         env:
-          GH_TOKEN: ${{ secrets.MIRROR_KEY }}
+          GH_TOKEN: ${{ secrets.CACHE_TOKEN }}
         run: |
           gh cache list
           gh cache delete --all
