@@ -196,14 +196,12 @@ jobs:
           echo "Content at './'"  
           ls -a ./
           echo "Copying content of ${{ env.OUTPUT_GENERATION }} to ${{env.TEMPORARY_FOLDER}}"
+          mkdir -p ${{ env.TEMPORARY_FOLDER}}
           cp -rf ${{ env.OUTPUT_GENERATION }} ${{env.TEMPORARY_FOLDER}}
           echo "Content of: ${{ env.TEMPORARY_FOLDER }}/"
           ls -a ${{ env.TEMPORARY_FOLDER }}/
           echo "Content of: ${{ env.OUTPUT_GENERATION }}/"
           ls -a ${{ env.OUTPUT_GENERATION }}/
-          echo "Content of: ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/"
-          ls -a ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/
-          mkdir -p ${{ env.TEMPORARY_FOLDER}}
       - name: Listing content of temporary folder
         run: |
           echo "Contents os ${{env.TEMPORARY_FOLDER}}"
