@@ -54,7 +54,7 @@ PROJECT_NUMBER = 1
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF = "This is the doxyfile in charge of generating the doxygen documentation for the program"
+PROJECT_BRIEF = "This is a project that Epitech asked us to create in order to allow us to reveiw the notions of the current year."
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -1272,7 +1272,7 @@ GENERATE_HTML = YES
 # The default directory is: html.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_OUTPUT = html
+HTML_OUTPUT = /app/documentation/html
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for each
 # generated HTML page (for example: .htm, .php, .asp).
@@ -1938,7 +1938,7 @@ GENERATE_LATEX = YES
 # The default directory is: latex.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-LATEX_OUTPUT = latex
+LATEX_OUTPUT = /app/documentation/latex
 
 # The LATEX_CMD_NAME tag can be used to specify the LaTeX command name to be
 # invoked.
@@ -2123,7 +2123,7 @@ GENERATE_RTF = YES
 # The default directory is: rtf.
 # This tag requires that the tag GENERATE_RTF is set to YES.
 
-RTF_OUTPUT = rtf
+RTF_OUTPUT = /app/documentation/rtf
 
 # If the COMPACT_RTF tag is set to YES, doxygen generates more compact RTF
 # documents. This may be useful for small projects and may help to save some
@@ -2179,7 +2179,7 @@ GENERATE_MAN = YES
 # The default directory is: man.
 # This tag requires that the tag GENERATE_MAN is set to YES.
 
-MAN_OUTPUT = man
+MAN_OUTPUT = /app/documentation/man
 
 # The MAN_EXTENSION tag determines the extension that is added to the generated
 # man pages. In case the manual section does not start with a number, the number
@@ -2222,7 +2222,7 @@ GENERATE_XML = YES
 # The default directory is: xml.
 # This tag requires that the tag GENERATE_XML is set to YES.
 
-XML_OUTPUT = xml
+XML_OUTPUT = /app/documentation/xml
 
 # If the XML_PROGRAMLISTING tag is set to YES, doxygen will dump the program
 # listings (including syntax highlighting and cross-referencing information) to
@@ -2256,7 +2256,7 @@ GENERATE_DOCBOOK = YES
 # The default directory is: docbook.
 # This tag requires that the tag GENERATE_DOCBOOK is set to YES.
 
-DOCBOOK_OUTPUT = docbook
+DOCBOOK_OUTPUT = /app/documentation/docbook
 
 #---------------------------------------------------------------------------
 # Configuration options for the AutoGen Definitions output
@@ -2286,7 +2286,7 @@ GENERATE_SQLITE3 = NO
 # The default directory is: sqlite3.
 # This tag requires that the tag GENERATE_SQLITE3 is set to YES.
 
-SQLITE3_OUTPUT = sqlite3
+SQLITE3_OUTPUT = /app/documentation/sqlite3
 
 # The SQLITE3_RECREATE_DB tag is set to YES, the existing doxygen_sqlite3.db
 # database file will be recreated with each doxygen run. If set to NO, doxygen
@@ -2607,7 +2607,7 @@ DOT_UML_DETAILS = NO
 # Minimum value: 0, maximum value: 1000, default value: 17.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_WRAP_THRESHOLD = 17
+DOT_WRAP_THRESHOLD = 1000
 
 # If the TEMPLATE_RELATIONS tag is set to YES then the inheritance and
 # collaboration graphs will show the relations between templates and their
