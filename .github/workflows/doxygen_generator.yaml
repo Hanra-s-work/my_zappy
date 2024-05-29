@@ -184,7 +184,7 @@ jobs:
             cache_key_doxygen
       - name: Copy the icons to the generated documentation
         run: |
-          DOCUMENTATION=$'find documentation/* -maxdepth 0 -type d)
+          DOCUMENTATION=$'find ${{ env.OUTPUT_GENERATION }}/* -maxdepth 0 -type d)
           for i in ${DOCUMETATION[@]}
           do
             FINAL_PATH="$i/files/icon"
