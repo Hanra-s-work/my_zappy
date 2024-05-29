@@ -185,6 +185,8 @@ jobs:
       - name: Copy the icons to the generated documentation
         run: |
           ls -a
+          echo "Content of: ${{ env.OUTPUT_GENERATION }}/*"
+          ls -a ${{ env.OUTPUT_GENERATION }}/*
           DOCUMENTATION=$'find ${{ env.OUTPUT_GENERATION }}/* -maxdepth 0 -type d)
           for i in ${DOCUMETATION[@]}
           do
