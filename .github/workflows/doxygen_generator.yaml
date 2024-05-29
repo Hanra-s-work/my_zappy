@@ -184,6 +184,7 @@ jobs:
             cache_key_doxygen
       - name: Copy the icons to the generated documentation
         run: |
+          ls -a
           DOCUMENTATION=$'find ${{ env.OUTPUT_GENERATION }}/* -maxdepth 0 -type d)
           for i in ${DOCUMETATION[@]}
           do
@@ -669,7 +670,7 @@ jobs:
 
   export_other_formats_when_present:
     runs-on: ubuntu-latest
-    needs: [clean_up_generation, build_project_linux, build_project_mac_apple_chip, build_project_mac_intel_chip]
+    needs: [build_project_linux, build_project_mac_apple_chip, build_project_mac_intel_chip, clean_up_generation]
     if: success()
     steps:
       - name: Checkout code
