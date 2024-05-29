@@ -27,6 +27,7 @@ env:
   IS_RELEASE: is_release.txt
   HTML_GENERATION: html
   MAN_INSTALL_PATH: bonus/doxygen_docker/man/installer.sh
+  HTML_SERVER_SPAWNER_PATH: bonus/doxygen_docker/html_opening/launch_server.sh
   DOXYGEN_VERSION: 1.8.20
   NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
   COMMIT_TITLE: "There is no title"
@@ -171,7 +172,7 @@ jobs:
     needs: build_doxygen
     if: success()
     env:
-      TEMPORARY_FOLDER: /tmp/dg/
+      TEMPORARY_FOLDER: /tmp/dg
       ICON_PATH: bonus/doxygen_docker/favicon/
     steps:
       - name: Checkout code
@@ -192,20 +193,21 @@ jobs:
             cache_key_doxygen
       - name: Making temporary folder permanent
         run: |
-            ls -a
-            echo "Content of: ${{ env.TEMPORARY_FOLDER }}/"
-            ls -a ${{ env.TEMPORARY_FOLDER }}/
-            echo "Content of: ${{ env.OUTPUT_GENERATION }}/"
-            ls -a ${{ env.OUTPUT_GENERATION }}/
-            echo "Content of: ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/"
-            ls -a ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/
-            mkdir -p ${{ env.TEMPORARY_FOLDER}}
-            echo "Copying content of ${{ env.OUTPUT_GENERATION }} to ${{env.TEMPORARY_FOLDER}}"
-            cp -rf ${{ env.OUTPUT_GENERATION }} ${{env.TEMPORARY_FOLDER}}
+          echo "Content at './'"  
+          ls -a ./
+          echo "Copying content of ${{ env.OUTPUT_GENERATION }} to ${{env.TEMPORARY_FOLDER}}"
+          cp -rf ${{ env.OUTPUT_GENERATION }} ${{env.TEMPORARY_FOLDER}}
+          echo "Content of: ${{ env.TEMPORARY_FOLDER }}/"
+          ls -a ${{ env.TEMPORARY_FOLDER }}/
+          echo "Content of: ${{ env.OUTPUT_GENERATION }}/"
+          ls -a ${{ env.OUTPUT_GENERATION }}/
+          echo "Content of: ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/"
+          ls -a ${{ env.TEMPORARY_FOLDER }}/${{ env.OUTPUT_GENERATION }}/
+          mkdir -p ${{ env.TEMPORARY_FOLDER}}
       - name: Listing content of temporary folder
         run: |
-            echo "Contents os ${{env.TEMPORARY_FOLDER}}"
-            ls -a ${{env.TEMPORARY_FOLDER}}
+          echo "Contents os ${{env.TEMPORARY_FOLDER}}"
+          ls -a ${{env.TEMPORARY_FOLDER}}
       - name: Copy the icons to the generated documentation
         run: |
           echo "Content of temporary folder: ${{ env.TEMPORARY_FOLDER }}"
@@ -221,10 +223,14 @@ jobs:
           done
       - name: Generate latex if present
         run: |
-          if [ -e "${{env.TEMPORARY_FOLDER}}/latex" ]; then
-            cd "${{env.TEMPORARY_FOLDER}}/latex"
+          if [ -e "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/latex" ]; then
+            cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/latex"
             if [ -e "Makefile" ]; then
-              make
+              CONT_NAME=loxygene
+              COMMAND="cd /app && make"
+              docker run -i -v "$(pwd)":"/app" --name "$CONT_NAME" ${{env.DOCKER_NAME}} /bin/bash -c "$COMMAND"
+              docker stop "$CONT_NAME"
+              docker rm "$CONT_NAME"
             else
               echo "No Makefile found, not generating anything"
             fi
@@ -233,11 +239,20 @@ jobs:
           fi
       - name: Inject install file if man is present
         run: |
-          if [ -e "${{env.TEMPORARY_FOLDER}}/man" ]; then
+          if [ -e "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/man" ]; then
             CWD=$(pwd)
             FILE_NAME="install_man.sh"
-            cd "${{env.TEMPORARY_FOLDER}}/man"
+            cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/man"
             cp $CWD/${{env.MAN_INSTALL_PATH}} ./$FILE_NAME
+            chmod a+x $FILE_NAME
+          fi
+      - name: Inject server spawner file if html is present
+        run: |
+          if [ -e "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/html" ]; then
+            CWD=$(pwd)
+            FILE_NAME="launch_server.sh"
+            cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/html"
+            cp $CWD/${{env.HTML_SERVER_SPAWNER_PATH}} ./$FILE_NAME
             chmod a+x $FILE_NAME
           fi
       - name: Save cache

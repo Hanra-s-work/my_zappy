@@ -1,4 +1,11 @@
 #!/bin/bash
+##
+## EPITECH PROJECT, 2024
+## my_zappy
+## File description:
+## installer.sh
+##
+
 TRUE=1
 FALSE=0
 DEBUG=$FALSE
@@ -246,3 +253,5 @@ if [ $STATUS -ne 0 ]; then
     exit $STATUS
 fi
 echo "Database updated"
+echo "(C) Created by Henry Letellier"
+echo "This program is provided as if and without any warranty"
