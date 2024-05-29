@@ -931,10 +931,8 @@ jobs:
   clean_created_cache:
     name: Clear the cache generated during the build time
     permissions: write-all
-    # environment: dev
     runs-on: ubuntu-latest
-    # , publish_html 
-    needs: [export_other_formats_when_present]
+    needs: [export_other_formats_when_present, publish_html ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
