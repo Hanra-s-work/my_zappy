@@ -42,16 +42,29 @@ function spin_up_the_docker {
     stop_container
     decho "Spinning up a new version"
     docker run -it -d -v "$MOUNT_SRC_PATH":"$MOUNT_PATH_DEST" -p $EXPOSED_PORT:80 --name $CONTAINER_NAME $IMAGE_NAME
+    STATUS=$?
+    if [ $STATUS -ne 0 ]; then
+        echo "Failed to start the server"
+        echo "This error could be due to many factors, but here are a few to consider:"
+        echo "* Low or abscent diskspace"
+        echo "* Port already taken (despite the scan the program did)"
+        echo "* No more ram"
+        echo "* The Docker program is not running"
+        echo "If you do not know the source of the issue, internet is your best friend"
+        echo "The exit code was: $STATUS"
+        exit $STATUS
+    fi
 }
 
 function find_correct_port {
 
-    for ((i = EXPOSED_PORT; i <= MAX_EXPOSED_PORT; i++)); do
+    for ((i = MIN_EXPOSED_PORT; i <= MAX_EXPOSED_PORT; i++)); do
         netstat -tuln | grep ":${i} " >/dev/null 2>&1
         if [ $? -ne 0 ]; then
             decho "Port: '$i' is not available"
         else
-            echo "$i"
+            decho "Port: '$i' is available"
+            EXPOSED_PORT=$i
             return 0
         fi
     done
