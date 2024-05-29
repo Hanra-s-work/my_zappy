@@ -785,7 +785,7 @@ jobs:
         id: get_latest_tag
         run: |
           echo "Getting tags"
-          git fetch --tags # Make sure to fetch the tags first
+          # git fetch --tags # Make sure to fetch the tags first
           echo "Updated the list"
           latest_tag=$(git tag --list "v*" | sort -rV | head -n 1)
           echo "Latest tag = $latest_tag"
