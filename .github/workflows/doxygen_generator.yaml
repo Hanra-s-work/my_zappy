@@ -165,6 +165,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_doxygen
     if: success()
+    env:
+      TEMPORARY_FOLDER: /tmp/dg
+      ICON_PATH: bonus/doxygen_docker/favicon/
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -182,17 +185,25 @@ jobs:
             cache-key-doxygen
             doxygen_cache_key
             cache_key_doxygen
+      - name: Making temporary folder permanent
+        run: |
+            ls -a
+            echo "Content of: ${{ env.OUTPUT_GENERATION }}/*"
+            ls -a ${{ env.OUTPUT_GENERATION }}/*
+            mkdir -p ${{ env.TEMPORARY_FOLDER}}
+            cp -rvf ${{ env.OUTPUT_GENERATION }} ${{env.TEMPORARY_FOLDER}}
+            echo "Contents os ${{env.TEMPORARY_FOLDER}}"
+            ls -a 
       - name: Copy the icons to the generated documentation
         run: |
-          ls -a
-          echo "Content of: ${{ env.OUTPUT_GENERATION }}/*"
-          ls -a ${{ env.OUTPUT_GENERATION }}/*
-          DOCUMENTATION=$'find ${{ env.OUTPUT_GENERATION }}/* -maxdepth 0 -type d)
+          echo "Content of temporary folder: ${{ env.TEMPORARY_FOLDER }}"
+          DOCUMENTATION=$'find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 0 -type d)
           for i in ${DOCUMETATION[@]}
           do
             FINAL_PATH="$i/files/icon"
+            echo "Final path = $FINAL_PATH"
             mkdir -p "$FINAL_PATH"
-            cp -r bonus/doxygen_docker/favicon/* "$FINAL_PATH"
+            cp -r ${{env.ICON_PATH}}/* "$FINAL_PATH"
             ls -a -ls --color=auto "$FINAL_PATH"
           done
       - name: Generate latex if present
