@@ -9,6 +9,11 @@
     font-family: 'Times New Roman', Times, serif;
 }
 
+body {
+    background-color: aliceblue;
+    color: black;
+}
+
 header {
     padding-top: 0;
     padding-left: 0;
@@ -23,6 +28,16 @@ a {
     color: blue;
     text-decoration: none;
     font-weight: normal;
+}
+
+a:hover {
+    text-decoration: underline;
+    font-style: italic;
+}
+
+a:active {
+    color: deepskyblue;
+    text-decoration: none;
 }
 
 footer {
