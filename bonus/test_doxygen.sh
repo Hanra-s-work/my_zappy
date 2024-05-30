@@ -1,6 +1,7 @@
 #!/bin/bash
 
 MY_USER=$USER
+BASH_CWD=$(pwd)
 
 function pause {
     echo "Press enter to continue..."
@@ -11,7 +12,11 @@ function pause {
 if [ "$EUID" -ne 0 ]; then
     echo "Please run as root"
     sudo $0 $@
-    exit $?
+    STATUS=$?
+    if [ $STATUS -ne 0 ]; then
+        echo "The program is exiting with error code: $STATUS probably because you refused to accord it elevated privileges"
+    fi
+    exit $STATUS
 fi
 
 # Free cache that is no longer needed (this could of been the result of other systems)
@@ -47,15 +52,23 @@ EXECUTABLES_MAC_INTEL="./zappy_mac_intel_ai ./zappy_mac_intel_gui ./zappy_mac_in
 EXECUTABLES_MAC_MONE="./zappy_mac_apple_chip_ai ./zappy_mac_apple_chip_gui ./zappy_mac_apple_chip_server"
 ICON_PATH=bonus/doxygen_docker/favicon/
 MAN_INSTALL_PATH=bonus/doxygen_docker/man/installer.sh
-HTML_SERVER_SPAWNER_PATH=bonus/doxygen_docker/html/launch_server.sh
-
-# The steps to the documentation
-docker pull $DOCKER_NAME
+HTML_SERVER_SPAWNER_PATH=bonus/doxygen_docker/html/launch_server.sh*
+LINUX_ZIP_NAME=linux.zip
+MAC_MON_ZIP_NAME=mac_apple_chip.zip
+MAC_INTEL_ZIP_NAME=mac_intel_chip.zip
+DOCUMENTATION_ZIP_NAME=documentation.zip
 
 # Removing previous generated documentation
 echo "Cleaning previous generation ${OUTPUT_GENERATION}"
 # pause
 rm -rf ${OUTPUT_GENERATION}
+echo "Removing generated zip folders if present (from a previous run)"
+rm -vf ${DOCUMENTATION_ZIP_NAME}
+echo "Removing child dockers (from the previous generation)"
+docker container prune -f
+
+# The steps to the documentation
+docker pull $DOCKER_NAME
 
 # Clean built binaries
 echo "Cleaning previous program build (if present)"
@@ -102,6 +115,7 @@ if [ $? -ne 0 ]; then
     echo "The documentation generation failed for the container"
     exit 1
 fi
+cd ${BASH_CWD}
 
 # Display generated content
 ls -a
@@ -121,6 +135,7 @@ for i in ${DOCUMENTATION[@]}; do
     cp -rv ${ICON_PATH}/* "$FINAL_PATH"
     ls -a -ls --color=auto "$FINAL_PATH"
 done
+cd ${BASH_CWD}
 
 # Generating latex if present
 if [ -e "${OUTPUT_GENERATION}/latex" ]; then
@@ -128,17 +143,19 @@ if [ -e "${OUTPUT_GENERATION}/latex" ]; then
     if [ -e "Makefile" ]; then
         CONT_NAME=loxygen
         COMMAND="cd /app && make"
-        docker stop "$CONT_NAME"
-        docker rm "$CONT_NAME"
-        docker run -i -v "$(pwd)":"/app" --name "$CONT_NAME" ${DOCKER_NAME} /bin/bash -c "$COMMAND"
-        docker stop "$CONT_NAME"
-        docker rm "$CONT_NAME"
+        # docker stop "$CONT_NAME"
+        # docker rm "$CONT_NAME"
+        # docker run -i -v "$(pwd)":"/app" --name "$CONT_NAME" ${DOCKER_NAME} /bin/bash -c "$COMMAND"
+        # docker stop "$CONT_NAME"
+        # docker rm "$CONT_NAME"
     else
         echo "No Makefile found, not generating anything"
     fi
+    cd ../..
 else
     echo "No latex folder found, not generating anything"
 fi
+cd ${BASH_CWD}
 
 # Inject install files in the man (if present)
 if [ -e "$OUTPUT_GENERATION/man" ]; then
@@ -151,6 +168,7 @@ if [ -e "$OUTPUT_GENERATION/man" ]; then
 else
     echo "There was no man generated"
 fi
+cd ${BASH_CWD}
 
 # Inject server spawner if present
 if [ -e "$OUTPUT_GENERATION/html" ]; then
@@ -163,25 +181,42 @@ if [ -e "$OUTPUT_GENERATION/html" ]; then
 else
     echo "There was no html generated"
 fi
+cd ${BASH_CWD}
 
 # Displaying the working directory
 echo "pwd: $(pwd)"
 
-# Create zip folders of the generated content
-DOCUMENTATION_ZIP_NAME=documentation.zip
-COMMAND_OPTIONS="--freshen -0"
-echo "Creating archives"
-zip $COMMAND_OPTIONS ${OUTPUT_GENERATION} ${DOCUMENTATION_ZIP_NAME}
+# Zip the content
+COMMAND_OPTIONS="-0 -r"
+echo "Finding folders in ${OUTPUT_GENERATION}"
+FORMATS=$(find ${OUTPUT_GENERATION} -maxdepth 1 -type d)
+echo "Found folders in the documentation: $FORMATS"
+# pause
+# echo "Generating archive of $(basename "${OUTPUT_GENERATION}")"
+# zip $COMMAND_OPTIONS ${DOCUMENTATION_ZIP_NAME} $(basename "${OUTPUT_GENERATION}")
+# pause
+for item in ${FORMATS[@]}; do
+    echo "Raw path: $item"
+    COMPILED_PATH="$item"
+    # COMPILED_PATH=$(basename "./$COMPILED_PATH")
+    echo "Creating zip archive: '$COMPILED_PATH'"
+    # pause
+    zip $COMMAND_OPTIONS ${item}.zip $COMPILED_PATH
+    # pause
+done
+cd ${BASH_CWD}
 
 # Reclaim ownership
 echo "Owning the generated content (replacing root by the current user account)"
 chown $MY_USER:$MY_USER -Rv $OUTPUT_GENERATION
 echo "Granting all users read-write rights on the files"
 chmod a+rw -Rv $OUTPUT_GENERATION
+cd ${BASH_CWD}
 
 # Display the final result
 echo "Displaying the latest version of the build process"
 ls -a ${OUTPUT_GENERATION}
+cd ${BASH_CWD}
 
 # Free cache that could of been created during the build process that is no longer required
 echo "Freeing no longer needed cache from the ram"
