@@ -1006,15 +1006,8 @@ jobs:
           echo "LBFRESULT='$LBFRESULT'"
           echo "MIBFRESULT='$MIBFRESULT'"
           echo "MMBFRESULT='$MMBFRESULT'"
-          FILE_LIST="$MMZN
-          $MIZN
-          $LZN
-          $DZN
-          $OGRESULT
-          $LBFRESULT
-          $MIBFRESULT
-          $MMBFRESULT"
-          echo "FOI=$FILE_LIST" >> $GITHUB_OUTPUT # Files Of Interest
+          FILE_LIST="$MMZN\n$MIZN\n$LZN\n$DZN\n$OGRESULT\n$LBFRESULT\n$MIBFRESULT\n$MMBFRESULT"
+          echo -e "FOI=$FILE_LIST" >> $GITHUB_OUTPUT # Files Of Interest
           # echo "$FILE_LIST" > ./upload_files.txt
 
       - name: Publish binary as GitHub release
