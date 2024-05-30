@@ -1030,7 +1030,8 @@ EXCLUDE                = *.o \
                          zappy_ai \
                          zappy_server \
                          zappy_gui \
-                         /app/src/ai/ai_env/**
+                         /app/src/ai/ai_env/** \
+                         /app/bonus/**
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
