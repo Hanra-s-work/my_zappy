@@ -946,6 +946,9 @@ jobs:
           if [ $STATUS -ne 0 ]; then
             echo "::error file=<none>,line=0,endLine=0,title=unzip is not installed::$STATUS"
           fi
+          if [ $? -ne 0 ]; then 
+            exit 0
+          fi
       
       - name: Compressing the folders into archives
         run: |
