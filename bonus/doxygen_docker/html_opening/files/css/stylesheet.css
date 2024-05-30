@@ -8,3 +8,29 @@
 * {
     font-family: 'Times New Roman', Times, serif;
 }
+
+header {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    display: flex;
+    flex-direction: row;
+    background-color: lightseagreen;
+    color: black;
+}
+
+a {
+    color: blue;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+footer {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: grey;
+    color: white;
+}
