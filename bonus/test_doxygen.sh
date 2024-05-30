@@ -143,11 +143,11 @@ if [ -e "${OUTPUT_GENERATION}/latex" ]; then
     if [ -e "Makefile" ]; then
         CONT_NAME=loxygen
         COMMAND="cd /app && make"
-        # docker stop "$CONT_NAME"
-        # docker rm "$CONT_NAME"
-        # docker run -i -v "$(pwd)":"/app" --name "$CONT_NAME" ${DOCKER_NAME} /bin/bash -c "$COMMAND"
-        # docker stop "$CONT_NAME"
-        # docker rm "$CONT_NAME"
+        docker stop "$CONT_NAME"
+        docker rm "$CONT_NAME"
+        docker run -i -v "$(pwd)":"/app" --name "$CONT_NAME" ${DOCKER_NAME} /bin/bash -c "$COMMAND"
+        docker stop "$CONT_NAME"
+        docker rm "$CONT_NAME"
     else
         echo "No Makefile found, not generating anything"
     fi

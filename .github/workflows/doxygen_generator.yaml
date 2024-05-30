@@ -978,9 +978,11 @@ jobs:
       - name: Display generated archives
         run: |
           echo "Displaying files at the source of the repository"
-          ls -a
-          echo "Dispolaying all zip files"
-          ls -a *.zip
+          ls -a --color=auto
+          echo "Displaying all zip files in ./"
+          ls -a --color=auto *.zip 
+          echo "Displaying all zip files in ${{env.OUTPUT_GENERATION}}/*.zip"
+          ls -a --color=auto ${{env.OUTPUT_GENERATION}}/*.zip
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
