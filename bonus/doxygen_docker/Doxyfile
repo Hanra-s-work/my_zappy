@@ -42,7 +42,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = Zappy - Year end project
+PROJECT_NAME           = "Zappy - Year end project"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -1302,7 +1302,7 @@ HTML_FILE_EXTENSION    = .html
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_HEADER            = /app/bonus/doxygen_docker/html_opening/header.html
+HTML_HEADER            = /app/bonus/doxygen_docker/html/header.html
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
 # generated HTML page. If the tag is left blank doxygen will generate a standard
@@ -1312,7 +1312,7 @@ HTML_HEADER            = /app/bonus/doxygen_docker/html_opening/header.html
 # that doxygen normally uses.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_FOOTER            = /app/bonus/doxygen_docker/html_opening/footer.html
+HTML_FOOTER            = /app/bonus/doxygen_docker/html/footer.html
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading style
 # sheet that is used by each HTML page. It can be used to fine-tune the look of
@@ -1324,7 +1324,7 @@ HTML_FOOTER            = /app/bonus/doxygen_docker/html_opening/footer.html
 # obsolete.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_STYLESHEET        = /app/bonus/doxygen_docker/html_opening/files/css/stylesheet.css
+HTML_STYLESHEET        = /app/bonus/doxygen_docker/html/files/css/stylesheet.css
 
 # The HTML_EXTRA_STYLESHEET tag can be used to specify additional user-defined
 # cascading style sheets that are included after the standard style sheets
@@ -1342,7 +1342,7 @@ HTML_STYLESHEET        = /app/bonus/doxygen_docker/html_opening/files/css/styles
 # documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = /app/bonus/doxygen_docker/html_opening/files/css/footer_stylesheet.css
+HTML_EXTRA_STYLESHEET  = /app/bonus/doxygen_docker/html/files/css/footer_stylesheet.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1469,7 +1469,7 @@ HTML_INDEX_NUM_ENTRIES = 100
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-GENERATE_DOCSET        = YES
+GENERATE_DOCSET        = NO
 
 # This tag determines the name of the docset feed. A documentation feed provides
 # an umbrella under which multiple documentation sets from a single provider
@@ -1528,7 +1528,7 @@ DOCSET_PUBLISHER_NAME  = Publisher
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-GENERATE_HTMLHELP      = YES
+GENERATE_HTMLHELP      = NO
 
 # The CHM_FILE tag can be used to specify the file name of the resulting .chm
 # file. You can add a path in front of the file if the result should not be
@@ -1693,7 +1693,7 @@ DISABLE_INDEX          = NO
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-GENERATE_TREEVIEW      = NO
+GENERATE_TREEVIEW      = YES
 
 # When both GENERATE_TREEVIEW and DISABLE_INDEX are set to YES, then the
 # FULL_SIDEBAR option determines if the side bar is limited to only the treeview
@@ -2387,7 +2387,8 @@ INCLUDE_PATH           = /app/src/server/include \
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 INCLUDE_FILE_PATTERNS  = *.h \
-                         *.hpp
+                         *.hpp \
+                         *.h++
 
 # The PREDEFINED tag can be used to specify one or more macro names that are
 # defined before the preprocessor is started (similar to the -D option of e.g.
