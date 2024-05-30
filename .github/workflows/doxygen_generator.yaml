@@ -722,6 +722,7 @@ jobs:
       MAC_INTEL_ZIP_NAME: mac_intel_chip.zip
       LINUX_ZIP_NAME: linux.zip
       DOCUMENTATION_ZIP_NAME: documentation.zip
+      FOLDERS_OF_INTEREST: ""
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -984,19 +985,25 @@ jobs:
           echo "Displaying all zip files in ${{env.OUTPUT_GENERATION}}/*.zip"
           ls -a --color=auto ${{env.OUTPUT_GENERATION}}/*.zip
 
+      - name: Get folders of interest
+        run: |
+          FILE_LIST="${{env.MAC_MON_ZIP_NAME}}
+          ${{env.MAC_INTEL_ZIP_NAME}}
+          ${{env.LINUX_ZIP_NAME}}
+          ${{env.DOCUMENTATION_ZIP_NAME}}
+          $(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -name "*.zip" -type f)
+          $(find ${{env.LINUX_BINARY_FOLDER}} -maxdepth 1 -type f)
+          $(find ${{env.MAC_INTEL_BINARY_FOLDER}} -maxdepth 1 -type f)
+          $(find ${{env.MAC_MONE_BINARY_FOLDER}} -maxdepth 1 -type f)" 
+          echo "FOLDERS_OF_INTEREST=$FILE_LIST" >> $GITHUB_ENV
+          echo "FOLDERS_OF_INTEREST = ${{env.FOLDERS_OF_INTEREST}}"
+
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ${{env.MAC_MON_ZIP_NAME}}
-            ${{env.MAC_INTEL_ZIP_NAME}}
-            ${{env.LINUX_ZIP_NAME}}
-            ${{env.DOCUMENTATION_ZIP_NAME}}
-            $(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -name "*.zip" -type f)
-            $(find ${{env.LINUX_BINARY_FOLDER}} -maxdepth 1 -type f)
-            $(find ${{env.MAC_INTEL_BINARY_FOLDER}} -maxdepth 1 -type f)
-            $(find ${{env.MAC_MONE_BINARY_FOLDER}} -maxdepth 1 -type f)
+            ${{env.FOLDERS_OF_INTEREST}}
           name: ${{ env.COMMIT_TITLE }}
           body: ${{ env.COMMIT_MESSAGE }}
           draft: false
