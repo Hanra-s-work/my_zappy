@@ -1028,10 +1028,10 @@ EXCLUDE                = *.o \
                          *.a \
                          *.pyc \
                          zappy_ai \
-                         zappy_server \
                          zappy_gui \
-                         /app/src/ai/ai_env/** \
-                         /app/bonus/**
+                         zappy_server \
+                         /app/bonus/** \
+                         /app/src/ai/ai_env/**
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

@@ -939,20 +939,20 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y zip unzip
-          zip --version >/dev/null 2>&1
-          STATUS=$?
-          if [ $STATUS -ne 0 ]; then
-            echo "::error file=<none>,line=0,endLine=0,title=zip is not installed::$STATUS"
-          fi
+          # zip --version >/dev/null 2>&1
+          # STATUS=$?
+          # if [ $STATUS -ne 0 ]; then
+          #   echo "::error file=<none>,line=0,endLine=0,title=zip is not installed::$STATUS"
+          # fi
 
-          unzip --version >/dev/null 2>&1
-          STATUS=$?
-          if [ $STATUS -ne 0 ]; then
-            echo "::error file=<none>,line=0,endLine=0,title=unzip is not installed::$STATUS"
-          fi
-          if [ $? -ne 0 ]; then 
-            exit 0
-          fi
+          # unzip --version >/dev/null 2>&1
+          # STATUS=$?
+          # if [ $STATUS -ne 0 ]; then
+          #   echo "::error file=<none>,line=0,endLine=0,title=unzip is not installed::$STATUS"
+          # fi
+          # if [ $? -ne 0 ]; then 
+          #   exit 0
+          # fi
       
       - name: Compressing the folders into archives
         run: |
