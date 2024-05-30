@@ -990,16 +990,32 @@ jobs:
       - name: Get folders of interest
         id: output-files
         run: |
-          FILE_LIST="${{env.MAC_MON_ZIP_NAME}}
-          ${{env.MAC_INTEL_ZIP_NAME}}
-          ${{env.LINUX_ZIP_NAME}}
-          ${{env.DOCUMENTATION_ZIP_NAME}}
-          $(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -name "*.zip" -type f)
-          $(find ${{env.LINUX_BINARY_FOLDER}} -maxdepth 1 -type f)
-          $(find ${{env.MAC_INTEL_BINARY_FOLDER}} -maxdepth 1 -type f)
-          $(find ${{env.MAC_MONE_BINARY_FOLDER}} -maxdepth 1 -type f)" 
+          MMZN=${{env.MAC_MON_ZIP_NAME}}
+          MIZN=${{env.MAC_INTEL_ZIP_NAME}}
+          LZN=${{env.LINUX_ZIP_NAME}}
+          DZN=${{env.DOCUMENTATION_ZIP_NAME}}
+          OGRESULT=$(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -name "*.zip" -type f)
+          LBFRESULT=$(find ${{env.LINUX_BINARY_FOLDER}} -maxdepth 1 -type f)
+          MIBFRESULT=$(find ${{env.MAC_INTEL_BINARY_FOLDER}} -maxdepth 1 -type f)
+          MMBFRESULT=$(find ${{env.MAC_MONE_BINARY_FOLDER}} -maxdepth 1 -type f)
+          echo "MMZN='$MMZN'"
+          echo "MIZN='$MIZN'"
+          echo "LZN='$LZN'"
+          echo "DZN='$DZN'"
+          echo "OGRESULT='$OGRESULT'"
+          echo "LBFRESULT='$LBFRESULT'"
+          echo "MIBFRESULT='$MIBFRESULT'"
+          echo "MMBFRESULT='$MMBFRESULT'"
+          FILE_LIST="$MMZN
+          $MIZN
+          $LZN
+          $DZN
+          $OGRESULT
+          $LBFRESULT
+          $MIBFRESULT
+          $MMBFRESULT"
           echo "FOI=$FILE_LIST" >> $GITHUB_OUTPUT # Files Of Interest
-          echo $FILE_LIST > ./upload_files.txt
+          # echo "$FILE_LIST" > ./upload_files.txt
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
