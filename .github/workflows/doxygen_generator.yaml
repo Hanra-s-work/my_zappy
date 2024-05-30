@@ -933,14 +933,16 @@ jobs:
       
       - name: Install the zip binary if not present
         run: |
-          zip --version >/dev/null 2>&1
+          zip --version >/dev/null 2>/dev/null
           if [ $? -ne 0 ]; then
-            apt install -y zip unzip
+            echo "zip is not installed, installing"
+            sudo apt install -y zip
           fi
 
-          unzip --version >/dev/null 2>&1
+          unzip --version >/dev/null 2>/dev/null
           if [ $? -ne 0 ]; then
-            apt install -y zip unzip
+            echo "unzip is not installed, installing"
+            sudo apt install -y unzip
           fi
       
       - name: Compressing the folders into archives
