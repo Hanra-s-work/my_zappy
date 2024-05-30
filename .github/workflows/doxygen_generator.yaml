@@ -958,8 +958,7 @@ jobs:
       
       - name: Compressing the folders into archives
         run: |
-          COMMAND_OPTIONS="--freshen -0"
-          COMMAND_OPTIONS="-0"
+          COMMAND_OPTIONS="-0 -r"
           zip $COMMAND_OPTIONS ${{env.DOCUMENTATION_ZIP_NAME}} ${{env.OUTPUT_GENERATION}}
           zip $COMMAND_OPTIONS ${{env.LINUX_ZIP_NAME}} ${{env.LINUX_BINARY_FOLDER}}
           zip $COMMAND_OPTIONS ${{env.MAC_INTEL_ZIP_NAME}} ${{env.MAC_INTEL_BINARY_FOLDER}}
