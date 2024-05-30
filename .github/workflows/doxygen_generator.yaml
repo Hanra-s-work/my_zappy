@@ -36,7 +36,7 @@ env:
   DOXYFILE: bonus/doxygen_docker/Doxyfile
   CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
   NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-  TEMPORARY_FOLDER: /tmp/dg
+  TEMPORARY_FOLDER: tmp_documentation
   OUTPUT_GENERATION: documentation
   LINUX_BINARY_FOLDER: "./linux_binaries"
   MAC_MONE_BINARY_FOLDER: "./mac_mone_binaries"
@@ -243,6 +243,8 @@ jobs:
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/man"
             cp $CWD/${{env.MAN_INSTALL_PATH}} ./$FILE_NAME
             chmod a+x $FILE_NAME
+          else
+            echo "There was no man generated"
           fi
       - name: Inject server spawner file if html is present
         run: |
@@ -252,6 +254,8 @@ jobs:
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/html"
             cp $CWD/${{env.HTML_SERVER_SPAWNER_PATH}} ./$FILE_NAME
             chmod a+x $FILE_NAME
+          else
+            echo "There was no html generated"
           fi
       - name: Save cache
         id: cache-save
