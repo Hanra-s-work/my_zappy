@@ -6,10 +6,6 @@ on:
       - "v*.*.*"
     branches:
       - doxygen_generation
-      # - main
-  # pull_request:
-  #   branches:
-  #     - main
   workflow_dispatch:
 
 
@@ -21,30 +17,37 @@ permissions:
 
 # The environment variables used for generation and upload
 env:
-  # GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Variables for managing required containers
+  DOCKER_NAME: hanralatalliard/doxygen
+  CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
+  # Variables for managin the tags
   SETUP_FILE: setup.py
   TAG_FILE: version.txt
   IS_RELEASE: is_release.txt
-  HTML_GENERATION: html
-  MAN_INSTALL_PATH: bonus/doxygen_docker/man/installer.sh
-  HTML_SERVER_SPAWNER_PATH: bonus/doxygen_docker/html/launch_server.sh
-  DOXYGEN_VERSION: 1.8.20
-  NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
+  # variables managing name publishing
   COMMIT_TITLE: "There is no title"
   COMMIT_MESSAGE: "There is no message"
-  DOCKER_NAME: hanralatalliard/doxygen
+  #Variables for the extras scripts
   DOXYFILE: bonus/doxygen_docker/Doxyfile
-  CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
+  MAN_INSTALL_PATH: bonus/doxygen_docker/man/installer.sh
+  HTML_SERVER_SPAWNER_PATH: bonus/doxygen_docker/html/launch_server.sh
+  # Variables for managing ntfy notification system
+  NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
   NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+  # Variables for specifying build locations
+  HTML_GENERATION: html
   TEMPORARY_FOLDER: tmp_documentation
   OUTPUT_GENERATION: documentation
+  # Variables for specifying the outputs to be cached/published
   LINUX_BINARY_FOLDER: "./linux_binaries"
   MAC_MONE_BINARY_FOLDER: "./mac_mone_binaries"
   MAC_INTEL_BINARY_FOLDER: "./mac_intel_binaries"
+  # Variable containing the reference key for the cache of each main section
   CACHE_KEY: doxygen-cache-key
   LINUX_CACHE_KEY_BUILD: linux-cache-key
   MAC_MONE_CACHE_KEY_BUILD: mac-mone-cache-key
   MAC_INTEL_CACHE_KEY_BUILD: mac-intel-cache-key
+  # Variables containing a more friendly name concerning their role and the destination architectures
   EXECUTABLES: "./zappy_ai ./zappy_gui ./zappy_server"
   EXECUTABLES_LINUX: "./zappy_linux_ai ./zappy_linux_gui ./zappy_linux_server"
   EXECUTABLES_MAC_INTEL: "./zappy_mac_intel_ai ./zappy_mac_intel_gui ./zappy_mac_intel_server"
@@ -722,7 +725,6 @@ jobs:
       MAC_INTEL_ZIP_NAME: mac_intel_chip.zip
       LINUX_ZIP_NAME: linux.zip
       DOCUMENTATION_ZIP_NAME: documentation.zip
-      FOLDERS_OF_INTEREST: ""
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
