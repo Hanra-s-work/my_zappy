@@ -36,6 +36,7 @@ env:
   DOXYFILE: bonus/doxygen_docker/Doxyfile
   CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
   NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+  TEMPORARY_FOLDER: /tmp/dg
   OUTPUT_GENERATION: documentation
   LINUX_BINARY_FOLDER: "./linux_binaries"
   MAC_MONE_BINARY_FOLDER: "./mac_mone_binaries"
@@ -172,7 +173,6 @@ jobs:
     needs: build_doxygen
     if: success()
     env:
-      TEMPORARY_FOLDER: /tmp/dg
       ICON_PATH: bonus/doxygen_docker/favicon/
     steps:
       - name: Checkout code
@@ -723,7 +723,7 @@ jobs:
         with:
           key: ${{ env.CACHE_KEY }}
           enableCrossOsArchive: true
-          path: ${{ env.OUTPUT_GENERATION }}
+          path: ${{ env.TEMPORARY_FOLDER }}
           restore-keys: |
             doxygen-cache-key
             cache-key-doxygen
@@ -913,16 +913,26 @@ jobs:
           ls -a ${{env.MAC_INTEL_BINARY_FOLDER}}
           echo "content of ${{env.MAC_MONE_BINARY_FOLDER}}"
           ls -a ${{env.MAC_MONE_BINARY_FOLDER}}
+      - name: Create archives
+        run: |
+          echo "Listing the source"
+          ls -a .
+          echo "Listing the content of the folders at the source"
+          ls -a ./*
+        
+      - name: Compressing the folders into archives
+        run: |
+          ls -a
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            ${{env.OUTPUT_GENERATION}}
-            ${{env.LINUX_BINARY_FOLDER}}
-            ${{env.MAC_INTEL_BINARY_FOLDER}}
-            ${{env.MAC_MONE_BINARY_FOLDER}}
+            ${{env.OUTPUT_GENERATION}}/*
+            ${{env.LINUX_BINARY_FOLDER}}/*
+            ${{env.MAC_INTEL_BINARY_FOLDER}}/*
+            ${{env.MAC_MONE_BINARY_FOLDER}}/*
           name: ${{ env.COMMIT_TITLE }}
           body: ${{ env.COMMIT_MESSAGE }}
           draft: false
