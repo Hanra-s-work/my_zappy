@@ -5,8 +5,8 @@ on:
     tags:
       - "v*.*.*"
     branches:
-      # - main
       - doxygen_generation
+      # - main
   # pull_request:
   #   branches:
   #     - main
@@ -210,7 +210,7 @@ jobs:
         run: |
           echo "Content of temporary folder: ${{ env.TEMPORARY_FOLDER }}"
           DOCUMENTATION=$(find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 1 -type d)
-          for i in ${DOCUMETATION[@]}
+          for i in ${DOCUMENTATION[@]}
           do
             echo "\$i = '$i'"
             FINAL_PATH="$i/files/icon"
@@ -243,6 +243,7 @@ jobs:
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/man"
             cp $CWD/${{env.MAN_INSTALL_PATH}} ./$FILE_NAME
             chmod a+x $FILE_NAME
+            cd $CWD
           else
             echo "There was no man generated"
           fi
@@ -254,6 +255,7 @@ jobs:
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/html"
             cp $CWD/${{env.HTML_SERVER_SPAWNER_PATH}} ./$FILE_NAME
             chmod a+x $FILE_NAME
+            cd $CWD
           else
             echo "There was no html generated"
           fi
@@ -957,6 +959,7 @@ jobs:
       - name: Compressing the folders into archives
         run: |
           COMMAND_OPTIONS="--freshen -0"
+          COMMAND_OPTIONS="-0"
           zip $COMMAND_OPTIONS ${{env.OUTPUT_GENERATION}} ${{env.DOCUMENTATION_ZIP_NAME}}
           zip $COMMAND_OPTIONS ${{env.LINUX_BINARY_FOLDER}} ${{env.LINUX_ZIP_NAME}}
           zip $COMMAND_OPTIONS ${{env.MAC_INTEL_BINARY_FOLDER}} ${{env.MAC_INTEL_ZIP_NAME}}
