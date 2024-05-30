@@ -204,7 +204,7 @@ jobs:
           ls -a ${{ env.OUTPUT_GENERATION }}/
       - name: Listing content of temporary folder
         run: |
-          echo "Contents os ${{env.TEMPORARY_FOLDER}}"
+          echo "Contents of ${{env.TEMPORARY_FOLDER}}"
           ls -a ${{env.TEMPORARY_FOLDER}}
       - name: Copy the icons to the generated documentation
         run: |
@@ -824,7 +824,7 @@ jobs:
         run: |
           is_release="$(cat ${{env.IS_RELEASE}})"
           latest_tag="$(cat ${{env.TAG_FILE}})"
-          echo "ls = $(ls)"
+          echo "ls = '$(ls)'"
           echo "is_release = $is_release"
           echo "latest_tag = $latest_tag"
           if [[ $is_release == "true" ]]; then
@@ -902,9 +902,15 @@ jobs:
           COMMIT_MESSAGE_ESCAPED=$(echo "$COMMIT_MESSAGE" | awk '{printf "%s\\n", $0}')
           echo "COMMIT_MESSAGE=$COMMIT_MESSAGE_ESCAPED" >> $GITHUB_ENV
 
+      - name: Restore the documentation to it's original directory
+        run: |
+          cp -rv ${{env.TEMPORARY_FOLDER}} ${{env.OUTPUT_GENERATION}}
+
       - name: Display current restored cache
         run: |
           ls -a
+          echo "content of ${{env.TEMPORARY_FOLDER}}"
+          ls -a ${{env.TEMPORARY_FOLDER}}
           echo "content of ${{env.OUTPUT_GENERATION}}"
           ls -a ${{env.OUTPUT_GENERATION}}
           echo "content of ${{env.LINUX_BINARY_FOLDER}}"
