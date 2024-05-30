@@ -122,7 +122,7 @@ for i in ${DOCUMENTATION[@]}; do
     ls -a -ls --color=auto "$FINAL_PATH"
 done
 
-# Generating latext if present
+# Generating latex if present
 if [ -e "${OUTPUT_GENERATION}/latex" ]; then
     cd "${OUTPUT_GENERATION}/latex"
     if [ -e "Makefile" ]; then
@@ -145,7 +145,7 @@ if [ -e "$OUTPUT_GENERATION/man" ]; then
     CWD=$(pwd)
     FILE_NAME="install_man.sh"
     cd "$OUTPUT_GENERATION/man"
-    cp $CWD/$MAN_INSTALL_PATH ./$FILE_NAME
+    cp -v $CWD/$MAN_INSTALL_PATH ./$FILE_NAME
     chmod a+x $FILE_NAME
     cd $CWD
 else
@@ -157,12 +157,15 @@ if [ -e "$OUTPUT_GENERATION/html" ]; then
     CWD=$(pwd)
     FILE_NAME="launch_server.sh"
     cd "$OUTPUT_GENERATION/html"
-    cp $CWD/$HTML_SERVER_SPAWNER_PATH ./$FILE_NAME
+    cp -v $CWD/$HTML_SERVER_SPAWNER_PATH ./$FILE_NAME
     chmod a+x $FILE_NAME
     cd $CWD
 else
     echo "There was no html generated"
 fi
+
+# Displaying the working directory
+echo "pwd: $(pwd)"
 
 # Create zip folders of the generated content
 DOCUMENTATION_ZIP_NAME=documentation.zip
