@@ -27,7 +27,7 @@ env:
   IS_RELEASE: is_release.txt
   HTML_GENERATION: html
   MAN_INSTALL_PATH: bonus/doxygen_docker/man/installer.sh
-  HTML_SERVER_SPAWNER_PATH: bonus/doxygen_docker/html_opening/launch_server.sh
+  HTML_SERVER_SPAWNER_PATH: bonus/doxygen_docker/html/launch_server.sh
   DOXYGEN_VERSION: 1.8.20
   NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
   COMMIT_TITLE: "There is no title"
