@@ -21,8 +21,6 @@ header,
     padding-right: 0;
     display: flex;
     flex-direction: row;
-    background-color: lightseagreen;
-    color: black;
 }
 
 .contents {
@@ -43,21 +41,6 @@ a:hover {
 a:active {
     color: deepskyblue;
     text-decoration: none;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: 'Times New Roman', Times, serif;
-    text-decoration: none;
-}
-
-ul {
-    color: black;
-    list-style-type: lower-greek;
 }
 
 
