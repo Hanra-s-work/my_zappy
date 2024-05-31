@@ -994,10 +994,10 @@ jobs:
           MIZN="${{env.MAC_INTEL_ZIP_NAME}}"
           LZN="${{env.LINUX_ZIP_NAME}}"
           DZN="${{env.DOCUMENTATION_ZIP_NAME}}"
-          OGRESULT="$(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -name '*.zip' -type f)"
-          LBFRESULT="$(find ${{env.LINUX_BINARY_FOLDER}} -maxdepth 1 -type f)"
-          MIBFRESULT="$(find ${{env.MAC_INTEL_BINARY_FOLDER}} -maxdepth 1 -type f)"
-          MMBFRESULT="$(find ${{env.MAC_MONE_BINARY_FOLDER}} -maxdepth 1 -type f)"
+          OGRESULT="$(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -name '*.zip' -type f | tr '\n' ' ')"
+          LBFRESULT="$(find ${{env.LINUX_BINARY_FOLDER}} -maxdepth 1 -type f | tr '\n' ' ')"
+          MIBFRESULT="$(find ${{env.MAC_INTEL_BINARY_FOLDER}} -maxdepth 1 -type f | tr '\n' ' ')"
+          MMBFRESULT="$(find ${{env.MAC_MONE_BINARY_FOLDER}} -maxdepth 1 -type f | tr '\n' ' ')"
           echo "MMZN='$MMZN'"
           echo "MIZN='$MIZN'"
           echo "LZN='$LZN'"
@@ -1007,7 +1007,7 @@ jobs:
           echo "MIBFRESULT='$MIBFRESULT'"
           echo "MMBFRESULT='$MMBFRESULT'"
           FILE_LIST="$MMZN $MIZN $LZN $DZN $OGRESULT $LBFRESULT $MIBFRESULT $MMBFRESULT"
-          echo -e "FOI='$FILE_LIST'" >> $GITHUB_OUTPUT # Files Of Interest
+          echo -e "FOI='$FILE_LIST'" >> "$GITHUB_OUTPUT" # Files Of Interest
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
