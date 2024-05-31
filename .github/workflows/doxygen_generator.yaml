@@ -233,6 +233,7 @@ jobs:
       - name: Generate latex if present
         run: |
           if [ -e "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/latex" ]; then
+            CWD=$(pwd)
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/latex"
             if [ -e "Makefile" ]; then
               CONT_NAME=loxygene
@@ -243,6 +244,7 @@ jobs:
             else
               echo "No Makefile found, not generating anything"
             fi
+            cd $CWDxs
           else
             echo "No latex folder found, not generating anything"
           fi
