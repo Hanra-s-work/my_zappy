@@ -48,7 +48,37 @@ function count_files_in_man_folder {
 }
 
 function dump_python_charset_changer_for_file {
-    echo "Charset changer to come"
+    decho "Creating file charset changer"
+    echo '#!/bin/env python3' >"$PYTHON_ENCODER"
+    echo '# Import the sys package in order to get the standard input' >>"$PYTHON_ENCODER"
+    echo 'import sys' >>"$PYTHON_ENCODER"
+    echo 'error = 1  # The status when the program fails' >>"$PYTHON_ENCODER"
+    echo 'success = 0  # The status when the program succeeds' >>"$PYTHON_ENCODER"
+    echo 'argc = len(sys.argv)' >>"$PYTHON_ENCODER"
+    echo '# Check if the argument count is not equal to 2 or (if the argument count is equal to 2 check that the content corresponds to a help call)' >>"$PYTHON_ENCODER"
+    echo 'if argc != 2 or (argc == 2 and sys.argv[1].lower() in ("-h", "--help", "/?")):' >>"$PYTHON_ENCODER"
+    echo '    # The print function displays text' >>"$PYTHON_ENCODER"
+    echo '    print(f"USAGE:\n\t<stdin_data> | {sys.argv[0]} <file_name>")' >>"$PYTHON_ENCODER"
+    echo '    # The print function displays text' >>"$PYTHON_ENCODER"
+    echo '    print("DESCRIPTION:\n\tThis script is used in order make sure that the files written to the disk are in the correct format.")' >>"$PYTHON_ENCODER"
+    echo '    # If the argument count is not 2, exit with an error' >>"$PYTHON_ENCODER"
+    echo '    if argc != 2:' >>"$PYTHON_ENCODER"
+    echo '        sys.exit(error)' >>"$PYTHON_ENCODER"
+    echo '    # If we did not exit before, we exit with a success code' >>"$PYTHON_ENCODER"
+    echo '    sys.exit(success)' >>"$PYTHON_ENCODER"
+    echo '# If we passed the check sequence, we open a file with the name passed as an argument (with a few encoding parameters)' >>"$PYTHON_ENCODER"
+    echo 'with open(f"{sys.argv[1]}", "w", encoding="utf-8", newline="\n") as file:' >>"$PYTHON_ENCODER"
+    echo '    # We get the content piped in by the user' >>"$PYTHON_ENCODER"
+    echo '    data = sys.stdin.read()' >>"$PYTHON_ENCODER"
+    echo '    # We write it to a file' >>"$PYTHON_ENCODER"
+    echo '    file.write(data)' >>"$PYTHON_ENCODER"
+    echo '# Once the with loop is exited, the file is automatically closed' >>"$PYTHON_ENCODER"
+    echo '# We display the "data is written to the file" message on the user"s screen' >>"$PYTHON_ENCODER"
+    echo 'print("The data is written to the file")' >>"$PYTHON_ENCODER"
+    echo "Granting execution wrights to: '$PYTHON_ENCODER'"
+    chmod a+x $PYTHON_ENCODER
+    chmod u+x $PYTHON_ENCODER
+    chmod g+x $PYTHON_ENCODER
 }
 
 function get_files_in_man_folder {
@@ -69,7 +99,7 @@ function get_files_in_man_folder {
         filename_without_extension="${filename%.3}"
         decho "file: '$filename_without_extension'" >&2
         # Append the file name to the man page content
-        MAN_CONTENT+="\n.B ${MAN_PROG_DIR}/${filename_without_extension}"
+        MAN_CONTENT+="\n.B ${MAN_PROG_DIR}/${filename_without_extension}\n"
         MAN_CONTENT+="\n.so ${MAN_PROG_DIR}/${filename}\n"
     done
     decho "Out of get file in man folder" >&2
@@ -230,8 +260,7 @@ $MAN_FILES
     if [ $DEBUG -eq $TRUE ]; then
         echo -e "$HOMEPAGE"
     fi
-    echo -e "$HOMEPAGE" >"$1"/"$2"."$3"
-
+    echo -e "$HOMEPAGE" | $PYTHON_ENCODER "$1/$2.$3"
 }
 
 function create_zappy_ai_man {
@@ -324,7 +353,7 @@ $MAN_FILES
     if [ $DEBUG -eq $TRUE ]; then
         echo -e "$HOMEPAGE"
     fi
-    echo -e "$HOMEPAGE" >"$1"/"$2"."$3"
+    echo -e "$HOMEPAGE" | $PYTHON_ENCODER "$1/$2.$3"
 
 }
 
@@ -420,7 +449,7 @@ $MAN_FILES
     if [ $DEBUG -eq $TRUE ]; then
         echo -e "$HOMEPAGE"
     fi
-    echo -e "$HOMEPAGE" >"$1"/"$2"."$3"
+    echo -e "$HOMEPAGE" | $PYTHON_ENCODER "$1/$2.$3"
 
 }
 
@@ -531,7 +560,7 @@ $MAN_FILES
     if [ $DEBUG -eq $TRUE ]; then
         echo -e "$HOMEPAGE"
     fi
-    echo -e "$HOMEPAGE" >"$1"/"$2"."$3"
+    echo -e "$HOMEPAGE" | $PYTHON_ENCODER "$1/$2.$3"
 
 }
 
@@ -654,6 +683,10 @@ MAN_SHORTCUT_HOME="${MAN_DIR}man${MAN_LEVEL}"
 MAN_SHORTCUT_BINS="${MAN_DIR}man1"
 MAN_SOURCE="./man3"
 MAN_DB="/etc/man_db.conf"
+
+# Create a python file that will be used to change the file encoding of the man pages we are going to create
+# See function content for line by line comments
+dump_python_charset_changer_for_file
 
 # Removing existing man pages if they exist
 echo "Removing previous manual entries of this program if they existed"
