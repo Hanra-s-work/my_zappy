@@ -1027,8 +1027,12 @@ jobs:
           FILES_OF_INTEREST: ${{ steps.output-files.outputs.FOI }}
         run: |
           TEMPORARY_FOLDER=./tmp_data
+          E=${{env.FILES_OF_INTEREST}}
           mkdir -p $TEMPORARY_FOLDER
-          cp -rvf ${{env.FILES_OF_INTEREST}} $TEMPORARY_FOLDER
+          for i in ${E[@]}
+          do
+            cp -vf $i "$TEMPORARY_FOLDER/$(basename "$i")"
+          done
           echo "AP=$(ls $TEMPORARY_FOLDER)" >> $GITHUB_OUTPUT #anchor point
 
 
@@ -1047,20 +1051,20 @@ jobs:
           make_latest: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  # clean_created_cache:
-  #   name: Clear the cache generated during the build time
-  #   permissions: write-all
-  #   runs-on: ubuntu-latest
-  #   needs: [export_other_formats_when_present, publish_html ]
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #     - name: Delete Created cache
-  #       env:
-  #         GH_TOKEN: ${{ secrets.CACHE_TOKEN }}
-  #       run: |
-  #         gh cache list
-  #         gh cache delete --all
+  clean_created_cache:
+    name: Clear the cache generated during the build time
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs: [export_other_formats_when_present, publish_html ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Delete Created cache
+        env:
+          GH_TOKEN: ${{ secrets.CACHE_TOKEN }}
+        run: |
+          gh cache list
+          gh cache delete --all
 
