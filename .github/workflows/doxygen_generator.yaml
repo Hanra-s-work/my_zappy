@@ -219,6 +219,10 @@ jobs:
               echo "Skipping 'man' directory"
               continue
             fi
+            if [[ "$(basename "$i")" == "html" ]]; then
+              echo "Skipping 'html' directory"
+              continue
+            fi
             echo "\$i = '$i'"
             FINAL_PATH="$i/files/icon"
             echo "Final path = $FINAL_PATH"
