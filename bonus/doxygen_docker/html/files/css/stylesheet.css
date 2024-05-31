@@ -10,8 +10,8 @@
 }
 
 body {
-    background-color: aliceblue;
-    color: black;
+    background-color: var(--page-background-color);
+    color: var(--page-foreground-color);
 }
 
 header,
