@@ -1007,7 +1007,8 @@ jobs:
           echo "MIBFRESULT='$MIBFRESULT'"
           echo "MMBFRESULT='$MMBFRESULT'"
           FILE_LIST="$MMZN $MIZN $LZN $DZN $OGRESULT $LBFRESULT $MIBFRESULT $MMBFRESULT"
-          echo -e "FOI='$FILE_LIST'" >> "$GITHUB_OUTPUT" # Files Of Interest
+          echo "Final file list='$FILE_LIST'"
+          echo "FOI=$(echo $FILE_LIST | tr '\n' ' ')" >> "$GITHUB_OUTPUT" # Files of interest
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
