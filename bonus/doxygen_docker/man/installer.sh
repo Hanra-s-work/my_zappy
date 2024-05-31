@@ -681,7 +681,7 @@ MAN_DEST="${MAN_DIR}${MAN_PROG_DIR}"
 MAN_LEVEL=6
 MAN_SHORTCUT_HOME="${MAN_DIR}man${MAN_LEVEL}"
 MAN_SHORTCUT_BINS="${MAN_DIR}man1"
-MAN_SOURCE="./man3"
+MAN_SOURCE="./man6"
 MAN_DB="/etc/man_db.conf"
 
 # Create a python file that will be used to change the file encoding of the man pages we are going to create
