@@ -215,6 +215,10 @@ jobs:
           DOCUMENTATION=$(find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 1 -type d)
           for i in ${DOCUMENTATION[@]}
           do
+            if [[ "$(basename "$i")" == "man" ]]; then
+              echo "Skipping 'man' directory"
+              continue
+            fi
             echo "\$i = '$i'"
             FINAL_PATH="$i/files/icon"
             echo "Final path = $FINAL_PATH"
