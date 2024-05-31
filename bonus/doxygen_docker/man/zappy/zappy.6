@@ -1,10 +1,10 @@
-." Manpage for zappy project
-." Contact: Your Name <your.email@example.com>
+.\" Manpage for zappy project
+.\" Contact: Henry Letellier <henrysoftwarehouse@protonmail.com>.
 .TH ZAPPY "EPITECH" 6 "May 2024" "Version 1.0" "Zappy Manual"
-
+.PP
 .SH NAME
 Zappy \- Welcome to Zappy!
-
+.PP
 .SH SYNOPSIS
 .nf
 .BI \fB\,zappy_ai\ \ \t\fR\fI\,\-help\fR\ |\ \fR\fI\,\-p\ \fRport\fR\ \fR\fI\,\-n\ \fRname\fR\ \fR\fI\,\-h\ \fRmachine
@@ -12,10 +12,30 @@ Zappy \- Welcome to Zappy!
 .BI \fB\,zappy_server\t\fR\fI\,\-help\fR\ |\ \fR\fI\,\-p\ \fRport\ \fR\fI\,\fR\fI\,\-x\ \fRwidth\ \fI\,\-y\ \fRheight\ \fI\,\-n\ \fRname1\ name2\ ...\ \fI\,\-c\ \fRclientsNb\ \fI\,\-f\ \fRfrequency
 .fi
 .SH DESCRIPTION
-The Zappy project is a game involving 3 binaries:
-
-
-
+.nf
+.BI \fRThe\ Zappy\ project\ is\ a\ multiplayer\ simulation\ game\ where\ players\ inhabit\ a\ virtual\ world\ and\ interact\ with\ each\ other\ and\ their\ environment.
+.BI \fRThe\ game\ environment\ is\ generated\ by\ a\ server,\ and\ players\ can\ join\ teams\ to\ compete\ or\ cooperate\ in\ various\ challenges.
+.BI \fR
+.BI \fRThe\ project\ consists\ of\ three\ main\ components:
+.IP \[bu]
+Server (zappy_server):
+.BI \fR\tThis\ component\ generates\ the\ virtual\ world\ where\ players\ reside.\
+.BI \fR\tIt\ manages\ the\ game\ state,\ including\ the\ terrain,\ resources,\ and\ entities.
+.BI \fR\tThe\ server\ listens\ for\ connections\ from\ clients\ and\ handles\ their\ interactions\ within\ the\ world.
+.IP \[bu]
+Graphical Client (zappy_gui):
+.BI \fR\tRThe\ graphical\ client\ provides\ a\ visual\ representation\ of\ the\ game\ world.
+.BI \fR\tRPlayers\ can\ observe\ the\ state\ of\ the\ environment,\ including\ the\ movements\ of\ entities\ and\ the\ distribution\ of\ resources.
+.BI \fR\tRIt\ enhances\ the\ gaming\ experience\ by\ offering\ real-time\ updates\ and\ immersive\ graphics.
+.IP \[bu]
+AI Client (zappy_ai):
+.BI \fR\tThe\ AI\ client\ allows\ players\ to\ control\ virtual\ inhabitants\ within\ the\ game\ world.
+.BI \fR\tPlayers\ can\ develop\ strategies\ and\ algorithms\ to\ navigate\ the\ environment,\ gather\ resources,\ and\ interact\ with\ other\ players.
+.BI \fR\tPThe\ AI\ client\ communicates\ with\ the\ server\ to\ execute\ commands\ and\ receive\ updates\ on\ the\ game\ state.
+.PP
+.BI \fRThe\ Zappy\ project\ offers\ an\ engaging\ and\ collaborative\ gaming\ experience,\ where\ players\ can\ explore,\ strategize,\ and\ compete\ in\ a\ dynamic\ virtual\ world.
+.fi
+.PP
 .SH OPTIONS
 .nf
 .PP
@@ -55,13 +75,25 @@ The Zappy project is a game involving 3 binaries:
 .BI\t\t\t\fRSpecifies\ the\ number\ of\ actions\ per\ time\ unit.
 .BI\t\t\t\fRA\ higher\ frequency\ means\ actions\ happen\ faster.
 .fi
-
+.PP
+.SH USAGE
+.nf
+.BI \fRExample\ usage:
+.BI \fRIn\ this\ example\ the\ 4\ lines\ need\ to\ be\ run\ one\ after\ the\ other\ (we\ are\ in\ a\ linux/mac\ environment).
+.BI \fR\t./zappy_ai\ \-p\ 4242\ \-n\ team1\ \-h\ localhost\ &
+.BI \fR\t./zappy_ai\ \-p\ 4243\ \-n\ team2\ \-h\ localhost\ &
+.BI \fR\t./zappy_server\ \-p\ 4244\ \-x\ 100\ \-y\ 100\ \-n\ team1\ team2\ \-c\ 10\ \-f\ 100\ &
+.BI \fR\t./zappy_gui\ \-p\ 4245\ \-h\ localhost\ &
+.PP
+.fi
 .SH SEE ALSO
-.BI    zappy_server(1),\ zappy_gui(1),\ zappy_server(1)
+.nf
+.BI zappy_ai(1),\ zappy_gui(1),\ zappy_server(1)
+.fi
 .SH AUTHOR
 Written by (c) Henry Letellier.
-
-.SH DEVELLOPPERS
+.PP
+.SH DEVELOPERS
 .nf
 .B (c)\ Harleen\ Singh-Kaur
 .B (c)\ Eric\ Xu
@@ -69,41 +101,42 @@ Written by (c) Henry Letellier.
 .B (c)\ Thomas\ Lebouc
 .B (c)\ Henry\ Letellier
 .fi
-
+.PP
 .SH COPYRIGHT
 .nf
 .BI \fRThis\ is\ a\ project\ that\ was\ created\ during\ our\ second\ year\ at\ Epitech.
 .BI \fRThus,\ feel\ free\ to\ use\ this\ project,\ but\ you\ cannot\ edit,\ sel\ or\ re-sel\ it.
 .fi
-
+.PP
 .SH BUGS
 .nf
-.BI \fRPlease\ report\ any\ bugs\ to\ <henrysoftwarehouse@protonmail.com>.
-.BI \fRAlthough,\ there\ is\ absolutly\ no\ garanty\ that\ it\ will\ be\ fixed.
+.BI \fRPlease\ report\ any\ bugs\ to\ <henrysoftwarehouse@protonmail\&.com>.
+.BI \fRAlthough,\ there\ is\ absolutely\ no\ guaranty\ that\ it\ will\ be\ fixed.
 .BI \fRAnother\ way\ would\ be\ to\ open\ an\ issue\ on\ the\ github\ project,\ see\ "PROJECT\ RESSOURCES"\ for\ more\ details.
 .fi
-
+.PP
 .SH NOTES
 .nf
 .BI \fIThis\ man\ page\ is\ for\ informational\ purposes\ only.
 .BI \fRFor\ detailed\ usage\ instructions,\ please\ refer\ to\ the\ specific\ manual\ pages\ listed\ under\ "SEE\ ALSO".
 .BI \fRYou\ can\ also\ find\ links\ concerning\ the\ project\ in\ "PROJECT\ RESSOURCES"
 .fi
-
+.PP
 .SH PROJECT RESSOURCES
 .nf
-.".BI\fRWebsite:\ https://zappy\&.pingpal\&.news/
-.BI\fRSource\ code\ (Github):\ https://github\&.com/Hanra-s-work/my_zappy/
-.BI\fRDocumentation:\ https://zappy\&.pingpal\&.news/
+.\" .BI\fRWebsite:\ https://zappy\&.pingpal\&.news/
+.BI \fRSource\ code\ (Github):\ https://github\&.com/Hanra-s-work/my_zappy/
+.BI \fRDocumentation:\ https://zappy\&.pingpal\&.news/
 .fi
-
+.PP
 .SH DISCLAIMER
+.PP
 This software is provided "as is" without warranty of any kind. Use at your own risk.
-
+.PP
 .SH VERSION
 1.0
-
+.PP
 .SH DATE
 May 2024
-
+.PP
 .SH SUB-PAGE DOXY DUMP [${FILE_COUNT} file(s)] (very crude for now)
