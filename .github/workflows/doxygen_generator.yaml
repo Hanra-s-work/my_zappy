@@ -44,6 +44,7 @@ env:
   MAC_INTEL_BINARY_FOLDER: "./mac_intel_binaries"
   # Variable containing the reference key for the cache of each main section
   CACHE_KEY: doxygen-cache-key
+  CACHE_KEY_CLEANED: doxygen-cache-key-cleaned
   LINUX_CACHE_KEY_BUILD: linux-cache-key
   MAC_MONE_CACHE_KEY_BUILD: mac-mone-cache-key
   MAC_INTEL_CACHE_KEY_BUILD: mac-intel-cache-key
@@ -276,7 +277,7 @@ jobs:
         id: cache-save
         uses: actions/cache@v4
         with:
-          key: ${{env.CACHE_KEY}}
+          key: ${{env.CACHE_KEY_CLEANED}}
           path: ${{env.TEMPORARY_FOLDER}}
           enableCrossOsArchive: true
 
@@ -300,7 +301,7 @@ jobs:
         id: html-cache-restore
         uses: actions/cache@v4
         with:
-          key: ${{ env.CACHE_KEY }}
+          key: ${{ env.CACHE_KEY_CLEANED }}
           path: ${{ env.OUTPUT_GENERATION }}
           enableCrossOsArchive: true
           restore-keys: |
@@ -745,7 +746,7 @@ jobs:
         id: cache-documentation-restore
         uses: actions/cache@v4
         with:
-          key: ${{ env.CACHE_KEY }}
+          key: ${{ env.CACHE_KEY_CLEANED }}
           enableCrossOsArchive: true
           path: ${{ env.TEMPORARY_FOLDER }}
           restore-keys: |
