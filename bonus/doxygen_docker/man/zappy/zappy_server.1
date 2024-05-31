@@ -1,0 +1,47 @@
+.ZAPPY_SERVER(1)                  User Commands                  .ZAPPY_SERVER(1)
+
+.NAME
+       zappy_server - generate the inhabitants’ world
+
+.SYNOPSIS
+       zappy_server [OPTIONS]
+
+.DESCRIPTION
+       zappy_server generates a world for inhabitants to live in and interact.
+
+.OPTIONS
+       -p, --port PORT
+              Specifies the port number on which the server listens.
+
+       -x, --width WIDTH
+              Specifies the width of the world.
+
+       -y, --height HEIGHT
+              Specifies the height of the world.
+
+       -n, --name TEAM_NAMES
+              Specifies the names of the teams. Multiple team names should be separated by spaces.
+
+       -c, --clients CLIENTS_NUMBER
+              Specifies the number of authorized clients per team.
+
+       -f, --freq FREQUENCY
+              Specifies the reciprocal of the time unit for the execution of actions.
+
+.USAGE
+       Example usage:
+
+              ./zappy_server -p 4242 -x 100 -y 100 -n team1 team2 -c 10 -f 100
+
+.AUTHOR
+       Written by [Your Name].
+
+.REPORTING BUGS
+       Report bugs to <your.email@example.com>.
+
+.COPYRIGHT
+       This is free software; see the source for copying conditions. There is NO
+       warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       zappy_gui(1), zappy_ai(1)
