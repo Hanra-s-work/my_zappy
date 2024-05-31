@@ -128,14 +128,21 @@ ls -a "${OUTPUT_GENERATION}/${HTML_GENERATION}":
 echo "Content of temporary folder: ${OUTPUT_GENERATION}"
 DOCUMENTATION=$(find ${OUTPUT_GENERATION}/* -maxdepth 1 -type d)
 for i in ${DOCUMENTATION[@]}; do
+    if [[ "$(basename "$i")" == "man" ]]; then
+        echo "Skipping 'man' directory"
+        continue
+    fi
+    if [[ "$(basename "$i")" == "html" ]]; then
+        echo "Skipping 'html' directory"
+        continue
+    fi
     echo "\$i = '$i'"
     FINAL_PATH="$i/files/icon"
     echo "Final path = $FINAL_PATH"
     mkdir -p "$FINAL_PATH"
-    cp -rv ${ICON_PATH}/* "$FINAL_PATH"
+    cp -r ${ICON_PATH}/* "$FINAL_PATH"
     ls -a -ls --color=auto "$FINAL_PATH"
 done
-cd ${BASH_CWD}
 
 # Generating latex if present
 if [ -e "${OUTPUT_GENERATION}/latex" ]; then
