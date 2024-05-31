@@ -11,7 +11,7 @@ on:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -1026,13 +1026,14 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         env:
           FILES_OF_INTEREST: ${{ steps.output-files.outputs.FOI }}
-          GH_TOKEN: ${{ secrets.CACHE_TOKEN }}
         with:
           files: ${{env.FILES_OF_INTEREST}}
           name: ${{ env.COMMIT_TITLE }}
           body: ${{ env.COMMIT_MESSAGE }}
           draft: false
           prerelease: false
+          make_latest: true
+          token: ${{ secrets.CACHE_TOKEN }}
 
   clean_created_cache:
     name: Clear the cache generated during the build time
