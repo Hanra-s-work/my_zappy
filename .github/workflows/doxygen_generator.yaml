@@ -1036,45 +1036,20 @@ jobs:
         run: |
           echo "In temporary load point"
           TEMPORARY_FOLDER=./tmp_data
-          E=${{env.FILES_OF_INTEREST}}
-          echo "content or E=$E"
+          FILES_OF_INTEREST="${{ steps.output-files.outputs.FOI }}"
+          echo "content of FILES_OF_INTEREST=$FILES_OF_INTEREST"
           mkdir -p $TEMPORARY_FOLDER
-          MMZN=${{ steps.output-files.outputs.MMZN}}
-          MIZN=${{ steps.output-files.outputs.MIZN}}
-          LZN=${{ steps.output-files.outputs.LZN}}
-          DZN=${{ steps.output-files.outputs.DZN}}
-          OGRESULT=${{ steps.output-files.outputs.OGRESULT}}
-          LBFRESULT=${{ steps.output-files.outputs.LBFRESULT}}
-          MIBFRESULT=${{ steps.output-files.outputs.MIBFRESULT}}
-          MMBFRESULT=${{ steps.output-files.outputs.MMBFRESULT}}
-          cp -vf "${MMZN}" "${MIZN}" "${LZN}" "${DZN}" "${TEMPORARY_FOLDER}"
-          for i in "${OGRESULT[@]}"
-          do
-            cp -vf "$i" "${TEMPORARY_FOLDER}"
+          for FILE in $FILES_OF_INTEREST; do
+            cp -v "$FILE" "$TEMPORARY_FOLDER"
           done
-          for i in "${LBFRESULT[@]}"
-          do
-            cp -vf "$i" "${TEMPORARY_FOLDER}"
-          done
-          for i in "${MIBFRESULT[@]}"
-          do
-            cp -vf "$i" "${TEMPORARY_FOLDER}"
-          done
-          for i in "${MMBFRESULT[@]}"
-          do
-            cp -vf "$i" "${TEMPORARY_FOLDER}"
-          done
-          echo "AP=$(ls ${TEMPORARY_FOLDER})" >> $GITHUB_OUTPUT #anchor point
+          echo "AP=$(ls $TEMPORARY_FOLDER)" >> $GITHUB_OUTPUT # anchor point
 
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
-        env:
-          FILES_OF_INTEREST: ${{ steps.anchor-point.outputs.AP}}
         with:
-          files: |
-            ${{env.FILES_OF_INTEREST}}
+          files: ${{ steps.anchor-point.outputs.AP}}
           name: ${{ env.COMMIT_TITLE }}
           body: ${{ env.COMMIT_MESSAGE }}
           draft: false
