@@ -1042,7 +1042,15 @@ jobs:
           for FILE in $FILES_OF_INTEREST; do
             cp -v "./$FILE" "$TEMPORARY_FOLDER"
           done
-          echo "AP=$(ls $TEMPORARY_FOLDER)" >> "$GITHUB_OUTPUT" # anchor point
+          echo "Loop finished"
+          echo "Content of TEMPORARY_FOLDER:"
+          ls -a "$TEMPORARY_FOLDER"
+          echo "sending content to github output"
+          {
+            echo 'AP<<EOF'
+            find ./$TEMPORARY_FOLDER -maxdepth 1 -type f
+            echo EOF
+          } >> "$GITHUB_OUTPUT" # anchor point
 
 
       - name: Publish binary as GitHub release
