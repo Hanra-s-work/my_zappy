@@ -24,6 +24,7 @@ env:
   SETUP_FILE: setup.py
   TAG_FILE: version.txt
   IS_RELEASE: is_release.txt
+  LATEST_TAG: ""
   # variables managing name publishing
   COMMIT_TITLE: "There is no title"
   COMMIT_MESSAGE: "There is no message"
@@ -822,10 +823,12 @@ jobs:
             echo "Latest Tag: $latest_tag"
           fi
           echo "$latest_tag" > ${{env.TAG_FILE}}
+          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
           echo -e "\n\n\n\n\n\n\n\n\n"
           echo "new_tag = $latest_tag"
           echo "env.new_tag = ${{env.tag_file}}"
           echo "cat env.new_tag = $(cat ${{env.TAG_FILE}})"
+          echo "env.LATEST_TAG = ${{env.LATEST_TAG}}"
           echo -e "\n\n\n\n\n\n\n\n\n"
 
       - name: Check if Latest Tag is a Release
@@ -874,12 +877,13 @@ jobs:
             new_tag="v${version[0]}.${version[1]}.${version[2]}"
             echo "New Tag: $new_tag"
             echo "$new_tag" > ${{env.TAG_FILE}}
+            echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
           else
             echo "Latest tag is not a release. Skipping tag increment."
           fi
           echo -e "\n\n\n\n\n\n\n\n\n"
           echo "new_tag = $new_tag"
-          echo "env.new_tag = ${{env.TAG_FILE}}"
+          echo "env.NEW_TAG = ${{env.NEW_TAG}}"
           echo "env.is_release = $(cat ${{env.IS_RELEASE}})"
           echo "cat env.new_tag = $(cat ${{env.TAG_FILE}})"
           echo "cat env.is_release = $(cat ${{env.IS_RELEASE}})"
@@ -892,11 +896,14 @@ jobs:
 
       - name: Get tag title
         run: |
-          TAG_NAME="$(cat ${{env.TAG_FILE}})"
-          COMMIT_TITLE=$(git tag -l --format='%(subject)' $TAG_NAME)
+          TAG_NAME="${{env.LATEST_TAG}}"
+          echo "Found file=$TAG_NAME"
+          COMMIT_TITLE="$(git tag -l --format='%(subject)' $TAG_NAME)"
           if [ "$COMMIT_TITLE" = "" ]
           then
             COMMIT_TITLE="There is no title"
+          else
+            COMMIT_TITLE="$TAG_NAME - $COMMIT_TITLE"
           fi
           echo "Commit title: $COMMIT_TITLE"
           echo "COMMIT_TITLE=$COMMIT_TITLE" >> $GITHUB_ENV
@@ -904,12 +911,12 @@ jobs:
       - name: Extract Tag Info
         id: extract_tag_info
         run: |
-          if [ ! -e ${{env.TAG_FILE}} ]
+          if [ "${{env.LATEST_TAG}}" = "" ]
           then
             echo "Tag name not found"
             TAG_NAME="v0.0.0"
           else
-            TAG_NAME="$(cat ${{env.TAG_FILE}})"
+            TAG_NAME="${{env.LATEST_TAG}}"
           fi
           echo "TAG NAME content = $TAG_NAME"
           COMMIT_MESSAGE=$(git tag -l --format='%(contents)' $TAG_NAME)
@@ -923,9 +930,15 @@ jobs:
           else
             COMMIT_MESSAGE="${COMMIT_MESSAGE}\n$(cat ./README.md)"
           fi
+          COMMIT_MESSAGE="${COMMIT_MESSAGE}\n$(git log --format=%s -n 50)"
           echo "Commit message final content = '$COMMIT_MESSAGE'"
-          COMMIT_MESSAGE_ESCAPED=$(echo "$COMMIT_MESSAGE" | awk '{printf "%s\\n", $0}')
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE_ESCAPED" >> $GITHUB_ENV
+          # COMMIT_MESSAGE_ESCAPED=$(echo "$COMMIT_MESSAGE" | awk '{printf "%s\\n", $0}')
+          # echo "COMMIT_MESSAGE=$COMMIT_MESSAGE_ESCAPED" >> $GITHUB_ENV
+          {
+            echo "COMMIT_MESSAGE<<EOH"
+            echo -e "$COMMIT_MESSAGE"
+            echo EOH
+          } >> $GITHUB_ENV
 
       - name: Restore the documentation to it's original directory
         run: |
