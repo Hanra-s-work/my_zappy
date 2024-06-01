@@ -1040,9 +1040,9 @@ jobs:
           echo "content of FILES_OF_INTEREST=$FILES_OF_INTEREST"
           mkdir -p $TEMPORARY_FOLDER
           for FILE in $FILES_OF_INTEREST; do
-            cp -v "$FILE" "$TEMPORARY_FOLDER"
+            cp -v "./$FILE" "$TEMPORARY_FOLDER"
           done
-          echo "AP=$(ls $TEMPORARY_FOLDER)" >> $GITHUB_OUTPUT # anchor point
+          echo "AP=$(ls $TEMPORARY_FOLDER)" >> "$GITHUB_OUTPUT" # anchor point
 
 
       - name: Publish binary as GitHub release
