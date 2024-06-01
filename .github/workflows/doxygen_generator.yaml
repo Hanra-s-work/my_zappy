@@ -1036,6 +1036,7 @@ jobs:
         run: |
           echo "In temporary load point"
           TEMPORARY_FOLDER=./tmp_data
+          E=${{env.FILES_OF_INTEREST}}
           echo "content or E=$E"
           mkdir -p $TEMPORARY_FOLDER
           MMZN=${{ steps.output-files.outputs.MMZN}}
