@@ -1047,7 +1047,7 @@ jobs:
           LBFRESULT=${{ steps.output-files.outputs.LBFRESULT}}
           MIBFRESULT=${{ steps.output-files.outputs.MIBFRESULT}}
           MMBFRESULT=${{ steps.output-files.outputs.MMBFRESULT}}
-          cp -vf ${MMZN} ${MIZN} ${LZN} ${DZN} ${TEMPORARY_FOLDER}
+          cp -vf "${MMZN}" "${MIZN}" "${LZN}" "${DZN}" "${TEMPORARY_FOLDER}"
           for i in "${OGRESULT[@]}"
           do
             cp -vf "$i" "${TEMPORARY_FOLDER}"
