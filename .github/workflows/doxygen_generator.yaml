@@ -930,7 +930,7 @@ jobs:
           else
             COMMIT_MESSAGE="${COMMIT_MESSAGE}\n$(cat ./README.md)"
           fi
-          COMMIT_MESSAGE="${COMMIT_MESSAGE}\n$(git log --format=%s -n 50)"
+          COMMIT_MESSAGE="${COMMIT_MESSAGE}\n\`\`\`log\n$(git log --format=%s -n 50)\n\`\`\`"
           echo "Commit message final content = '$COMMIT_MESSAGE'"
           # COMMIT_MESSAGE_ESCAPED=$(echo "$COMMIT_MESSAGE" | awk '{printf "%s\\n", $0}')
           # echo "COMMIT_MESSAGE=$COMMIT_MESSAGE_ESCAPED" >> $GITHUB_ENV
