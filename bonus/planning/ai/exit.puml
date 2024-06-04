@@ -1,0 +1,13 @@
+@startuml exit
+
+namespace exit {
+    class display_error {}
+    class kill_threads {}
+    class free_ressources {}
+    class exit_with_status {}
+    display_error --> kill_threads
+    kill_threads --> free_ressources
+    free_ressources --> exit_with_status
+}
+
+@enduml exit

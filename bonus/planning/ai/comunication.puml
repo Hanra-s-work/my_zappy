@@ -1,0 +1,65 @@
+@startuml comunication
+
+namespace comunication {
+    enum commands {
+        FORWARD
+        RIGHT
+        LEFT
+        LOOK
+        INVENTORY
+        BROADCAST_TEXT
+        CONNECT_NBR
+        FORK
+        EJECT
+        EMPTY
+        TAKE_OBJECT
+        SET_OBJECT
+        INCANTATION
+    }
+    
+    struct dict {
+        +commands
+        +argument
+    }
+
+    class tag_income {
+        -raw_response : list
+        -converted_input: dict
+        +process_raw_input() : int
+        +convert_input() : void
+        +get_input() : dict
+    }
+    class fill_buffer {
+        +append_to_mainloop(dict tagged_income) : void
+    }
+    class talk_to_the_wild {
+        +converted_input : list
+        +convert_input_to_correct_out(dict required_send) : void
+        +send_commands_to_user() : int
+    }
+
+    note right of tag_income
+        This class is in charge of
+        converting the incomming request
+        to a dict type list of inputted commands
+    end note
+
+    note right of fill_buffer
+        This class is in charge of
+        appending the converted tags to
+    end note
+
+    note top of commands
+        These are a way of speeding up comparisons
+        during computing in the logic of the aixs
+    end note
+
+    note top of dict
+        This is a way of storing a series of input commands
+        so that they are quicker to access.
+    end note
+
+    tag_income ..> fill_buffer : Inheritance
+}
+
+@enduml comunication
