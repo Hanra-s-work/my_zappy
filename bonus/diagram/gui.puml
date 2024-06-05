@@ -1,0 +1,34 @@
+@startuml
+
+package gui
+{
+    class graphic {
+        graphic()
+        void init()
+        void launchWindow()
+        void display()
+        void NetworkMessages()
+        void title()
+        void playSound()
+        void clear()
+        void refresh()
+        std::list<Event> pollEvent()
+        void displayText()
+    }
+
+    class ISprite {
+        Isprite()
+        void initSprite()
+        void displaySprite()
+        void player()
+        void stone()
+    }
+
+    class network {
+        bool connection()
+        -int serverIp
+        -int serverPort
+    }
+}
+
+@enduml
