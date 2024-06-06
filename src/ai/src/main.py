@@ -8,7 +8,11 @@
 
 import sys
 
-from constants import GlobalVariables as GV
+from constants import GlobalVariables, MAX_PORT_RANGE, MIN_PORT_RANGE
+from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
+from sender import SenderThread
+from receiver import TCPThreader
+from logistics import LogicsticsThread
 
 
 class Main:
@@ -31,25 +35,27 @@ class Main:
 
     def __init__(self, error: int = 84, success: int = 0, ip: str = "0.0.0.0", port: int = 8080) -> None:
         self.argc = len(sys.argv)
-        self.constants = GV(
-            error=error,
-            success=success,
-            ip=ip,
-            port=port
-        )
+        self.success = success
+        self.error = error
         self.help_options = [
             "-h", "-help", "-?",
             "--h", "--help", "--?",
             "/h", "/help", "/?"
         ]
-        self.opts = self.constants.flags
-        self.constants.colourise_output.init_pallet()
-        self._process_arguments()
+        self.sender = None
+        self.server = None
+        self.logistics = None
+        self.constants = None
 
     def __del__(self) -> None:
         """
         Function in charge of unloading the colour library when the class is destroyed.
         """
+        self._stop_threads()
+        if self.constants is None:
+            return
+        if self.constants.colourise_output is None:
+            return
         self.constants.colourise_output.display(
             "0A",
             (),
@@ -57,25 +63,154 @@ class Main:
         )
         self.constants.colourise_output.unload_ressources()
 
-    def _process_arguments(self) -> None:
+    def _process_arguments(self) -> int:
         """
         _summary_
         This function is used to check the arguments provided by argv.
         They will be used to define some parameters that user could specify.
+        This function is also the one in charge of displaying the help section when required.
         """
-        if (self.argc < 2 or self.argc > 7) or (self.argc == 2 and sys.argv[1] == "-help"):
+        if (self.argc not in (2, 7, 8)) or (self.argc == 2 and sys.argv[1] in self.help_options):
             print("USAGE: ./zappy_ai -p port -n name -h machine")
             if self.argc == 2:
-                sys.exit(self.constants.success)
-            sys.exit(self.constants.error)
+                return self.success
+            return self.error
 
-        if self.argc == 7:
+        if self.argc == 7 or self.argc == 8:
             if sys.argv[1].lower() == "-p":
-                self.constants.port = int(sys.argv[2])
+                if sys.argv[2].isnumeric() is False:
+                    print(
+                        f"Error: The -p flag must be a positive whole number that ranges between {MIN_PORT_RANGE} and {MAX_PORT_RANGE}\nPlease run {sys.argv[0]} --help"
+                    )
+                    return self.error
+                port = int(sys.argv[2])
+                if port < MIN_PORT_RANGE or port > MAX_PORT_RANGE:
+                    print(
+                        f"Error: The -p flag must be a positive whole number that ranges between {MIN_PORT_RANGE} and {MAX_PORT_RANGE}\nPlease run {sys.argv[0]} --help"
+                    )
+                    return self.error
+            else:
+                print(
+                    f"Error: The -p flag is missing\nPlease run {sys.argv[0]} --help"
+                )
+                return self.error
             if sys.argv[3].lower() == "-n":
-                self.constants.port = sys.argv[4]
+                name = sys.argv[4]
+            else:
+                print(
+                    f"Error: The -n flag is missing\nPlease run {sys.argv[0]} --help"
+                )
+                return self.error
             if sys.argv[5].lower() == "-h":
-                self.constants.port = sys.argv[6]
+                host = sys.argv[6]
+            else:
+                print(
+                    f"Error: The -h flag is missing\nPlease run {sys.argv[0]} --help"
+                )
+                return self.error
+            if self.argc == 8 and sys.argv[7].lower() == "-d":
+                debug = True
+            else:
+                debug = False
+            return {"port": port, "name": name, "host": host, "debug": debug}
+        return self.error
+
+    def _start_threads(self) -> None:
+        """
+        _summary_
+        This function is in charge of starting the 3 threads that are used in this program:
+        * The thread for the process that will receive the requests
+        * The thread for the process that will send the requests
+        * The thread for the process that will be running the brain
+        """
+        pdebug(self.constants, "Starting threads")
+        self.sender.start()
+        self.constants.created_threads["sender"] = self.sender
+        pdebug(self.constants, "Sender thread started")
+        self.server.start()
+        self.constants.created_threads["server"] = self.server
+        pdebug(self.constants, "Server thread started")
+        self.logistics.start()
+        self.constants.created_threads["logistics"] = self.logistics
+        pdebug(self.constants, "Logistics thread started")
+
+    def _stop_threads(self) -> None:
+        """_summary_
+        This function is called when we wish to terminate the program.
+        This function will attempt to terminate the threads that have been started in the main function.
+        """
+        if self.constants is None or self.constants.colourise_output is None:
+            data = [self.sender, self.server, self.logistics]
+            for i in data:
+                if i is None:
+                    continue
+                i.join()
+            return
+        if len(self.constants.created_threads) == 0:
+            return
+        for key, value in self.constants.created_threads.items():
+            pdebug(self.constants, f"Checking {key}")
+            if value is None:
+                pdebug(
+                    self.constants,
+                    f"{key} is empty, there is thus nothing to stop"
+                )
+                continue
+            pdebug(self.constants, f"{key} is not empty, stopping")
+            data = value.join()
+            pdebug(self.constants, f"{key} has stopped and returned: {data}")
+        return
+
+    def _stay_alive(self) -> int:
+        """
+        _sumary_
+        This function's role is to check on the threads and know when it is time to stop the program
+        """
+        while self.constants.continue_running:
+            self.constants.continue_running = False
+        return self.constants.current_status
+
+    def main(self) -> int:
+        """
+        _sumary_
+        The main function of the program.
+        This function is the one in charge of:
+        * Parsing the arguments
+        * Creating the threads
+        * Starting the threads
+        """
+        response = self._process_arguments()
+        if isinstance(response, int):
+            print(
+                f"One or more errors have occurred\nPlease run {sys.argv[0]} --help for more information"
+            )
+            return response
+        self.constants = GlobalVariables(
+            error=self.error,
+            success=self.success,
+            ip=response["host"],
+            port=response["port"],
+            name=response["name"],
+            debug=response["debug"]
+        )
+        print("ù")
+        self.constants.colourise_output.init_pallet()
+        self.constants.colourise_output.display(
+            self.constants.message_colours.DEFAULT,
+            (),
+            ""
+        )
+        pinfo(self.constants, "Main class loaded")
+        self.sender = SenderThread(self.constants)
+        pdebug(self.constants, "Thread Sender is loaded")
+        self.server = TCPThreader(self.constants)
+        pdebug(self.constants, "Thread TCP is loaded")
+        self.logistics = LogicsticsThread(self.constants)
+        pdebug(self.constants, "Thread Logistics is loaded")
+        pinfo(self.constants, "Thread classes loaded")
+        self._start_threads()
+        psuccess(self.constants, "Threads launched")
+        return self._stay_alive()
 
 
 if __name__ == "__main__":
@@ -89,3 +224,4 @@ if __name__ == "__main__":
         ip=IP,
         port=PORT
     )
+    sys.exit(MI.main())

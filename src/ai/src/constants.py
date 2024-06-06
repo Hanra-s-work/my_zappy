@@ -10,7 +10,17 @@
     This file (constants.py) is in charge of storing any variable that needs to be shared to different classes and not just be a copy
 """
 
+from sys import stderr
+from display_tty import Disp, TOML_CONF
 from colourise_output import ColouriseOutput
+
+
+# These define the maximum and minimum port ranges for the tcp protocol
+MAX_PORT_RANGE = 3000
+MIN_PORT_RANGE = 1024
+
+# Disabeling animation
+TOML_CONF['PRETTIFY_OUTPUT'] = False
 
 
 class Commands:
@@ -86,25 +96,81 @@ class AI:
         self.current_items: list[any] = []
 
 
-class Arguments
+class MessageColours:
+    """
+    _summary_
+    This is the class in charge of storing the different colours that will be used for the messages
+    """
+    END = 'rr'
+    INFO = '0B'
+    ERROR = '0C'
+    DEBUG = '0D'
+    SUCCESS = '0A'
+    WARNING = '0E'
+    DEFAULT = "0F"
+
+
+class UserArguments:
+    """
+    _summary_
+    This is the class in charge of storing the arguments passed by the user
+    """
+
+    def __init__(self, ip: str = "0.0.0.0", port: int = 8080, name: str = "No name", debug: bool = False) -> None:
+        self.host: str = ip
+        self.port: int = port
+        self.name: str = name
+        self.debug: bool = debug
 
 
 class GlobalVariables:
-    """ This is the class in charge of storing the variables that are to be globally synced throughout the program"""
+    """
+    _summary_
+    This is the class in charge of storing the variables that are to be globally synced throughout the program
 
-    def __init__(self, success: int = 0, error: int = 84, ip: str = "0.0.0.0", port: int = 8080) -> None:
-        self.ai: AI = AI()
+    Args:
+        success (int, optional): _description_. Defaults to 0.
+        error (int, optional): _description_. Defaults to 84.
+        ip (str, optional): _description_. Defaults to "0.0.0.0".
+        port (int, optional): _description_. Defaults to 8080.
+        name (str, optional): _description_. Defaults to "".
+    """
+
+    def __init__(self, success: int = 0, error: int = 84, ip: str = "0.0.0.0", port: int = 8080, name: str = "", debug: bool = False) -> None:
+        # Heartbeat variable, if it is set to false, the program stops
+        self.continue_running: bool = True
+
+        # Classes acting as enums
         self.items: Items = Items()
+        self.commands: Commands = Commands()
+
+        # Bundle of variables relevant to the sections of the program containing the same name
+        self.ai: AI = AI()
+        self.server_data: ServerData = ServerData(ip="0.0.0.0", port=port)
+        self.request_data: RequestData = RequestData(ip=ip, port=port)
+        self.user_arguments = UserArguments(ip, port, name, debug)
+
+        # Variable in charge of tracking the threads that were created
+        self.created_threads: dict[str, any] = {}
+
+        # Status tracking
         self.error: int = error
         self.success: int = success
-        self.commands: Commands = Commands()
-        self.server_data: ServerData = ServerData(ip="0.0.0.0", port=port)
         self.current_status: int = self.success
-        self.request_data: RequestData = RequestData(ip=ip, port=port)
+
+        # The converted income from the server
         self.current_buffer: list[dict[Commands, any]] = []
-        self.created_threads: dict[str, any] = {}
-        self.continue_running: bool = True
+
+        # Message customisation desing
+        self.message_colours: MessageColours = MessageColours()
         self.colourise_output: ColouriseOutput = ColouriseOutput()
-        self.port: int = 0
-        self.name: str = ""
-        self.host: str = ""
+        self.beautify_error: Disp = Disp(
+            toml_content=TOML_CONF,
+            save_to_file=True,
+            file_name="",
+            file_descriptor=stderr
+        )
+        self.beautify_standard: Disp = Disp(
+            toml_content=TOML_CONF,
+            save_to_file=False
+        )

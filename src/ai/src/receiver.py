@@ -2,23 +2,23 @@
 # EPITECH PROJECT, 2023
 # my_zappy
 # File description:
-# server.py
+# receiver.py
 ##
 
 import socketserver
-from typing import Callable,  Any, Iterable, Mapping
 from threading import Thread
 from constants import GlobalVariables
+from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
 
 
 class TCPThreader(Thread):
     """
     This is the class that will start the tcp server in a new thread (that is not the main one)
-    This is so that requests will not block the 
+    This is so that requests will not block the
     """
 
-    def __init__(self, my_globals: GlobalVariables, group: None = None, target: Callable[..., object] = None, name: str = None, args: Iterable[Any] = ..., kwargs: Mapping[str, Any] = None, *, daemon: bool = None) -> None:
-        super().__init__(group, target, name, args, kwargs, daemon=daemon)
+    def __init__(self, my_globals: GlobalVariables) -> None:
+        super().__init__()
         self.my_globals = my_globals
         self.ip = my_globals.server_data.ip
         self.port = my_globals.server_data.port
