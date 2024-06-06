@@ -16,8 +16,11 @@ from colourise_output import ColouriseOutput
 
 
 # These define the maximum and minimum port ranges for the tcp protocol
-MAX_PORT_RANGE = 3000
+MAX_PORT_RANGE = 9000
 MIN_PORT_RANGE = 1024
+
+# Thread kill delay
+THREAD_TIMEOUT = 5  # None
 
 # Disabeling animation
 TOML_CONF['PRETTIFY_OUTPUT'] = False
@@ -68,6 +71,9 @@ class ServerData:
     def __init__(self, ip: str = "0.0.0.0", port: int = 8080) -> None:
         self.ip: str = ip
         self.port: int = port
+        self.buffer_size: int = 1024*4
+        self.startup_message: str = f"AI land is live at {self.ip}:{self.port}"
+        self.welcome_message: str = "Welcome to AI land."
         self.raw_buffer: list[dict[Commands, any]] = []
         self.client_address: list[any] = []
 

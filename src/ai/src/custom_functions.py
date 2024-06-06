@@ -22,7 +22,11 @@ def perror(global_variables: GlobalVariables, string: str = "This is an error") 
         (),
         ""
     )
-    global_variables.beautify_error.title(f"Error: {string}")
+    data = f"{string}".split("\n")
+    if data[-1] == "":
+        data.pop()
+    for i in data:
+        global_variables.beautify_error.title(f"Error: {i}")
     global_variables.colourise_output.display(
         global_variables.message_colours.DEFAULT,
         (),
@@ -44,7 +48,11 @@ def pwarning(global_variables: GlobalVariables, string: str = "This is a warning
         (),
         ""
     )
-    global_variables.beautify_standard.title(f"Warning: {string}")
+    data = f"{string}".split('\n')
+    if data[-1] == '':
+        data.pop(-1)
+    for i in data:
+        global_variables.beautify_standard.warning_message(i)
     global_variables.colourise_output.display(
         global_variables.message_colours.DEFAULT,
         (),
@@ -66,7 +74,11 @@ def psuccess(global_variables: GlobalVariables, string: str = "This is a success
         (),
         ""
     )
-    global_variables.beautify_standard.title(f"Success: {string}")
+    data = f"{string}".split("\n")
+    if data == '':
+        data.pop(-1)
+    for i in data:
+        global_variables.beautify_standard.success_message(i)
     global_variables.colourise_output.display(
         global_variables.message_colours.DEFAULT,
         (),
@@ -88,7 +100,11 @@ def pinfo(global_variables: GlobalVariables, string: str = "This is a success") 
         (),
         ""
     )
-    global_variables.beautify_standard.title(f"Info: {string}")
+    data = f"Info: {string}".split('\n')
+    if data[-1] == '':
+        data.pop(-1)
+    for i in data:
+        global_variables.beautify_standard.inform_message(i)
     global_variables.colourise_output.display(
         global_variables.message_colours.DEFAULT,
         (),
@@ -107,7 +123,7 @@ def pdebug(global_variables: GlobalVariables, string: str = "This is a debug str
             (),
             ""
         )
-        global_variables.beautify_standard.title(f"Debug: {string}")
+        global_variables.beautify_standard.message(f"Debug: {string}")
         global_variables.colourise_output.display(
             global_variables.message_colours.DEFAULT,
             (),

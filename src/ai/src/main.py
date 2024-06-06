@@ -8,7 +8,7 @@
 
 import sys
 
-from constants import GlobalVariables, MAX_PORT_RANGE, MIN_PORT_RANGE
+from constants import GlobalVariables, MAX_PORT_RANGE, MIN_PORT_RANGE, THREAD_TIMEOUT
 from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
 from sender import SenderThread
 from receiver import TCPThreader
@@ -33,7 +33,7 @@ class Main:
                 * Exit with the status contained in GlobalVariables
     """
 
-    def __init__(self, error: int = 84, success: int = 0, ip: str = "0.0.0.0", port: int = 8080) -> None:
+    def __init__(self, error: int = 84, success: int = 0) -> None:
         self.argc = len(sys.argv)
         self.success = success
         self.error = error
@@ -128,8 +128,8 @@ class Main:
         self.constants.created_threads["sender"] = self.sender
         pdebug(self.constants, "Sender thread started")
         self.server.start()
-        self.constants.created_threads["server"] = self.server
-        pdebug(self.constants, "Server thread started")
+        self.constants.created_threads["receiver"] = self.server
+        pdebug(self.constants, "Receiver thread started")
         self.logistics.start()
         self.constants.created_threads["logistics"] = self.logistics
         pdebug(self.constants, "Logistics thread started")
@@ -144,7 +144,7 @@ class Main:
             for i in data:
                 if i is None:
                     continue
-                i.join()
+                i.join(THREAD_TIMEOUT)
             return
         if len(self.constants.created_threads) == 0:
             return
@@ -157,7 +157,8 @@ class Main:
                 )
                 continue
             pdebug(self.constants, f"{key} is not empty, stopping")
-            data = value.join()
+            data = value.join(THREAD_TIMEOUT)
+            self.constants.created_threads[key] = None
             pdebug(self.constants, f"{key} has stopped and returned: {data}")
         return
 
@@ -167,7 +168,9 @@ class Main:
         This function's role is to check on the threads and know when it is time to stop the program
         """
         while self.constants.continue_running:
+            tt = input("pause press enter to continue...")
             self.constants.continue_running = False
+        self._stop_threads()
         return self.constants.current_status
 
     def main(self) -> int:
@@ -200,11 +203,15 @@ class Main:
             (),
             ""
         )
+        pdebug(
+            self.constants,
+            f"Thread timeout is set to: {THREAD_TIMEOUT} seconds"
+        )
         pinfo(self.constants, "Main class loaded")
         self.sender = SenderThread(self.constants)
         pdebug(self.constants, "Thread Sender is loaded")
         self.server = TCPThreader(self.constants)
-        pdebug(self.constants, "Thread TCP is loaded")
+        pdebug(self.constants, "Receiver is loaded")
         self.logistics = LogicsticsThread(self.constants)
         pdebug(self.constants, "Thread Logistics is loaded")
         pinfo(self.constants, "Thread classes loaded")
@@ -220,8 +227,6 @@ if __name__ == "__main__":
     PORT = 8080
     MI = Main(
         error=ERROR,
-        success=SUCCESS,
-        ip=IP,
-        port=PORT
+        success=SUCCESS
     )
     sys.exit(MI.main())
