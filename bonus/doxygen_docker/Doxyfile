@@ -1348,7 +1348,10 @@ HTML_EXTRA_STYLESHEET  = bonus/doxygen_docker/html/files/css/doxysheet.css \
 
 HTML_EXTRA_FILES       = bonus/doxygen_docker/html/files/icon/favicon.ico \
                          bonus/doxygen_docker/html/files/icon/browserconfig.xml \
-                         bonus/doxygen_docker/html/files/icon/site.webmanifest
+                         bonus/doxygen_docker/html/files/icon/site.webmanifest \
+                         bonus/doxygen_docker/html/files/sub_pages/ai_api.html \
+                         bonus/doxygen_docker/html/files/sub_pages/gui_api.html \
+                         bonus/doxygen_docker/html/files/sub_pages/server_api.html \
 
 # The HTML_COLORSTYLE tag can be used to specify if the generated HTML output
 # should be rendered with a dark or light theme.
