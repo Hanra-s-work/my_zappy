@@ -8,10 +8,58 @@
 
 import sys
 
+from constants import GlobalVariables as GV
 
-if len(sys.argv) == 2 and sys.argv[1] == "-help":
-    print("USAGE: ./zappy_ai -p port -n name -h machine")
-    sys.exit(0)
 
-"""! Simple function to display the string 'Hello World!'"""
-print("Hello World!")
+class Main:
+    """ 
+        This is the main class of the program.
+        This class is responsible for calling the three main steps of the program.
+        These steps are:
+        * Initialisation:
+                * Check arguments
+                * Create listener on a new thread
+                * Create sender on a new thread
+        * Launch mainloop (skipped if error occurs before this step)
+        * When the program ends:
+                * If the reason was an error:
+                        * Display the error
+                * Kill all created threads
+                * Free any allocated ressource that was not freed
+                * Exit with the status contained in GlobalVariables
+    """
+
+    def __init__(self, error: int = 84, success: int = 0, ip: str = "0.0.0.0", port: int = 8080) -> None:
+        self.argc = len(sys.argv)
+        self.constants = GV(
+            error=error,
+            success=success,
+            ip=ip,
+            port=port
+        )
+        self._process_arguments()
+
+    def _process_arguments(self) -> None:
+        """
+        _summary_
+        This function is used to check the arguments provided by argv.
+        They will be used to define some parameters that user could specify.
+        """
+        if (self.argc < 2 or self.argc > 7) or (self.argc == 2 and sys.argv[1] == "-help"):
+            print("USAGE: ./zappy_ai -p port -n name -h machine")
+            if self.argc == 2:
+                sys.exit(self.constants.success)
+            sys.exit(self.constants.error)
+
+
+if __name__ == "__main__":
+    ERROR = 84
+    SUCCESS = 0
+    IP = "0.0.0.0"
+    PORT = 8080
+    MI = Main(
+        error=ERROR,
+        success=SUCCESS,
+        ip=IP,
+        port=PORT
+    )

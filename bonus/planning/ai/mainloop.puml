@@ -5,8 +5,8 @@
 namespace mainloop {
     class init {
         -continue_running : bool
-        -current_buffer: dict
-        -response_buffer: dict
+        -current_buffer: list[dict]
+        -response_buffer: list[dict]
         -current_status: int
         +update_loop_status()
     }
