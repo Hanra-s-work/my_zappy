@@ -5,46 +5,51 @@ on:
     tags:
       - "v*.*.*"
     branches:
-      # - main
       - doxygen_generation
-  # pull_request:
-  #   branches:
-  #     - main
   workflow_dispatch:
 
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 # The environment variables used for generation and upload
 env:
-  # GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Variables for managing required containers
+  DOCKER_NAME: hanralatalliard/doxygen
+  CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
+  # Variables for managin the tags
   SETUP_FILE: setup.py
   TAG_FILE: version.txt
   IS_RELEASE: is_release.txt
-  HTML_GENERATION: html
-  MAN_INSTALL_PATH: bonus/doxygen_docker/man/installer.sh
-  HTML_SERVER_SPAWNER_PATH: bonus/doxygen_docker/html_opening/launch_server.sh
-  DOXYGEN_VERSION: 1.8.20
-  NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
+  LATEST_TAG: ""
+  # variables managing name publishing
   COMMIT_TITLE: "There is no title"
   COMMIT_MESSAGE: "There is no message"
-  DOCKER_NAME: hanralatalliard/doxygen
+  #Variables for the extras scripts
   DOXYFILE: bonus/doxygen_docker/Doxyfile
-  CODING_STYLE_CONTAINER: ghcr.io/epitech/coding-style-checker:latest
+  MAN_INSTALL_PATH: bonus/doxygen_docker/man/installer.sh
+  HTML_SERVER_SPAWNER_PATH: bonus/doxygen_docker/html/launch_server.sh
+  # Variables for managing ntfy notification system
+  NOTIFY_CHANNEL: ntfy.sh/is_up #${{ secrets.NOTIFY_ZAPPY }}
   NOTIFY_LOCATION: ${GITHUB_REPOSITORY}:${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-  TEMPORARY_FOLDER: /tmp/dg
+  # Variables for specifying build locations
+  HTML_GENERATION: html
+  TEMPORARY_FOLDER: tmp_documentation
   OUTPUT_GENERATION: documentation
+  # Variables for specifying the outputs to be cached/published
   LINUX_BINARY_FOLDER: "./linux_binaries"
   MAC_MONE_BINARY_FOLDER: "./mac_mone_binaries"
   MAC_INTEL_BINARY_FOLDER: "./mac_intel_binaries"
+  # Variable containing the reference key for the cache of each main section
   CACHE_KEY: doxygen-cache-key
+  CACHE_KEY_CLEANED: doxygen-cache-key-cleaned
   LINUX_CACHE_KEY_BUILD: linux-cache-key
   MAC_MONE_CACHE_KEY_BUILD: mac-mone-cache-key
   MAC_INTEL_CACHE_KEY_BUILD: mac-intel-cache-key
+  # Variables containing a more friendly name concerning their role and the destination architectures
   EXECUTABLES: "./zappy_ai ./zappy_gui ./zappy_server"
   EXECUTABLES_LINUX: "./zappy_linux_ai ./zappy_linux_gui ./zappy_linux_server"
   EXECUTABLES_MAC_INTEL: "./zappy_mac_intel_ai ./zappy_mac_intel_gui ./zappy_mac_intel_server"
@@ -204,14 +209,22 @@ jobs:
           ls -a ${{ env.OUTPUT_GENERATION }}/
       - name: Listing content of temporary folder
         run: |
-          echo "Contents os ${{env.TEMPORARY_FOLDER}}"
+          echo "Contents of ${{env.TEMPORARY_FOLDER}}"
           ls -a ${{env.TEMPORARY_FOLDER}}
       - name: Copy the icons to the generated documentation
         run: |
           echo "Content of temporary folder: ${{ env.TEMPORARY_FOLDER }}"
           DOCUMENTATION=$(find ${{ env.TEMPORARY_FOLDER }}/* -maxdepth 1 -type d)
-          for i in ${DOCUMETATION[@]}
+          for i in ${DOCUMENTATION[@]}
           do
+            if [[ "$(basename "$i")" == "man" ]]; then
+              echo "Skipping 'man' directory"
+              continue
+            fi
+            if [[ "$(basename "$i")" == "html" ]]; then
+              echo "Skipping 'html' directory"
+              continue
+            fi
             echo "\$i = '$i'"
             FINAL_PATH="$i/files/icon"
             echo "Final path = $FINAL_PATH"
@@ -222,6 +235,7 @@ jobs:
       - name: Generate latex if present
         run: |
           if [ -e "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/latex" ]; then
+            CWD=$(pwd)
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/latex"
             if [ -e "Makefile" ]; then
               CONT_NAME=loxygene
@@ -232,6 +246,7 @@ jobs:
             else
               echo "No Makefile found, not generating anything"
             fi
+            cd $CWDxs
           else
             echo "No latex folder found, not generating anything"
           fi
@@ -243,6 +258,9 @@ jobs:
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/man"
             cp $CWD/${{env.MAN_INSTALL_PATH}} ./$FILE_NAME
             chmod a+x $FILE_NAME
+            cd $CWD
+          else
+            echo "There was no man generated"
           fi
       - name: Inject server spawner file if html is present
         run: |
@@ -252,12 +270,15 @@ jobs:
             cd "${{env.TEMPORARY_FOLDER}}/${{ env.OUTPUT_GENERATION }}/html"
             cp $CWD/${{env.HTML_SERVER_SPAWNER_PATH}} ./$FILE_NAME
             chmod a+x $FILE_NAME
+            cd $CWD
+          else
+            echo "There was no html generated"
           fi
       - name: Save cache
         id: cache-save
         uses: actions/cache@v4
         with:
-          key: ${{env.CACHE_KEY}}
+          key: ${{env.CACHE_KEY_CLEANED}}
           path: ${{env.TEMPORARY_FOLDER}}
           enableCrossOsArchive: true
 
@@ -281,7 +302,7 @@ jobs:
         id: html-cache-restore
         uses: actions/cache@v4
         with:
-          key: ${{ env.CACHE_KEY }}
+          key: ${{ env.CACHE_KEY_CLEANED }}
           path: ${{ env.OUTPUT_GENERATION }}
           enableCrossOsArchive: true
           restore-keys: |
@@ -711,6 +732,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build_project_linux, build_project_mac_apple_chip, build_project_mac_intel_chip, clean_up_generation]
     if: success()
+    env:
+      MAC_MON_ZIP_NAME: mac_apple_chip.zip
+      MAC_INTEL_ZIP_NAME: mac_intel_chip.zip
+      LINUX_ZIP_NAME: linux.zip
+      DOCUMENTATION_ZIP_NAME: documentation.zip
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -721,7 +747,7 @@ jobs:
         id: cache-documentation-restore
         uses: actions/cache@v4
         with:
-          key: ${{ env.CACHE_KEY }}
+          key: ${{ env.CACHE_KEY_CLEANED }}
           enableCrossOsArchive: true
           path: ${{ env.TEMPORARY_FOLDER }}
           restore-keys: |
@@ -797,10 +823,12 @@ jobs:
             echo "Latest Tag: $latest_tag"
           fi
           echo "$latest_tag" > ${{env.TAG_FILE}}
+          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
           echo -e "\n\n\n\n\n\n\n\n\n"
           echo "new_tag = $latest_tag"
           echo "env.new_tag = ${{env.tag_file}}"
           echo "cat env.new_tag = $(cat ${{env.TAG_FILE}})"
+          echo "env.LATEST_TAG = ${{env.LATEST_TAG}}"
           echo -e "\n\n\n\n\n\n\n\n\n"
 
       - name: Check if Latest Tag is a Release
@@ -824,7 +852,7 @@ jobs:
         run: |
           is_release="$(cat ${{env.IS_RELEASE}})"
           latest_tag="$(cat ${{env.TAG_FILE}})"
-          echo "ls = $(ls)"
+          echo "ls = '$(ls)'"
           echo "is_release = $is_release"
           echo "latest_tag = $latest_tag"
           if [[ $is_release == "true" ]]; then
@@ -849,12 +877,13 @@ jobs:
             new_tag="v${version[0]}.${version[1]}.${version[2]}"
             echo "New Tag: $new_tag"
             echo "$new_tag" > ${{env.TAG_FILE}}
+            echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
           else
             echo "Latest tag is not a release. Skipping tag increment."
           fi
           echo -e "\n\n\n\n\n\n\n\n\n"
           echo "new_tag = $new_tag"
-          echo "env.new_tag = ${{env.TAG_FILE}}"
+          echo "env.NEW_TAG = ${{env.NEW_TAG}}"
           echo "env.is_release = $(cat ${{env.IS_RELEASE}})"
           echo "cat env.new_tag = $(cat ${{env.TAG_FILE}})"
           echo "cat env.is_release = $(cat ${{env.IS_RELEASE}})"
@@ -867,11 +896,14 @@ jobs:
 
       - name: Get tag title
         run: |
-          TAG_NAME="$(cat ${{env.TAG_FILE}})"
-          COMMIT_TITLE=$(git tag -l --format='%(subject)' $TAG_NAME)
-          if [ $COMMIT_TITLE == "" ]
+          TAG_NAME="${{env.LATEST_TAG}}"
+          echo "Found file=$TAG_NAME"
+          COMMIT_TITLE="$(git tag -l --format='%(subject)' $TAG_NAME)"
+          if [ "$COMMIT_TITLE" = "" ]
           then
             COMMIT_TITLE="There is no title"
+          else
+            COMMIT_TITLE="$TAG_NAME - $COMMIT_TITLE"
           fi
           echo "Commit title: $COMMIT_TITLE"
           echo "COMMIT_TITLE=$COMMIT_TITLE" >> $GITHUB_ENV
@@ -879,12 +911,12 @@ jobs:
       - name: Extract Tag Info
         id: extract_tag_info
         run: |
-          if [ ! -e ${{env.TAG_FILE}} ]
+          if [ "${{env.LATEST_TAG}}" = "" ]
           then
             echo "Tag name not found"
             TAG_NAME="v0.0.0"
           else
-            TAG_NAME="$(cat ${{env.TAG_FILE}})"
+            TAG_NAME="${{env.LATEST_TAG}}"
           fi
           echo "TAG NAME content = $TAG_NAME"
           COMMIT_MESSAGE=$(git tag -l --format='%(contents)' $TAG_NAME)
@@ -898,13 +930,25 @@ jobs:
           else
             COMMIT_MESSAGE="${COMMIT_MESSAGE}\n$(cat ./README.md)"
           fi
+          COMMIT_MESSAGE="${COMMIT_MESSAGE}\n\`\`\`log\n$(git log --format=%s -n 50)\n\`\`\`"
           echo "Commit message final content = '$COMMIT_MESSAGE'"
-          COMMIT_MESSAGE_ESCAPED=$(echo "$COMMIT_MESSAGE" | awk '{printf "%s\\n", $0}')
-          echo "COMMIT_MESSAGE=$COMMIT_MESSAGE_ESCAPED" >> $GITHUB_ENV
+          # COMMIT_MESSAGE_ESCAPED=$(echo "$COMMIT_MESSAGE" | awk '{printf "%s\\n", $0}')
+          # echo "COMMIT_MESSAGE=$COMMIT_MESSAGE_ESCAPED" >> $GITHUB_ENV
+          {
+            echo "COMMIT_MESSAGE<<EOH"
+            echo -e "$COMMIT_MESSAGE"
+            echo EOH
+          } >> $GITHUB_ENV
+
+      - name: Restore the documentation to it's original directory
+        run: |
+          cp -rvf ${{env.TEMPORARY_FOLDER}}/* ${{env.OUTPUT_GENERATION}}
 
       - name: Display current restored cache
         run: |
           ls -a
+          echo "content of ${{env.TEMPORARY_FOLDER}}"
+          ls -a ${{env.TEMPORARY_FOLDER}}
           echo "content of ${{env.OUTPUT_GENERATION}}"
           ls -a ${{env.OUTPUT_GENERATION}}
           echo "content of ${{env.LINUX_BINARY_FOLDER}}"
@@ -919,24 +963,120 @@ jobs:
           ls -a .
           echo "Listing the content of the folders at the source"
           ls -a ./*
-        
+      
+      - name: Install the zip binary if not present
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip
+          # zip --version >/dev/null 2>&1
+          # STATUS=$?
+          # if [ $STATUS -ne 0 ]; then
+          #   echo "::error file=<none>,line=0,endLine=0,title=zip is not installed::$STATUS"
+          # fi
+
+          # unzip --version >/dev/null 2>&1
+          # STATUS=$?
+          # if [ $STATUS -ne 0 ]; then
+          #   echo "::error file=<none>,line=0,endLine=0,title=unzip is not installed::$STATUS"
+          # fi
+          # if [ $? -ne 0 ]; then 
+          #   exit 0
+          # fi
+      
       - name: Compressing the folders into archives
         run: |
-          ls -a
+          COMMAND_OPTIONS="-0 -r"
+          FORMATS=$(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -type d)
+          echo "Found folders in the documentation: $FORMATS"
+          echo "Generating archive of $(basename "${{env.OUTPUT_GENERATION}}")"
+          zip $COMMAND_OPTIONS ${{env.DOCUMENTATION_ZIP_NAME}} $(basename "${{env.OUTPUT_GENERATION}}")
+          echo "Generating archive of $(basename "${{env.LINUX_BINARY_FOLDER}}")"
+          zip $COMMAND_OPTIONS ${{env.LINUX_ZIP_NAME}} $(basename "${{env.LINUX_BINARY_FOLDER}}")
+          echo "Generating archive of $(basename "${{env.MAC_MONE_BINARY_FOLDER}}")"
+          zip $COMMAND_OPTIONS ${{env.MAC_MON_ZIP_NAME}} $(basename "${{env.MAC_MONE_BINARY_FOLDER}}")
+          echo "Generating archive of $(basename "${{env.MAC_INTEL_BINARY_FOLDER}}")"
+          zip $COMMAND_OPTIONS ${{env.MAC_INTEL_ZIP_NAME}} $(basename "${{env.MAC_INTEL_BINARY_FOLDER}}")
+          for item in ${FORMATS[@]}
+          do
+            echo "Creating zip archive: '$item'"
+            zip $COMMAND_OPTIONS ${item}.zip $item
+          done
+
+      - name: Display generated archives
+        run: |
+          echo "Displaying files at the source of the repository"
+          ls -a --color=auto
+          echo "Displaying all zip files in ./"
+          ls -a --color=auto *.zip 
+          echo "Displaying all zip files in ${{env.OUTPUT_GENERATION}}/*.zip"
+          ls -a --color=auto ${{env.OUTPUT_GENERATION}}/*.zip
+
+      - name: Get folders of interest
+        id: output-files
+        run: |
+          MMZN="${{env.MAC_MON_ZIP_NAME}}"
+          MIZN="${{env.MAC_INTEL_ZIP_NAME}}"
+          LZN="${{env.LINUX_ZIP_NAME}}"
+          DZN="${{env.DOCUMENTATION_ZIP_NAME}}"
+          OGRESULT="$(find ${{env.OUTPUT_GENERATION}} -maxdepth 1 -name '*.zip' -type f | tr '\n' ' ')"
+          LBFRESULT="$(find ${{env.LINUX_BINARY_FOLDER}} -maxdepth 1 -type f | tr '\n' ' ')"
+          MIBFRESULT="$(find ${{env.MAC_INTEL_BINARY_FOLDER}} -maxdepth 1 -type f | tr '\n' ' ')"
+          MMBFRESULT="$(find ${{env.MAC_MONE_BINARY_FOLDER}} -maxdepth 1 -type f | tr '\n' ' ')"
+          echo "MMZN=$MMZN" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "MIZN=$MIZN" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "LZN=$LZN" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "DZN=$DZN" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "OGRESULT=$OGRESULT" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "LBFRESULT=$LBFRESULT" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "MIBFRESULT=$MIBFRESULT" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "MMBFRESULT=$MMBFRESULT" >> "$GITHUB_OUTPUT" # Files of interest
+          echo "MMZN=$MMZN"
+          echo "MIZN=$MIZN"
+          echo "LZN=$LZN"
+          echo "DZN=$DZN"
+          echo "OGRESULT=$OGRESULT"
+          echo "LBFRESULT=$LBFRESULT"
+          echo "MIBFRESULT=$MIBFRESULT"
+          echo "MMBFRESULT=$MMBFRESULT"
+          FILE_LIST="$MMZN $MIZN $LZN $DZN $OGRESULT $LBFRESULT $MIBFRESULT $MMBFRESULT"
+          echo "Final file list='$FILE_LIST'"
+          echo "FOI=$(echo $FILE_LIST | tr '\n' ' ')" >> "$GITHUB_OUTPUT" # Files of interest
+
+      - name: Create a temporary load point
+        id: anchor-point
+        env:
+          FILES_OF_INTEREST: ${{ steps.output-files.outputs.FOI }}
+        run: |
+          echo "In temporary load point"
+          TEMPORARY_FOLDER=./tmp_data
+          FILES_OF_INTEREST="${{ steps.output-files.outputs.FOI }}"
+          echo "content of FILES_OF_INTEREST=$FILES_OF_INTEREST"
+          mkdir -p $TEMPORARY_FOLDER
+          for FILE in $FILES_OF_INTEREST; do
+            cp -v "./$FILE" "$TEMPORARY_FOLDER"
+          done
+          echo "Loop finished"
+          echo "Content of TEMPORARY_FOLDER:"
+          ls -a "$TEMPORARY_FOLDER"
+          echo "sending content to github output"
+          {
+            echo 'AP<<EOF'
+            find ./$TEMPORARY_FOLDER -maxdepth 1 -type f
+            echo EOF
+          } >> "$GITHUB_OUTPUT" # anchor point
+
 
       - name: Publish binary as GitHub release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            ${{env.OUTPUT_GENERATION}}/*
-            ${{env.LINUX_BINARY_FOLDER}}/*
-            ${{env.MAC_INTEL_BINARY_FOLDER}}/*
-            ${{env.MAC_MONE_BINARY_FOLDER}}/*
+          files: ${{ steps.anchor-point.outputs.AP}}
           name: ${{ env.COMMIT_TITLE }}
           body: ${{ env.COMMIT_MESSAGE }}
           draft: false
           prerelease: false
+          make_latest: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   clean_created_cache:
     name: Clear the cache generated during the build time

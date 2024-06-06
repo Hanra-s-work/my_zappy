@@ -10,22 +10,25 @@
 }
 
 body {
-    background-color: aliceblue;
-    color: black;
+    background-color: var(--page-background-color);
+    color: var(--page-foreground-color);
 }
 
-header {
+header,
+.header {
     padding-top: 0;
     padding-left: 0;
     padding-right: 0;
     display: flex;
     flex-direction: row;
-    background-color: lightseagreen;
-    color: black;
+}
+
+.contents {
+    background-color: aliceblue;
 }
 
 a {
-    color: blue;
+    color: rgb(28, 106, 208);
     text-decoration: none;
     font-weight: normal;
 }
@@ -40,21 +43,6 @@ a:active {
     text-decoration: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: 'Times New Roman', Times, serif;
-    text-decoration: none;
-}
-
-ul {
-    color: black;
-    list-style-type: lower-greek;
-}
-
 
 footer {
     padding-left: 0;
@@ -62,6 +50,4 @@ footer {
     padding-bottom: 0;
     display: flex;
     flex-direction: column;
-    background-color: grey;
-    color: white;
 }

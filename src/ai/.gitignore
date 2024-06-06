@@ -2,6 +2,7 @@
 ./dist/**
 ./coverage_data/**
 __pycache__/**
+*.pyc
 .coveragerc
 *.spec
 *.pyc
