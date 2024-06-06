@@ -37,7 +37,25 @@ class Main:
             ip=ip,
             port=port
         )
+        self.help_options = [
+            "-h", "-help", "-?",
+            "--h", "--help", "--?",
+            "/h", "/help", "/?"
+        ]
+        self.opts = self.constants.flags
+        self.constants.colourise_output.init_pallet()
         self._process_arguments()
+
+    def __del__(self) -> None:
+        """
+        Function in charge of unloading the colour library when the class is destroyed.
+        """
+        self.constants.colourise_output.display(
+            "0A",
+            (),
+            "Unloading ressources\n"
+        )
+        self.constants.colourise_output.unload_ressources()
 
     def _process_arguments(self) -> None:
         """
@@ -50,6 +68,14 @@ class Main:
             if self.argc == 2:
                 sys.exit(self.constants.success)
             sys.exit(self.constants.error)
+
+        if self.argc == 7:
+            if sys.argv[1].lower() == "-p":
+                self.constants.port = int(sys.argv[2])
+            if sys.argv[3].lower() == "-n":
+                self.constants.port = sys.argv[4]
+            if sys.argv[5].lower() == "-h":
+                self.constants.port = sys.argv[6]
 
 
 if __name__ == "__main__":

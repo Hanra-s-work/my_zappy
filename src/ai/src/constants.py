@@ -10,6 +10,8 @@
     This file (constants.py) is in charge of storing any variable that needs to be shared to different classes and not just be a copy
 """
 
+from colourise_output import ColouriseOutput
+
 
 class Commands:
     """ 
@@ -84,6 +86,9 @@ class AI:
         self.current_items: list[any] = []
 
 
+class Arguments
+
+
 class GlobalVariables:
     """ This is the class in charge of storing the variables that are to be globally synced throughout the program"""
 
@@ -99,3 +104,7 @@ class GlobalVariables:
         self.current_buffer: list[dict[Commands, any]] = []
         self.created_threads: dict[str, any] = {}
         self.continue_running: bool = True
+        self.colourise_output: ColouriseOutput = ColouriseOutput()
+        self.port: int = 0
+        self.name: str = ""
+        self.host: str = ""
