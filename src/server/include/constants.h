@@ -15,5 +15,7 @@
     //!! PARSING CONSTANTS !!
 
     #define NB_PARAM 6
+    #define CLIENTS_NB_PARAM "number of authorized clients per team"
+    #define FREQUENCE_PARAM "reciprocal of time unit for execution of actions"
 
 #endif
