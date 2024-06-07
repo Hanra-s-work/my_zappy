@@ -4,8 +4,18 @@
 ** File description:
 ** utils.c
 */
+
 #include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+
 #include "arg_parse.h"
+
+int write_error_msg(char *str)
+{
+    write(STDERR_FILENO, str, strlen(str));
+    return (-1);
+}
 
 void free_args(struct arg_s **args, size_t size)
 {

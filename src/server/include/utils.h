@@ -10,6 +10,8 @@
 
     #include "arg_parse.h"
 
+int write_error_msg(char *str);
+
 void free_array(void *to_free);
 
 void free_args(struct arg_s **args, size_t size);
