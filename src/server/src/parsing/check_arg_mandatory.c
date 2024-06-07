@@ -59,14 +59,14 @@ int check_mandatory_set(int ac, const char **av, int nb_param,
     int mandatory_present = 0;
 
     if (mandatory == NULL || nb_param < nb_mandatory)
-        return (-1);
+        return (write_error_msg("Error: Not enough parameters.\n"));
     for (int i = 0; i < nb_mandatory; ++i) {
         is_mandatory(ac, &mandatory_present, av, mandatory[i]);
     }
     if (nb_mandatory != mandatory_present) {
         free_array(mandatory);
         free(mandatory);
-        return (-1);
+        return (write_error_msg("Error: A parameter was not recognised.\n"));
     }
     free_array(mandatory);
     free(mandatory);
