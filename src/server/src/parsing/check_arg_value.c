@@ -4,7 +4,9 @@
 ** File description:
 ** check_arg_has_value.c
 */
+
 #include <string.h>
+
 #include "arg_parse.h"
 
 int is_param(const char *str, const struct option_list_s *opt_list)

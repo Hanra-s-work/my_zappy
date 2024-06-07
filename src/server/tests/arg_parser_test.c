@@ -4,7 +4,9 @@
 ** File description:
 ** arg_parser_test.c
 */
+
 #include <criterion/criterion.h>
+
 #include "arg_parse.h"
 
 Test(arg_parser, get_nb_mandatory)

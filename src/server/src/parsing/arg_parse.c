@@ -4,9 +4,11 @@
 ** File description:
 ** arg_parse.c
 */
+
 #include <string.h>
-#include "arg_parse.h"
+
 #include "utils.h"
+#include "arg_parse.h"
 
 static void get_multiple_value(const char **av, int idx, struct arg_s *arg)
 {

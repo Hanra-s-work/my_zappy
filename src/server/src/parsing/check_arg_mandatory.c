@@ -4,8 +4,10 @@
 ** File description:
 ** check_arg_mandatory.c
 */
-#include <string.h>
+
 #include <stdio.h>
+#include <string.h>
+
 #include "utils.h"
 #include "arg_parse.h"
 
