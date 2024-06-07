@@ -71,6 +71,19 @@ class ConvertData:
         else:
             return self.error
 
+    def set_raw_data(self, data: any) -> int:
+        """_summary_
+
+        Args:
+            data (any): _description_: The type of data is meant to be of type dict or string or a set of byte string.
+            Other formats will return an error.
+            If the content is empty, an error is returned.
+
+        Returns:
+            int: _description_: success if it succeeded to update the raw data, error if it failed to update the raw data.
+        """
+        return self.update_raw_data(data)
+
     def to_internal(self) -> dict[Commands, any]:
         """_summary_
         Convert the raw data to the internal language used by the ai

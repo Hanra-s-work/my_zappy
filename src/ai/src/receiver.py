@@ -16,11 +16,19 @@ from convert_data import ConvertData
 
 class TCPThreader(Thread):
     """
-    This is the class that will start the tcp server in a new thread (that is not the main one)
-    This is so that requests will not block the
+    This is the class that will start the udp server in a new thread (that is not the main one)
+    This is so that requests will not block the parent when running
     """
 
     def __init__(self, my_globals: GlobalVariables, error: int = 84, success: int = 0) -> None:
+        """_summary_
+        This is the class that will start the udp server in a new thread (that is not the main one)
+        This is so that requests will not block the parent when running
+        Args:
+            my_globals (GlobalVariables): _description_
+            error (int, optional): _description_. Defaults to 84.
+            success (int, optional): _description_. Defaults to 0.
+        """
         super().__init__()
         self.error = error
         self.success = success
@@ -125,6 +133,7 @@ class TCPThreader(Thread):
 
         # The boot message
         pinfo(self.my_globals, self.server_data.startup_message)
+        # udp_server_socket = self.my_globals.socket
         try:
             return self._maintain_loop(udp_server_socket)
         except Exception as e:

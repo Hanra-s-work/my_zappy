@@ -11,6 +11,7 @@
 """
 
 from sys import stderr
+from socket import socket
 from display_tty import Disp, TOML_CONF
 from colourise_output import ColouriseOutput
 
@@ -80,7 +81,7 @@ class ServerData:
         self.client_address: list[any] = []
 
 
-class RequestData:
+class SenderData:
     """
     _summary_
     This is the class in charge of storing the data referring to the data that needs to be sent out to the server
@@ -89,6 +90,9 @@ class RequestData:
     def __init__(self, ip: str = "0.0.0.0", port: int = 8080) -> None:
         self.ip: str = ip
         self.port: int = port
+        self.buffer_size: int = 1024 * 4
+        self.timeout: float = 5  # None
+        self.make_tcp_wait: bool = False
 
 
 class AI:
@@ -153,8 +157,11 @@ class GlobalVariables:
 
         # Bundle of variables relevant to the sections of the program containing the same name
         self.ai: AI = AI()
-        self.server_data: ServerData = ServerData(ip="0.0.0.0", port=port)
-        self.request_data: RequestData = RequestData(ip=ip, port=port)
+        self.server_data: ServerData = ServerData(
+            ip=ip,
+            port=port
+        )  # "0.0.0.0"
+        self.sender_data: SenderData = SenderData(ip=ip, port=port)
         self.user_arguments = UserArguments(ip, port, name, debug)
 
         # Variable in charge of tracking the threads that were created
@@ -168,6 +175,9 @@ class GlobalVariables:
         # The converted income from the server
         self.current_buffer: list[dict[Commands, any]] = []
         self.response_buffer: list[list[dict[Commands, any]]] = []
+
+        # The socket for the server
+        self.socket: socket = None
 
         # Message customisation desing
         self.message_colours: MessageColours = MessageColours()

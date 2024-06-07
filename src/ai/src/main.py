@@ -7,6 +7,8 @@
 """! @brief Example program for compilation reasons """
 
 import sys
+from socket import socket, AF_INET, SOCK_STREAM, SOCK_DGRAM
+
 
 from constants import GlobalVariables, MAX_PORT_RANGE, MIN_PORT_RANGE, THREAD_TIMEOUT
 from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
@@ -174,6 +176,31 @@ class Main:
         self._stop_threads()
         return self.constants.current_status
 
+    # def _create_socket(self) -> None:
+    #     """_summary_
+    #     """
+    #     # self.constants.socket = socket(
+    #     #     family=AF_INET,
+    #     #     type=SOCK_STREAM
+    #     # )
+    #     # self.constants.socket.connect(
+    #     #     (self.constants.sender_data.ip, self.constants.sender_data.port)
+    #     # )
+    #     # self.constants.socket.setblocking(
+    #     #     self.constants.sender_data.make_tcp_wait
+    #     # )
+    #     self.constants.socket = socket(
+    #         family=AF_INET,
+    #         type=SOCK_DGRAM
+    #     )
+    #     self.constants.socket.bind(
+    #         (self.constants.sender_data.ip, self.constants.server_data.port)
+    #     )
+    #     self.constants.socket.setblocking(
+    #         self.constants.server_data.make_udp_wait
+    #     )
+    #     self.constants.socket.settimeout(self.constants.sender_data.timeout)
+
     def main(self) -> int:
         """
         _sumary_
@@ -218,6 +245,7 @@ class Main:
         pinfo(self.constants, "Thread classes loaded")
         self._start_threads()
         psuccess(self.constants, "Threads launched")
+        # self._create_socket()
         return self._stay_alive()
 
 
