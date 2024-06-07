@@ -22,7 +22,8 @@ static int display_helper(void)
     "\t-y height           height of the world\n"
     "\t-n name1 name2 ...  name of the team\n"
     "\t-c clientNb         number of authorized clients per team\n"
-    "\t-f freq             reciprocal of time unit for execution of actions\n");
+    "\t-f freq             reciprocal of time unit "
+    "for execution of actions\n");
     return (0);
 }
 
