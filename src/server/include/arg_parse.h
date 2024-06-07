@@ -11,7 +11,7 @@
     #include <stdlib.h>
     #include <stdbool.h>
 
-    #define NB_PARAM 6
+    #include "constants.h"
 
 struct arg_s {
     char *name;
@@ -34,7 +34,7 @@ struct option_list_s {
 
 static const struct option_list_s SERVER_OPTION[NB_PARAM] = {
     { {"-p", true, false, "port number", true, NULL } },
-    { {"-w", true, false, "width of the world", true, NULL } },
+    { {"-x", true, false, "width of the world", true, NULL } },
     { {"-y", true, false, "height of the world", true, NULL} },
     { {"-n", true, true, "name of the team", true, NULL} },
     { {"-c", true, false, "number of authorized clients per team", true,
