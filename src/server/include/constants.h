@@ -5,12 +5,15 @@
 ** constants
 */
 
-#pragma once
+#ifndef SERVER_CONSTANTS_H
+    #define SERVER_CONSTANTS_H
 
-//!! GLOBAL CONSTANTS !!\\
+    //!! GLOBAL CONSTANTS !!
 
-#define SUCCESS 0
-#define ERROR 84
-#define FUNC_ERROR -1
+    #define ERROR 84
 
-//!! ERROR MESSAGE !!\\
+    //!! PARSING CONSTANTS !!
+
+    #define NB_PARAM 6
+
+#endif
