@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/eletellier/Documents/001_github/Hanra-s-work/my_zappy/src/ai/ai_env"
+VIRTUAL_ENV="/home/hhh/Documents/my_repositories/Hanra-s-work/my_zappy/src/ai/ai_env"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
