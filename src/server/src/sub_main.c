@@ -35,6 +35,10 @@ int sub_main(int argc, char **argv)
     (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "-help") == 0)) {
         return display_helper();
     }
+    if ((argc % 2) != 1) {
+        write_error_msg("Error: The number of arguments must be even.");
+        return (ERROR);
+    }
     arguments = get_zappy_args(argc, (const char **)argv, SERVER_OPTION);
     if (arguments == NULL) {
         write_error_msg("See the helper with '-h' or '-help' option.\n");
