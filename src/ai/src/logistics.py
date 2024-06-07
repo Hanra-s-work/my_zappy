@@ -22,7 +22,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.FORWARD: ""}
         )
 
@@ -30,7 +30,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.LEFT: ""}
         )
 
@@ -38,7 +38,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.LOOK: ""}
         )
 
@@ -46,7 +46,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.FORK: ""}
         )
 
@@ -54,7 +54,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.RIGHT: ""}
         )
 
@@ -62,7 +62,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.EMPTY: ""}
         )
 
@@ -70,7 +70,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.EJECT: ""}
         )
 
@@ -78,7 +78,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.INVENTORY: ""}
         )
 
@@ -86,7 +86,7 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.CONNECT_NBR: ""}
         )
 
@@ -94,8 +94,32 @@ class Sender:
         """
         Ajoute la commande "forward" a la queue d'envoi
         """
-        self.my_globals.server_data.raw_buffer.append(
+        self.my_globals.response_buffer.append(
             {self.my_globals.commands.SET_OBJECT: ""}
+        )
+
+    def take_obj(self) -> None:
+        """
+        Ajoute la commande "forward" a la queue d'envoi
+        """
+        self.my_globals.response_buffer.append(
+            {self.my_globals.commands.TAKE_OBJECT: ""}
+        )
+
+    def incantation(self) -> None:
+        """
+        Ajoute la commande "forward" a la queue d'envoi
+        """
+        self.my_globals.response_buffer.append(
+            {self.my_globals.commands.INCANTATION: ""}
+        )
+
+    def broadcast(self) -> None:
+        """
+        Ajoute la commande "forward" a la queue d'envoi
+        """
+        self.my_globals.response_buffer.append(
+            {self.my_globals.commands.BROADCAST_TEXT: ""}
         )
 
 

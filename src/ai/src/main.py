@@ -61,6 +61,7 @@ class Main:
             (),
             "Unloading ressources\n"
         )
+        self.constants.colourise_output.display("rr", (), "End of script\n")
         self.constants.colourise_output.unload_ressources()
 
     def _process_arguments(self) -> int:

@@ -45,6 +45,7 @@ class Commands:
     TAKE_OBJECT: int = 11
     INCANTATION: int = 12
     BROADCAST_TEXT: int = 13
+    UNKNOWN: int = 14
 
 
 class Items:
@@ -71,6 +72,7 @@ class ServerData:
     def __init__(self, ip: str = "0.0.0.0", port: int = 8080) -> None:
         self.ip: str = ip
         self.port: int = port
+        self.make_udp_wait: bool = False
         self.buffer_size: int = 1024*4
         self.startup_message: str = f"AI land is live at {self.ip}:{self.port}"
         self.welcome_message: str = "Welcome to AI land."
@@ -87,7 +89,6 @@ class RequestData:
     def __init__(self, ip: str = "0.0.0.0", port: int = 8080) -> None:
         self.ip: str = ip
         self.port: int = port
-        self.response_buffer: list[list[dict[Commands, any]]] = []
 
 
 class AI:
@@ -166,6 +167,7 @@ class GlobalVariables:
 
         # The converted income from the server
         self.current_buffer: list[dict[Commands, any]] = []
+        self.response_buffer: list[list[dict[Commands, any]]] = []
 
         # Message customisation desing
         self.message_colours: MessageColours = MessageColours()

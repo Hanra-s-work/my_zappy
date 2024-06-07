@@ -5,9 +5,10 @@
 # receiver.py
 ##
 
-from socket import socket, AF_INET, SOCK_DGRAM
+from socket import socket, AF_INET, SOCK_DGRAM, error as sock_error
 
 from threading import Thread
+
 from constants import GlobalVariables, THREAD_TIMEOUT
 from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
 from convert_data import ConvertData
@@ -19,8 +20,10 @@ class TCPThreader(Thread):
     This is so that requests will not block the
     """
 
-    def __init__(self, my_globals: GlobalVariables) -> None:
+    def __init__(self, my_globals: GlobalVariables, error: int = 84, success: int = 0) -> None:
         super().__init__()
+        self.error = error
+        self.success = success
         self.my_globals = my_globals
         self.ip = my_globals.server_data.ip
         self.port = my_globals.server_data.port
@@ -40,34 +43,63 @@ class TCPThreader(Thread):
         Returns:
             int: _description_ : This function will return an error if it is fatal, otherwise, it will return success
         """
+        error_found = False
 
+        pdebug(
+            self.my_globals,
+            f"Server is listening on: {self.ip}:{self.port}"
+        )
         while self.my_globals.continue_running:
-            pdebug(
-                self.my_globals,
-                f"Server is listening on: {self.ip}:{self.port}"
-            )
-            bytes_address_pair = udp_socket.recvfrom(
-                self.server_data.buffer_size
-            )
-            message = bytes_address_pair[0]
-            address = bytes_address_pair[1]
-            client_msg = f"Message from Client:{message}"
-            client_ip = f"Client IP Address:{address}"
-            psuccess(self.my_globals, client_msg)
-            psuccess(self.my_globals, client_ip)
-            converted_data = ConvertData(message)
-            pdebug(
-                self.my_globals,
-                f"Converted data: {converted_data.to_internal()}"
-            )
-            self.my_globals.current_buffer.append(converted_data.to_internal())
-            # Sending a reply to client
-            # udp_socket.sendto(self.server_data.welcome_message, address)
-            if self.my_globals.continue_running is False:
-                pwarning(
-                    self.my_globals,
-                    f"The value of continue running is : {self.my_globals.continue_running}.\nThe server will now stop"
+            try:
+                bytes_address_pair = udp_socket.recvfrom(
+                    self.server_data.buffer_size
                 )
+                pinfo(
+                    self.my_globals,
+                    f"Content of bytes_address_pair: '{bytes_address_pair}'"
+                )
+                if not bytes_address_pair:
+                    pdebug(self.my_globals, "There is no content to be processed")
+                    continue
+                message, address = bytes_address_pair
+                if isinstance(message, bytes):
+                    message = message.decode()
+                    message = message[:-1]
+                psuccess(self.my_globals, f"Message from Client:{message}")
+                psuccess(self.my_globals, f"Client IP Address:{address}")
+
+                converted_data = ConvertData(message)
+                cleaned_data = converted_data.to_internal()
+                pdebug(self.my_globals, f"Converted data: {cleaned_data}")
+                self.my_globals.current_buffer.append(cleaned_data)
+                # Sending a reply to client
+                # udp_socket.sendto(self.server_data.welcome_message, address)
+            except sock_error as e:
+                if e.errno == 11:
+                    continue
+                perror(self.my_globals, f"Receiver socket error: {e}")
+                self.my_globals.continue_running = False
+                error_found = True
+
+        if self.my_globals.continue_running is False:
+            pwarning(
+                self.my_globals,
+                f"The value of continue running is : {self.my_globals.continue_running}.\nThe server will now stop"
+            )
+        pinfo(
+            self.my_globals,
+            "Current buffer is:"
+        )
+        pinfo(
+            self.my_globals,
+            self.my_globals.current_buffer
+        )
+        if error_found is True:
+            perror(self.my_globals, "Fatal error occurred. Server will now stop")
+        if self.my_globals.continue_running is False:
+            pdebug(self.my_globals, "The receiver loop is exiting with an error.")
+            return self.error
+        return self.success
 
     def _start_server(self) -> int:
         """_summary_
@@ -84,12 +116,22 @@ class TCPThreader(Thread):
         # Bind to address and ip
         udp_server_socket.bind((self.ip, self.port))
 
+        # Make udp blocking
+        pdebug(
+            self.my_globals,
+            f"UDP blocking is set to: {self.server_data.make_udp_wait}"
+        )
+        udp_server_socket.setblocking(self.server_data.make_udp_wait)
+
         # The boot message
         pinfo(self.my_globals, self.server_data.startup_message)
         try:
             return self._maintain_loop(udp_server_socket)
         except Exception as e:
-            perror(self.my_globals, f"An unexpected error occurred: {e}")
+            perror(
+                self.my_globals,
+                f"An unexpected error occurred in the receiver loop: {e}"
+            )
             return self.my_globals.error
 
     def run(self) -> int:

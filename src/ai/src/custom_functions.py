@@ -22,9 +22,12 @@ def perror(global_variables: GlobalVariables, string: str = "This is an error") 
         (),
         ""
     )
-    data = f"{string}".split("\n")
-    if data[-1] == "":
-        data.pop()
+    if isinstance(string, list):
+        data = string
+    else:
+        data = f"{string}".split("\n")
+        if data[-1] == "":
+            data.pop()
     for i in data:
         global_variables.beautify_error.title(f"Error: {i}")
     global_variables.colourise_output.display(
@@ -48,9 +51,12 @@ def pwarning(global_variables: GlobalVariables, string: str = "This is a warning
         (),
         ""
     )
-    data = f"{string}".split('\n')
-    if data[-1] == '':
-        data.pop(-1)
+    if isinstance(string, list):
+        data = string
+    else:
+        data = f"{string}".split("\n")
+        if data[-1] == "":
+            data.pop()
     for i in data:
         global_variables.beautify_standard.warning_message(i)
     global_variables.colourise_output.display(
@@ -74,9 +80,12 @@ def psuccess(global_variables: GlobalVariables, string: str = "This is a success
         (),
         ""
     )
-    data = f"{string}".split("\n")
-    if data == '':
-        data.pop(-1)
+    if isinstance(string, list):
+        data = string
+    else:
+        data = f"{string}".split("\n")
+        if data[-1] == "":
+            data.pop()
     for i in data:
         global_variables.beautify_standard.success_message(i)
     global_variables.colourise_output.display(
@@ -100,9 +109,12 @@ def pinfo(global_variables: GlobalVariables, string: str = "This is a success") 
         (),
         ""
     )
-    data = f"Info: {string}".split('\n')
-    if data[-1] == '':
-        data.pop(-1)
+    if isinstance(string, list):
+        data = string
+    else:
+        data = f"{string}".split("\n")
+        if data[-1] == "":
+            data.pop()
     for i in data:
         global_variables.beautify_standard.inform_message(i)
     global_variables.colourise_output.display(
@@ -123,7 +135,14 @@ def pdebug(global_variables: GlobalVariables, string: str = "This is a debug str
             (),
             ""
         )
-        global_variables.beautify_standard.message(f"Debug: {string}")
+        if isinstance(string, list):
+            data = string
+        else:
+            data = f"{string}".split("\n")
+            if data[-1] == "":
+                data.pop()
+        for i in data:
+            global_variables.beautify_standard.message(f"Debug: {i}")
         global_variables.colourise_output.display(
             global_variables.message_colours.DEFAULT,
             (),
