@@ -58,4 +58,6 @@ struct arg_s **get_zappy_args(int ac, const char **av,
 
 int check_arg_value_server(struct arg_s **zappy_args);
 
+int check_values_validity(const struct arg_s **arguments, const size_t size);
+
 #endif //ZAPPY_ARG_PARSE_H

@@ -11,6 +11,7 @@
     //!! GLOBAL CONSTANTS !!
 
     #define ERROR 84
+    #define MAX_BUFFER_SIZE 1024
 
     //!! PARSING CONSTANTS !!
 
