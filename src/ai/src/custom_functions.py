@@ -25,13 +25,13 @@ def perror(global_variables: GlobalVariables, string: str = "This is an error") 
         if data[-1] == "":
             data.pop()
     for i in data:
-        global_variables.beautify_error.disp_round_message_box(f"Error: {i}")
-        global_variables.colourise_output.display(
+        global_variables.beautify.disp_round_message_box(f"Error: {i}")
+        global_variables.colourise_error.display(
             global_variables.message_colours.ERROR,
             (),
-            global_variables.beautify_error.get_generated_content()
+            global_variables.beautify.get_generated_content()
         )
-    global_variables.colourise_output.display(
+    global_variables.colourise_error.display(
         global_variables.message_colours.DEFAULT,
         (),
         ""
@@ -54,11 +54,11 @@ def pwarning(global_variables: GlobalVariables, string: str = "This is a warning
         if data[-1] == "":
             data.pop()
     for i in data:
-        global_variables.beautify_standard.warning_message(i)
+        global_variables.beautify.warning_message(i)
         global_variables.colourise_output.display(
             global_variables.message_colours.WARNING,
             (),
-            global_variables.beautify_standard.get_generated_content()
+            global_variables.beautify.get_generated_content()
         )
     global_variables.colourise_output.display(
         global_variables.message_colours.DEFAULT,
@@ -83,11 +83,11 @@ def psuccess(global_variables: GlobalVariables, string: str = "This is a success
         if data[-1] == "":
             data.pop()
     for i in data:
-        global_variables.beautify_standard.success_message(i)
+        global_variables.beautify.success_message(i)
         global_variables.colourise_output.display(
             global_variables.message_colours.SUCCESS,
             (),
-            global_variables.beautify_standard.get_generated_content()
+            global_variables.beautify.get_generated_content()
         )
     global_variables.colourise_output.display(
         global_variables.message_colours.DEFAULT,
@@ -112,11 +112,11 @@ def pinfo(global_variables: GlobalVariables, string: str = "This is a success") 
         if data[-1] == "":
             data.pop()
     for i in data:
-        global_variables.beautify_standard.inform_message(i)
+        global_variables.beautify.inform_message(i)
         global_variables.colourise_output.display(
             global_variables.message_colours.INFO,
             (),
-            global_variables.beautify_standard.get_generated_content()
+            global_variables.beautify.get_generated_content()
         )
     global_variables.colourise_output.display(
         global_variables.message_colours.DEFAULT,
@@ -138,11 +138,11 @@ def pdebug(global_variables: GlobalVariables, string: str = "This is a debug str
             if data[-1] == "":
                 data.pop()
         for i in data:
-            global_variables.beautify_standard.message(f"Debug: {i}")
+            global_variables.beautify.message(f"Debug: {i}")
             global_variables.colourise_output.display(
                 global_variables.message_colours.DEBUG,
                 (),
-                global_variables.beautify_standard.get_generated_content()
+                global_variables.beautify.get_generated_content()
             )
         global_variables.colourise_output.display(
             global_variables.message_colours.DEFAULT,

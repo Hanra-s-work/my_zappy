@@ -65,6 +65,7 @@ class Main:
         )
         self.constants.colourise_output.display("rr", (), "End of script\n")
         self.constants.colourise_output.unload_ressources()
+        self.constants.colourise_error.unload_ressources()
 
     def _process_arguments(self) -> int:
         """
@@ -227,6 +228,7 @@ class Main:
         )
         print("ù")
         self.constants.colourise_output.init_pallet()
+        self.constants.colourise_error.init_pallet()
         self.constants.colourise_output.display(
             self.constants.message_colours.DEFAULT,
             (),
@@ -244,6 +246,7 @@ class Main:
         self.logistics = LogicsticsThread(self.constants)
         pdebug(self.constants, "Thread Logistics is loaded")
         pinfo(self.constants, "Thread classes loaded")
+        perror(self.constants, "This is a sample error message")
         self._start_threads()
         psuccess(self.constants, "Threads launched")
         # self._create_socket()

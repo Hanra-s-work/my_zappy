@@ -186,13 +186,8 @@ class GlobalVariables:
         # Message customisation desing
         self.message_colours: MessageColours = MessageColours()
         self.colourise_output: ColouriseOutput = ColouriseOutput()
-        self.beautify_error: Disp = Disp(
-            toml_content=TOML_CONF,
-            save_to_file=True,
-            file_name="",
-            file_descriptor=stderr
-        )
-        self.beautify_standard: Disp = Disp(
+        self.colourise_error: ColouriseOutput = ColouriseOutput(stderr)
+        self.beautify: Disp = Disp(
             toml_content=TOML_CONF,
             save_to_file=False
         )
