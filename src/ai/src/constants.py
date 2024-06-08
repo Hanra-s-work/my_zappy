@@ -12,7 +12,7 @@
 
 from sys import stderr
 from socket import socket
-from display_tty import Disp, TOML_CONF
+from display_tty import Disp, TOML_CONF, OSTRING
 from colourise_output import ColouriseOutput
 
 
@@ -25,6 +25,7 @@ THREAD_TIMEOUT = 5  # None
 
 # Disabeling animation
 TOML_CONF['PRETTIFY_OUTPUT'] = False
+TOML_CONF['OUTPUT_MODE'] = OSTRING
 
 
 class Commands:
@@ -171,6 +172,9 @@ class GlobalVariables:
         self.error: int = error
         self.success: int = success
         self.current_status: int = self.success
+
+        # Sender monitoring
+        self.sender_ready: bool = False
 
         # The converted income from the server
         self.current_buffer: list[dict[Commands, any]] = []

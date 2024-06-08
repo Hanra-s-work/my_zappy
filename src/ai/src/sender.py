@@ -7,7 +7,6 @@
 
 from socket import socket, AF_INET, SOCK_STREAM, error as sock_error, timeout as sock_timeout
 from threading import Thread
-import time
 
 from constants import GlobalVariables, Commands
 from convert_data import ConvertData
@@ -103,6 +102,8 @@ class SenderThread(Thread):
             self.my_globals,
             f"Sender is listening on: {self.ip}:{self.port}"
         )
+        conn, addr = tcp_socket.accept()
+        pinfo(self.my_globals, f"Client {addr} is connected")
         while self.my_globals.continue_running:
             if self.my_globals.response_buffer == []:
                 continue
@@ -110,7 +111,7 @@ class SenderThread(Thread):
                 index += 1
                 self.sent_data.append({"id": index})
                 message = self.my_globals.response_buffer.pop(0)
-                send_status = self._send_tcp_message(tcp_socket, message)
+                send_status = self._send_tcp_message(conn, message)
                 if send_status != 0:
                     perror(self.my_globals, f"Send error code: {send_status}")
                     continue
@@ -118,7 +119,7 @@ class SenderThread(Thread):
                     self.my_globals,
                     "(sender) Message sent successfully !"
                 )
-                response_status = self._get_tcp_response(tcp_socket)
+                response_status = self._get_tcp_response(conn)
                 if response_status != self.success:
                     continue
                 psuccess(
@@ -162,14 +163,37 @@ class SenderThread(Thread):
         Returns:
             int: _description_: It will return an error if it fails, otherwise, will return whatever _maintain_loop will return
         """
-        socket_tcp = socket(
-            family=AF_INET,
-            type=SOCK_STREAM
-        )
-        socket_tcp.connect((self.ip, self.port))
-        socket_tcp.setblocking(self.sender_data.make_tcp_wait)
-        socket_tcp.settimeout(self.sender_data.timeout)
+        try:
+            socket_tcp = socket(
+                family=AF_INET,
+                type=SOCK_STREAM
+            )
+            psuccess(self.my_globals, "Tcp socket class initialised")
+        except sock_error as e:
+            perror(self.my_globals, f"Failed to create socket: {e}")
+
+        try:
+            socket_tcp.bind((self.ip, self.port))
+            psuccess(self.my_globals, "Socket connected to sender server")
+        except sock_error as e:
+            perror(self.my_globals, f"Failed to connect to sender server: {e}")
+
+        try:
+            socket_tcp.setblocking(self.sender_data.make_tcp_wait)
+            socket_tcp.settimeout(self.sender_data.timeout)
+            if self.sender_data.make_tcp_wait:
+                psuccess(self.my_globals, "Socket set to blocking mode")
+            else:
+                psuccess(self.my_globals, "Socket set to non-blocking mode")
+            psuccess(
+                self.my_globals,
+                f"Timeout is set to {self.sender_data.timeout}"
+            )
+        except sock_error as e:
+            perror(self.my_globals, f"Failed to set socket options: {e}")
+
         # socket_tcp = self.my_globals.socket
+        self.my_globals.sender_ready = True
         try:
             return self._maintain_loop(socket_tcp)
         except Exception as e:

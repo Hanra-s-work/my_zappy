@@ -5,6 +5,7 @@
 # receiver.py
 ##
 
+import time
 from socket import socket, AF_INET, SOCK_DGRAM, error as sock_error
 
 from threading import Thread
@@ -115,21 +116,52 @@ class TCPThreader(Thread):
         Returns:
             int: _description_: It will return an error if it fails, otherwise, will return whatever _maintain_loop will return
         """
+        # Stall while tcp server is starting
+        while self.my_globals.sender_ready is False and self.my_globals.continue_running:
+            time.sleep(0.5)
+
         # Create a datagram socket
-        udp_server_socket = socket(
-            family=AF_INET,
-            type=SOCK_DGRAM
-        )
+        try:
+            udp_server_socket = socket(
+                family=AF_INET,
+                type=SOCK_DGRAM
+            )
+            psuccess(self.my_globals, "UDP server socket class is initialised.")
+        except sock_error as e:
+            perror(
+                self.my_globals,
+                f"Failed to initialise udp socket class: {e}"
+            )
 
         # Bind to address and ip
-        udp_server_socket.bind((self.ip, self.port))
+        try:
+            udp_server_socket.bind((self.ip, self.port))
+            psuccess(self.my_globals, "Udp socket address is bound to the port")
+        except sock_error as e:
+            perror(
+                self.my_globals,
+                f"Failed to bind udp socket to address and port: {e}"
+            )
 
         # Make udp blocking
-        pdebug(
-            self.my_globals,
-            f"UDP blocking is set to: {self.server_data.make_udp_wait}"
-        )
-        udp_server_socket.setblocking(self.server_data.make_udp_wait)
+        try:
+            pdebug(
+                self.my_globals,
+                f"UDP blocking is set to: {self.server_data.make_udp_wait}"
+            )
+            udp_server_socket.setblocking(self.server_data.make_udp_wait)
+            if self.server_data.make_udp_wait:
+                psuccess(
+                    self.my_globals,
+                    "UDP blocking is set wait for an answer"
+                )
+            else:
+                psuccess(self.my_globals, "UDP blocking is set to non-blocking")
+        except sock_error as e:
+            perror(
+                self.my_globals,
+                f"Updating the blocking mode of the udp socket failed: {e}"
+            )
 
         # The boot message
         pinfo(self.my_globals, self.server_data.startup_message)
