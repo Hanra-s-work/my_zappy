@@ -73,9 +73,9 @@ class Main:
         They will be used to define some parameters that user could specify.
         This function is also the one in charge of displaying the help section when required.
         """
-        if (self.argc not in (2, 7, 8)) or (self.argc == 2 and sys.argv[1] in self.help_options):
+        if (self.argc not in (7, 8)):
             print("USAGE: ./zappy_ai -p port -n name -h machine")
-            if self.argc == 2:
+            if self.argc == 2 and sys.argv[1] in self.help_options:
                 return self.success
             return self.error
 
@@ -171,7 +171,7 @@ class Main:
         This function's role is to check on the threads and know when it is time to stop the program
         """
         while self.constants.continue_running:
-            tt = input("pause press enter to continue...")
+            tt = input("pause press enter to continue...\n")
             self.constants.continue_running = False
         self._stop_threads()
         return self.constants.current_status
@@ -212,9 +212,10 @@ class Main:
         """
         response = self._process_arguments()
         if isinstance(response, int):
-            print(
-                f"One or more errors have occurred\nPlease run {sys.argv[0]} --help for more information"
-            )
+            if response != self.success:
+                print(
+                    f"One or more errors have occurred\nPlease run {sys.argv[0]} --help for more information"
+                )
             return response
         self.constants = GlobalVariables(
             error=self.error,
