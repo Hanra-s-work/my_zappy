@@ -7,13 +7,21 @@
 
 SRC_MAIN	=	./src/main.c
 
-SRC	=	./src/sub_main.c
+SRC	=	./src/sub_main.c					\
+		./src/parsing/arg_parse.c			\
+		./src/parsing/check_arg_mandatory.c	\
+		./src/parsing/check_arg_value.c	\
+		./src/utils.c
+
+SRC_TEST	=	./tests/arg_parser_test.c
 
 CC	=	gcc
 
 RM	=	rm -rf
 
 OBJ	=	$(SRC:.c=.o)
+
+OBJ_TEST	=	$(SRC_TEST:.c=.o)
 
 OBJ_MAIN	=	$(SRC_MAIN:.c=.o)
 
@@ -36,6 +44,7 @@ update_binary_location:
 clean:
 	$(RM) $(OBJ_MAIN)
 	$(RM) $(OBJ)
+	$(RM) $(OBJ_TEST)
 	$(RM) *.gcno
 	$(RM) *.gcda
 
@@ -54,8 +63,8 @@ tests_run:	CXXFLAGS	+=	-coverage
 tests_run:	clean
 tests_run:	$(NAME_TEST)
 
-$(NAME_TEST):
-	$(CXX) $(SRC) -o $(NAME_TEST) $(LDFLAGS) $(LDLIBS)
+$(NAME_TEST):	$(OBJ) $(OBJ_TEST)
+	$(CC) $(OBJ) $(OBJ_TEST) -o $(NAME_TEST) $(LDFLAGS) $(LDLIBS)
 	./$(NAME_TEST)
 
 coverage:	tests_run
