@@ -6,11 +6,22 @@
 */
 
 #include <iostream>
+#include "Parsing.hpp"
 
 int sub_main(int argc, char **argv)
 {
-    if (argc == 2) {
-        std::cout << argv[1] << std::endl;
+    Gui::Parsing p;
+
+    if (p.parse_args(argc, argv) != true) {
+        p.help();
+        return 84;
     }
+
+    if (p.validate_args() != true) {
+        p.help();
+        return 84;
+    }
+
+    p.print_args();
     return 0;
 }

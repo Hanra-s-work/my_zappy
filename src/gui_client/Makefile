@@ -7,7 +7,8 @@
 
 SRC_MAIN	=	./src/main.cpp
 
-SRC	=	./src/sub_main.cpp
+SRC	=	./src/sub_main.cpp	\
+		./src/Parsing.cpp	\
 
 CXX	=	g++
 
