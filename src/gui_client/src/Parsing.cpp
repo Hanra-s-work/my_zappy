@@ -51,10 +51,9 @@ namespace Gui
 
     bool Parsing::check_valid_port(const std::string &port)
     {
-        char c = NULL;
 
         for (size_t i = 0; i < port.size(); ++i) {
-            c = port[i];
+            char c = port[i];
             if (std::isdigit(c) == 0)
                 return false;
         }
