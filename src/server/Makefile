@@ -7,14 +7,16 @@
 
 SRC_MAIN	=	./src/main.c
 
-SRC	=	./src/utils.c							\
+SRC	=	./src/utils/utils.c						\
+		./src/utils/array_utils.c				\
+\
 		./src/sub_main.c						\
 \
 		./src/parsing/arg_parse.c				\
 		./src/parsing/check_arg_mandatory.c		\
 		./src/parsing/check_arg_value.c			\
 		./src/parsing/check_values_validity.c 	\
-\
+		./src/parsing/command_parse.c			\
 
 SRC_TEST	=	./tests/arg_parser_test.c
 

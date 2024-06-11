@@ -8,8 +8,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-
-#include "arg_parse.h"
+#include <stdlib.h>
+#include "../../include/arg_parse.h"
+#include "../../include/utils.h"
 
 int write_error_msg(char *str)
 {
@@ -31,14 +32,5 @@ void free_args(struct arg_s **args, size_t size)
         for (size_t j = 0; j < args[i]->nb_value; ++j) {
             free(tmp[j]);
         }
-    }
-}
-
-void free_array(void *to_free)
-{
-    void **array = (void **)to_free;
-
-    for (int i = 0; array[i] != NULL; ++i) {
-        free(array[i]);
     }
 }
