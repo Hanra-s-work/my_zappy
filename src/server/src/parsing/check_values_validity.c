@@ -39,6 +39,9 @@ static int compare_name_2(char **array, const char *name, const size_t x)
     char str[MAX_BUFFER_SIZE];
 
     for (size_t i = 0; i < x; i++) {
+        if (array[i] == NULL) {
+            break;
+        }
         if (strcmp(name, array[i]) == 0) {
             strcpy(str, "Error: The team name '");
             strcat(str, name);
@@ -55,16 +58,18 @@ static int compare_name_1(const struct arg_s **arguments, const size_t index)
     char **name = NULL;
     size_t x = 0;
 
-    name = (char **)arguments[index]->value;
+    name = arguments[index]->value;
     tmp = malloc(sizeof(char *) * arguments[index]->nb_value + 1);
     for (size_t i = 0; i < arguments[index]->nb_value; i++) {
         if (compare_name_2(tmp, *name, x) == -1) {
+            free(tmp);
             return (-1);
         }
-        tmp[x] = strdup(*name);
+        tmp[x] = *name;
         x++;
         name++;
     }
+    free(tmp);
     return (0);
 }
 
@@ -81,6 +86,23 @@ static int name_checker(const struct arg_s **arguments, const size_t index)
     return (0);
 }
 
+static int map_size_checker(const struct arg_s **arguments)
+{
+    char str[MAX_BUFFER_SIZE];
+    int x = 0;
+    int y = 0;
+
+    strcpy(str, (char *)find_value_by_param(arguments, "-x"));
+    x = atoi(str);
+    strcpy(str, (char *)find_value_by_param(arguments, "-y"));
+    y = atoi(str);
+    if (x * y < MINIMUM_MAP_SIZE) {
+        write_error_msg("Error: The map size must be bigger than 20.\n");
+        return (-1);
+    }
+    return (0);
+}
+
 int check_values_validity(const struct arg_s **arguments, const size_t size)
 {
     for (size_t i = 0; i < size; i++) {
@@ -91,5 +113,5 @@ int check_values_validity(const struct arg_s **arguments, const size_t size)
             return (-1);
         }
     }
-    return (0);
+    return map_size_checker(arguments);
 }
