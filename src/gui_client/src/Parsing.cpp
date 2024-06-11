@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include "Parsing.hpp"
+#include "ArgumentHandling.hpp"
 
 namespace Gui
 {
@@ -23,11 +24,12 @@ namespace Gui
         for (int i = 1; i < ac; ++i) {
             if (std::strcmp(av[i], "-p") == 0 && i + 1 < ac) {
                 _port = av[++i];
+                if (check_valid_port(_port) != true)
+                    throw Exception::ArgumentHandling("Invalid port number.");
             } else if (std::strcmp(av[i], "-h") == 0 && i + 1 < ac) {
                 _machine = av[++i];
             } else {
-                std::cerr << "Invalid argument: " << av[i] << std::endl;
-                return false;
+                throw Exception::ArgumentHandling("Invalid argument: " + std::string(av[i]));
             }
         }
         return true;
@@ -36,8 +38,7 @@ namespace Gui
     bool Parsing::validate_args() const
     {
         if (_port.empty() || _machine.empty()) {
-            std::cerr << "Missing arguments." << std::endl;
-            return false;
+            throw Exception::ArgumentHandling("Missing arguments.");
         }
         return true;
     }
@@ -50,10 +51,9 @@ namespace Gui
 
     bool Parsing::check_valid_port(const std::string &port)
     {
-        char c = NULL;
 
         for (size_t i = 0; i < port.size(); ++i) {
-            c = port[i];
+            char c = port[i];
             if (std::isdigit(c) == 0)
                 return false;
         }
