@@ -7,14 +7,23 @@
 
 SRC_MAIN	=	./src/main.c
 
-SRC	=	./src/utils.c							\
-		./src/sub_main.c						\
+SRC	=	./src/sub_main.c						\
+\
+		./src/utils/finder.c					\
+		./src/utils/free.c						\
+		./src/utils/writer.c					\
+		./src/utils/fill.c						\
 \
 		./src/parsing/arg_parse.c				\
 		./src/parsing/check_arg_mandatory.c		\
 		./src/parsing/check_arg_value.c			\
 		./src/parsing/check_values_validity.c 	\
 \
+		./src/server/server_initialization.c	\
+		./src/server/game_data_initialization.c	\
+		./src/server/client_management.c 		\
+\
+		./src/show/show_game_data.c				\
 
 SRC_TEST	=	./tests/arg_parser_test.c
 
