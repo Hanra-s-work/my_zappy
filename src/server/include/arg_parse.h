@@ -37,10 +37,8 @@ static const struct option_list_s SERVER_OPTION[NB_PARAM] = {
     { {"-x", true, false, "width of the world", true, NULL } },
     { {"-y", true, false, "height of the world", true, NULL} },
     { {"-n", true, true, "name of the team", true, NULL} },
-    { {"-c", true, false, "number of authorized clients per team", true,
-        NULL} },
-    { {"-f", true, false, "reciprocal of time unit for execution of actions",
-        false, (void *) 100} },
+    { {"-c", true, false, CLIENTS_NB_PARAM, true, NULL} },
+    { {"-f", true, false, FREQUENCE_PARAM, false, (void *) 100} },
 };
 
 int get_nb_mandatory_option(const struct option_list_s *opt_list);
@@ -59,5 +57,7 @@ struct arg_s **get_zappy_args(int ac, const char **av,
     const struct option_list_s *opt_l);
 
 int check_arg_value_server(struct arg_s **zappy_args);
+
+int check_values_validity(const struct arg_s **arguments, const size_t size);
 
 #endif //ZAPPY_ARG_PARSE_H

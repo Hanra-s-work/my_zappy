@@ -7,11 +7,23 @@
 
 SRC_MAIN	=	./src/main.c
 
-SRC	=	./src/sub_main.c					\
-		./src/parsing/arg_parse.c			\
-		./src/parsing/check_arg_mandatory.c	\
-		./src/parsing/check_arg_value.c	\
-		./src/utils.c
+SRC	=	./src/sub_main.c						\
+\
+		./src/utils/finder.c					\
+		./src/utils/free.c						\
+		./src/utils/writer.c					\
+		./src/utils/fill.c						\
+\
+		./src/parsing/arg_parse.c				\
+		./src/parsing/check_arg_mandatory.c		\
+		./src/parsing/check_arg_value.c			\
+		./src/parsing/check_values_validity.c 	\
+\
+		./src/server/server_initialization.c	\
+		./src/server/game_data_initialization.c	\
+		./src/server/client_management.c 		\
+\
+		./src/show/show_game_data.c				\
 
 SRC_TEST	=	./tests/arg_parser_test.c
 
@@ -28,6 +40,8 @@ OBJ_MAIN	=	$(SRC_MAIN:.c=.o)
 CFLAGS	=	-Wall -Wextra
 
 CPPFLAGS	=	-iquote ./include
+
+TESTFLAGS	=	--coverage -lcriterion
 
 NAME	=	zappy_server
 
@@ -58,13 +72,8 @@ re:	fclean all
 debug:	CFLAGS += -g3
 debug:	clean all
 
-tests_run:	LDLIBS	+=	-lcriterion
-tests_run:	CXXFLAGS	+=	-coverage
-tests_run:	clean
-tests_run:	$(NAME_TEST)
-
-$(NAME_TEST):	$(OBJ) $(OBJ_TEST)
-	$(CC) $(OBJ) $(OBJ_TEST) -o $(NAME_TEST) $(LDFLAGS) $(LDLIBS)
+tests_run:
+	$(CC) $(SRC) $(SRC_TEST) -o $(NAME_TEST) $(TESTFLAGS) $(CFLAGS) $(CPPFLAGS)
 	./$(NAME_TEST)
 
 coverage:	tests_run
