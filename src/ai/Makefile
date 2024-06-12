@@ -88,7 +88,7 @@ C_YELLOW	=	\033[38;5;226m$(C_BACKGROUND)
 # Compile the project
 all: install_dependencies build_binary update_binary_location clean
 
-my_all: create_environement install_dependencies build_binary update_binary_location clean
+my_all: create_environement all
 
 # Create the python environement
 create_environement:
