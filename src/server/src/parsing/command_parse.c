@@ -7,6 +7,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
 #include "utils.h"
 #include "command_parse.h"
 
@@ -85,6 +87,13 @@ static char ***parse_individual_command(char **buf)
     return (commands);
 }
 
+static void *free_values(char **array, char *str)
+{
+    free(str);
+    free_array(array);
+    return (NULL);
+}
+
 char ***parse_buffer(uint8_t *buffer, ssize_t buf_size)
 {
     char *str = malloc(sizeof(char) * (buf_size + 2));
@@ -95,16 +104,14 @@ char ***parse_buffer(uint8_t *buffer, ssize_t buf_size)
         return (NULL);
     (void) memcpy(str, buffer, buf_size);
     str[buf_size + 1] = '\0';
-    if ((buf = str_to_word_array(str, COMMAND_SEPARATOR)) == NULL) {
-        free(str);
-        return (NULL);
+    buf = str_to_word_array(str, COMMAND_SEPARATOR);
+    if (buf == NULL) {
+        return (free_values(buf, str));
     }
-    if ((commands = parse_individual_command(buf)) == NULL) {
-        free(str);
-        free_array(buf);
-        return (NULL);
+    commands = parse_individual_command(buf);
+    if (commands == NULL) {
+        return (free_values(buf, str));
     }
-    free(str);
-    free_array(buf);
+    free_values(buf, str);
     return (commands);
 }
