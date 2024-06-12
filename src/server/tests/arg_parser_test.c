@@ -19,7 +19,7 @@ Test(arg_parser, get_nb_mandatory)
 Test(arg_parser, check_mandatory_set)
 {
     int mandatory_ok;
-    const char *av[13] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[13] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", NULL};
 
     mandatory_ok = check_mandatory_set(13, av, 5, SERVER_OPTION);
@@ -29,7 +29,7 @@ Test(arg_parser, check_mandatory_set)
 Test(arg_parser, check_mandatory_set_with_f)
 {
     int mandatory_ok;
-    const char *av[15] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[15] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", "-f", "200", NULL };
 
     mandatory_ok = check_mandatory_set(15, av, 6, SERVER_OPTION);
@@ -39,7 +39,7 @@ Test(arg_parser, check_mandatory_set_with_f)
 Test(arg_parser, check_mandatory_set_incorrect, .description = "Port missing")
 {
     int mandatory_ok;
-    const char *av[11] = {"zappy", "-w", "30", "-y", "100", "-n", "toto",
+    const char *av[11] = {"zappy", "-x", "30", "-y", "100", "-n", "toto",
         "titi", "-c", "2", NULL };
 
     mandatory_ok = check_mandatory_set(11, av, 4, SERVER_OPTION);
@@ -49,7 +49,7 @@ Test(arg_parser, check_mandatory_set_incorrect, .description = "Port missing")
 Test(arg_parser, get_nb_parameter)
 {
     int nb_parameter;
-    const char *av[13] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[13] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", NULL };
 
     nb_parameter = get_nb_parameter(13, av);
@@ -59,7 +59,7 @@ Test(arg_parser, get_nb_parameter)
 Test(arg_parser, get_nb_parameter_with_f)
 {
     int nb_parameter;
-    const char *av[15] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[15] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", "-f", "200", NULL };
 
     nb_parameter = get_nb_parameter(15, av);
@@ -69,20 +69,22 @@ Test(arg_parser, get_nb_parameter_with_f)
 Test(arg_parser, is_param)
 {
     int r_val;
-    const char *av[15] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[15] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", "-f", "200", NULL };
 
-    r_val = is_param(av[1], &SERVER_OPTION[0].option);
+    r_val = is_param(av[1],
+    (const struct option_list_s *)&SERVER_OPTION[0].option);
     cr_assert(r_val != -1);
 }
 
 Test(arg_parser, is_param_false)
 {
     int r_val;
-    const char *av[15] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[15] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", "-f", "200", NULL };
 
-    r_val = is_param(av[0], &SERVER_OPTION[0].option);
+    r_val = is_param(av[0],
+    (const struct option_list_s *)&SERVER_OPTION[0].option);
     cr_assert(r_val == -1);
 }
 
@@ -90,7 +92,7 @@ Test(arg_parser, get_arg)
 {
     struct arg_s **args;
     char **teams;
-    const char *av[13] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[13] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", NULL };
 
     args = get_zappy_args(13, av, SERVER_OPTION);
@@ -98,7 +100,7 @@ Test(arg_parser, get_arg)
         exit(1);
     cr_assert_str_eq(args[0]->name, "-p");
     cr_assert_str_eq((char *)args[0]->value, "8888");
-    cr_assert_str_eq(args[1]->name, "-w");
+    cr_assert_str_eq(args[1]->name, "-x");
     cr_assert_str_eq((char *)args[1]->value, "30");
     cr_assert_str_eq(args[2]->name, "-y");
     cr_assert_str_eq((char *)args[2]->value, "100");
@@ -115,7 +117,7 @@ Test(arg_parser, get_arg_with_f)
 {
     struct arg_s **args;
     char **teams;
-    const char *av[15] = {"zappy", "-p", "8888", "-w", "30", "-y", "100", "-n",
+    const char *av[15] = {"zappy", "-p", "8888", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", "-f", "200", NULL };
 
     args = get_zappy_args(15, av, SERVER_OPTION);
@@ -123,7 +125,7 @@ Test(arg_parser, get_arg_with_f)
         exit(1);
     cr_assert_str_eq(args[0]->name, "-p");
     cr_assert_str_eq((char *)args[0]->value, "8888");
-    cr_assert_str_eq(args[1]->name, "-w");
+    cr_assert_str_eq(args[1]->name, "-x");
     cr_assert_str_eq((char *)args[1]->value, "30");
     cr_assert_str_eq(args[2]->name, "-y");
     cr_assert_str_eq((char *)args[2]->value, "100");
@@ -142,7 +144,7 @@ Test(arg_parser, get_arg_with_f)
 Test(arg_parser, get_arg_fail)
 {
     struct arg_s **args;
-    const char *av[13] = {"zappy", "-w", "30", "-y", "100", "-n",
+    const char *av[13] = {"zappy", "-x", "30", "-y", "100", "-n",
         "toto", "titi", "-c", "2", "-f", "200", NULL };
 
     args = get_zappy_args(13, av, SERVER_OPTION);

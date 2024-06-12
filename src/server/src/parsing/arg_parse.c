@@ -52,12 +52,12 @@ int get_arg_value(int ac, const char **av,
 {
     (*arg) = malloc(sizeof(struct arg_s) * 1);
     if ((*arg) == NULL)
-        return (-1);
+        return (write_error_msg("Error: Internal server error.\n"));
     (*arg)->name = strdup(param->name);
     (*arg)->nb_value = 0;
     if ((*arg)->name == NULL) {
         free((*arg));
-        return (-1);
+        return (write_error_msg("Error: Internal server error.\n"));
     }
     for (int i = 0; i < ac; ++i) {
         if (param_has_mul_val(i, *arg, av, param) == 0)
@@ -65,7 +65,7 @@ int get_arg_value(int ac, const char **av,
     }
     free((*arg)->name);
     free((*arg));
-    return (-1);
+    return (write_error_msg("Error: Internal server error.\n"));
 }
 
 static int *get_set_param(int ac, const char **av, int nb_param)
