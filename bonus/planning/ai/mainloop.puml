@@ -1,0 +1,51 @@
+@startuml mainloop
+
+!include ./exit.puml
+
+namespace mainloop {
+    class init {
+        -continue_running : bool
+        -current_buffer: list[dict]
+        -response_buffer: list[dict]
+        -current_status: int
+        +update_loop_status()
+    }
+    !include ./comunication.puml
+    !include ./logic.puml
+    init --> comunication.fill_buffer : append_to_mainloop
+    init --> logic.process_buffer: update loop status
+
+    note right of init::continue_running 
+        This variable allows to allow
+        if the main loop can continue
+        running or not
+    end note
+
+    note right of init::current_buffer
+        This buffer contains all the user
+        information that the server responded with
+    end note
+
+    note right of init::response_buffer
+        This is the buffer that will be sent out
+        to the server to update the moves
+    end note
+
+    note right of init::update_loop_status
+        This function looks at the current_buffer
+        to see if the loop should continue to run or not
+    end note
+
+    note right of init::status
+        This is a variable that will be updated with
+        status of the latest function execution
+        on exit of the program this will be the value retuned
+    end note
+}
+
+mainloop.init --> exit.display_error : if one or more errors raised
+mainloop.init --> exit.kill_threads : When exit condition is met (and no errors raised)
+mainloop.comunication.fill_buffer --> exit.display_error: if an error was raised
+mainloop.logic.process_buffer --> exit.display_error: if an error was raised
+
+@enduml mainloop

@@ -1,0 +1,11 @@
+@startuml initialise
+
+namespace initialise {
+    class process_arguments {}
+    class dispatch_arguments {}
+    class create_threads {}
+    process_arguments --> dispatch_arguments
+    dispatch_arguments --> create_threads
+}
+
+@enduml initialise

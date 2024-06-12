@@ -12,8 +12,10 @@ This class follows the batch colour coding rules (from 0 to F for foreground and
 """
 
 import os
+import sys
 import platform
 import colorama as COC
+from typing import TextIO
 
 
 class ColouriseOutput:
@@ -22,13 +24,14 @@ class ColouriseOutput:
     This class follows the batch colour coding rules (from 0 to F for foreground and background)
 """
 
-    def __init__(self) -> None:
+    def __init__(self, output_channel: TextIO = sys.stdout) -> None:
         self.__version__ = "1.0.0"
         self.author = "Henry Letellier"
         self.colour_pallet = {}
         self.unix_colour_pallet = dict()
         self.colourise_output = True
         self.wich_system = platform.system()
+        self.output = output_channel
 
     def process_attributes(self, attributes: tuple = ()) -> list:
         """ Convert the inputted tuple to a list containing the options """
@@ -55,13 +58,14 @@ class ColouriseOutput:
             try:
                 print(
                     f"{self.unix_colour_pallet[colour]}{processed_attributes}{text}",
-                    end=""
+                    end="",
+                    file=self.output
                 )
             except IOError:
                 if self.wich_system == "Windows":
                     os.system(f"{self.colour_pallet[colour]}")
                     if len(text) > 0:
-                        print(f"{text}", end="")
+                        print(f"{text}", end="", file=self.output)
                 else:
                     os.system(
                         f"echo -e \"{self.colour_pallet[colour]}{processed_attributes}{text}\""
