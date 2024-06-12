@@ -45,32 +45,3 @@ int get_nb_parameter(int ac, const char **av)
     }
     return (nb_param);
 }
-
-int check_numeral_value(char *str)
-{
-    char *endptr = NULL;
-    long value;
-
-    value = strtol(str, &endptr, 10);
-    if (endptr[0] != '\0')
-        return (-1);
-    if (value < 0)
-        return (-1);
-    return (0);
-}
-
-int check_arg_value_server(struct arg_s **zappy_args)
-{
-    int r_val;
-
-    for (int i = 0; zappy_args[i] != NULL; ++i) {
-        if (strcmp(zappy_args[i]->name, "-n") == 0) {
-            r_val = zappy_args[i]->nb_value >= 1 ? 0 : -1;
-        } else {
-            r_val = check_numeral_value((char *)zappy_args[i]->value);
-        }
-        if (r_val == -1)
-            return (-1);
-    }
-    return (0);
-}
