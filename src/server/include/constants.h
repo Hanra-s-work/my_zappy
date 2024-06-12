@@ -45,5 +45,13 @@
     #define INVENTORY_TIME 1
     #define FORK_TIME 42
     #define INCANTATION_TIME 300
+    #define COMMAND_DELIMITER   " "
+    #define COMMAND_SEPARATOR   "\n"
+
+    // !! COMMAND_CONSTANT !!
+
+    #define CLIENT_COMMAND_NB   13
+    #define GUI_COMMAND_NB      9
+    #define BROADCAST_COMMAND   5
 
 #endif
