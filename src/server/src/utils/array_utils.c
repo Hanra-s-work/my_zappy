@@ -8,52 +8,77 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "utils.h"
+
 size_t get_array_len(char **array)
 {
     size_t len = 0;
 
-    for (; array[len] != NULL; ++len) {}
+    for (; array[len] != NULL; ++len);
     return (len);
 }
 
-void free_array(void *to_free)
+static int count_string_character(const char *str, const char delim)
 {
-    void **array = (void **)to_free;
+    int count = 0;
 
-    for (int i = 0; array[i] != NULL; ++i) {
-        free(array[i]);
-    }
-}
-
-void free_array_size_n(void *to_free, size_t n)
-{
-    void **array = (void **)to_free;
-
-    for (size_t i = 0; i < n; ++i) {
-        free(array[i]);
-    }
-}
-
-char **str_to_word_array(char *str, const char *delim)
-{
-    int array_size = 1;
-    char *buf;
-    char **array = NULL;
-    char **new_array = NULL;
-
-    buf = strtok(str, delim);
-    for (; buf != NULL; ++array_size) {
-        new_array = realloc(array, sizeof(char *) * (array_size + 1));
-        if (new_array == NULL)
-            return (NULL);
-        array[array_size] = malloc(sizeof(char) * (strlen(buf) + 1));
-        if (array[array_size] == NULL) {
-            free_array_size_n(array, array_size - 1);
-            return (NULL);
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] != delim) {
+            count++;
+        } else {
+            return (count);
         }
-        (void) strcpy(array[array_size], buf);
-        buf = strtok(str, delim);
     }
-    array[array_size] = NULL;
-    return (array);
+    return (count);
+}
+
+static int count_string_number(const char *str, const char delim)
+{
+    int count = 0;
+
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == delim) {
+            count++;
+        }
+    }
+    count++;
+    return (count);
+}
+
+static int jump_n(const int n, const int size, const char *str,
+    const char delim)
+{
+    int new_n = size + n;
+
+    while (str[new_n] == '\0' || str[new_n] == delim) {
+        if (str[new_n] == '\0') {
+            return (new_n);
+        }
+        new_n = new_n + 1;
+    }
+    return (new_n);
+}
+
+char **str_to_word_array(const char *str, const char delim)
+{
+    int count = count_string_number(str, delim);
+    char **tab = malloc(sizeof(char *) * (count + 1));
+    int n = 0;
+    int line = 0;
+    int size = 0;
+
+    if (tab == NULL)
+        return (NULL);
+    while (str[n] != '\0' && line < count) {
+        size = count_string_character(str + n, delim);
+        tab[line] = malloc(sizeof(char) * (size + 1));
+        if (tab[line] == NULL)
+            return (NULL);
+        strncpy(tab[line], str + n, size);
+        tab[line][size] = '\0';
+        line++;
+        n = jump_n(n, size, str, delim);
+    }
+    tab[line] = NULL;
+    return (tab);
 }
