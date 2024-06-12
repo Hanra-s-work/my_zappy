@@ -48,3 +48,13 @@ class CO(ColouriseOutput):
 class C_O(ColouriseOutput):
     """ The class in charge of adding colour to the terminal while respecting the windows colour norm """
     pass
+
+
+if __name__ == '__main__':
+    CI = ColouriseOutput()
+    CI.init_pallet()
+    CI.test_colours()
+    CI.display("0A", (), "Hello World !\n")
+    CI.display("rr", "")
+    CI.unload_ressources()
+    print(f"Created by {CI.author}")

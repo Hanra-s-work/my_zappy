@@ -1,0 +1,39 @@
+@startuml logic
+!include ./comunication.puml
+
+namespace logic {
+    class process_buffer {
+        -list[dict] current_buffer
+        +set_buffer_node(list[dict] node): void
+        -process_buffer_nodes(): void
+    }
+
+    class process_node {
+        -current_node: dict
+        -current_angle: deg
+        -current_inventory: list
+        +set_node(dict node): void
+        +get_response_node(): dict
+        -move_forward(): void
+        -move_left(): void
+        -move_right(): void
+        -get_inventory(): void
+        -send_text(): void
+    }
+
+    note right of process_node
+        All the functions will interract with
+        the current node and response node
+        When required, they will send the output in the correct format
+    end note
+
+    note right of process_buffer
+        This is the mainloop of the current buffer feed
+    end note
+
+    process_node ..> process_buffer : Inheritance
+}
+
+comunication.talk_to_the_wild ..> process_node : Inheritance
+
+@enduml logic

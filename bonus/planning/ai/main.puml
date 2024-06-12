@@ -1,0 +1,12 @@
+@startuml main
+
+!include ./initialise.puml
+
+!include ./mainloop.puml
+
+!include ./exit.puml
+
+initialise.create_threads --> mainloop.init : if no errors were raised
+initialise.create_threads --> exit.display_error : if one or more errors were raised
+
+@enduml main
