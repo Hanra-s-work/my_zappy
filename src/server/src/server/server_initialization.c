@@ -61,5 +61,8 @@ int server_initialization(server_handler_t *server, struct arg_s **arguments)
     if (init_server_queue(server) == -1) {
         return (-1);
     }
+    for (int i = 0; i < MAX_CLIENT; i++) {
+        server->fd_queue[i] = UNKNOWN;
+    }
     return init_game_data(server, arguments);
 }
