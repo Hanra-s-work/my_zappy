@@ -37,41 +37,41 @@ class TranslationReference:
 
     def __init__(self) -> None:
         self.enum_equivalence = {
-            "forward": Commands.FORWARD,
-            "right": Commands.RIGHT,
-            "left": Commands.LEFT,
-            "look": Commands.LOOK,
-            "inventory": Commands.INVENTORY,
-            "broadcast": Commands.BROADCAST_TEXT,
-            "connect_nbr": Commands.CONNECT_NBR,
-            "fork": Commands.FORK,
-            "eject": Commands.EJECT,
-            "take": Commands.TAKE_OBJECT,
-            "set": Commands.SET_OBJECT,
+            "Forward": Commands.FORWARD,
+            "Right": Commands.RIGHT,
+            "Left": Commands.LEFT,
+            "Look": Commands.LOOK,
+            "Inventory": Commands.INVENTORY,
+            "Broadcast": Commands.BROADCAST_TEXT,
+            "Connect_nbr": Commands.CONNECT_NBR,
+            "Fork": Commands.FORK,
+            "Eject": Commands.EJECT,
+            "Take": Commands.TAKE_OBJECT,
+            "Set": Commands.SET_OBJECT,
             "ok": Commands.OK,
             "ko": Commands.KO,
-            "incantation": Commands.INCANTATION,
-            "welcome": Commands.WELCOME,
-            "dead": Commands.DEAD
+            "Incantation": Commands.INCANTATION,
+            "Welcome": Commands.WELCOME,
+            "Dead": Commands.DEAD
         }
         self.text_equivalence = {
-            Commands.FORWARD: "forward",
-            Commands.RIGHT: "right",
-            Commands.LEFT: "left",
-            Commands.LOOK: "look",
-            Commands.INVENTORY: "inventory",
-            Commands.BROADCAST_TEXT: "broadcast",
-            Commands.CONNECT_NBR: "connect_nbr",
-            Commands.FORK: "fork",
-            Commands.EJECT: "eject",
-            Commands.TAKE_OBJECT: "take",
-            Commands.SET_OBJECT: "set",
-            Commands.INCANTATION: "incantation",
-            Commands.OK: "ok",
-            Commands.KO: "ko",
-            Commands.UNKNOWN: "none",
-            Commands.WELCOME: "welcome",
-            Commands.DEAD: "dead"
+            Commands.FORWARD: "Forward",
+            Commands.RIGHT: "Right",
+            Commands.LEFT: "Left",
+            Commands.LOOK: "Look",
+            Commands.INVENTORY: "Inventory",
+            Commands.BROADCAST_TEXT: "Broadcast",
+            Commands.CONNECT_NBR: "Connect_nbr",
+            Commands.FORK: "Fork",
+            Commands.EJECT: "Eject",
+            Commands.TAKE_OBJECT: "Take",
+            Commands.SET_OBJECT: "Set",
+            Commands.INCANTATION: "Incantation",
+            Commands.OK: "Ok",
+            Commands.KO: "Ko",
+            Commands.UNKNOWN: "None",
+            Commands.WELCOME: "Welcome",
+            Commands.DEAD: "Dead"
         }
 
         self.item_string_to_class = {
@@ -81,7 +81,8 @@ class TranslationReference:
             "sibur": Items.SIBUR,
             "mendiane": Items.MENDIANE,
             "phiras": Items.PHIRAS,
-            "thystame": Items.THYSTAME
+            "thystame": Items.THYSTAME,
+            "player": Items.PLAYER
         }
 
         self.item_class_to_string = {
@@ -91,7 +92,9 @@ class TranslationReference:
             Items.SIBUR: "sibur",
             Items.MENDIANE: "mendiane",
             Items.PHIRAS: "phiras",
-            Items.THYSTAME: "thystame"
+            Items.THYSTAME: "thystame",
+            Items.PLAYER: "player",
+            Items.UNKNOWN: "None"
         }
 
 
@@ -136,6 +139,8 @@ class Items:
     MENDIANE: int = 5
     PHIRAS: int = 6
     THYSTAME: int = 7
+    PLAYER: int = 8
+    UNKNOWN: int = 9
 
 
 class ServerData:

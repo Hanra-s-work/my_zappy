@@ -68,6 +68,72 @@ class ConvertData:
         """
         return self.update_raw_data(data)
 
+    def _process_inventory(self, data_list: list[str]) -> dict[Commands, list[list[str, int]]]:
+        """_summary_
+            This function is to be used to process the inventory list.
+        Args:
+            data_list (list[str]): _description_: The raw list
+
+        Returns:
+            dict[Commands, list[str]]: _description_: The converted version
+        """
+        processed_result = []
+
+        for i in data_list:
+            name, quantity = i.split(" ")
+            if quantity.isnumeric() is False:
+                return {Commands.UNKNOWN: ""}
+            processed_result.append([name.strip(), int(quantity)])
+        return {Commands.INVENTORY: processed_result}
+
+    def _process_look(self, data: list[str]) -> dict[Commands, list[Items]]:
+        """_summary_
+        This function is in charge of converting the input to a list of items.
+
+        Args:
+            data (list[str]): _description_: The semi processed list based of the input
+
+        Returns:
+            dict[Commands, list[Items or str]]: _description_: The final converted version of the input
+        """
+
+        processed_result = []
+        temporary_result = []
+        for i in data:
+            if " " in i:
+                for j in i.split(" "):
+                    temporary_result.append(j)
+            else:
+                temporary_result.append(i)
+
+        for i in temporary_result:
+            tmp = i.strip()
+            if tmp in self.item_string_to_class:
+                processed_result.append(self.item_string_to_class[tmp])
+            else:
+                processed_result.append(Items.UNKNOWN)
+        return {Commands.LOOK: processed_result}
+
+    def _special_list_treatment(self) -> dict[Commands, any]:
+        """_summary_
+        Function in charge of the converting a list input to the correct response command.
+
+        Returns:
+            dict[Commands, any]: _description_: The converted list
+        """
+        key = ","
+        if key not in self.data:
+            return {Commands.BROADCAST_TEXT: self.data}
+        data = self.data[1:-1]
+        data_list = data.split(key)
+        if data_list[-1] == "":
+            data_list.pop(-1)
+        if len(data_list) == 0:
+            return {Commands.LOOK: []}
+        if " " in data_list[0] and data_list[0][-1].isnumeric():
+            return self._process_inventory(data_list)
+        return self._process_look(data)
+
     def to_internal(self) -> dict[Commands, any]:
         """_summary_
         Convert the raw data to the internal language used by the ai
@@ -79,20 +145,15 @@ class ConvertData:
         arguments = ""
         if isinstance(self.data, str) is False:
             return {command: arguments}
-        data_list = self.data.split(" ")
-        if len(data_list) == 0:
+        if "[" in self.data:
+            return self._special_list_treatment()
+        if len(self.data) == 0:
             return {command: arguments}
-        if data_list[-1] == '':
-            data_list.pop()
-        if len(data_list) == 0:
-            return {command: arguments}
-        if data_list[0].lower() in self.enum_equivalence:
-            command = self.enum_equivalence[data_list[0].lower()]
-        if len(data_list) > 1:
-            if command in self.item_equivalence_input:
-                arguments = self.item_equivalence_input[command](data_list[1:])
-            else:
-                arguments = data_list[1:]
+        if self.data.lower() in self.enum_equivalence:
+            command = self.enum_equivalence[self.data.lower()]
+        else:
+            command = Commands.BROADCAST_TEXT
+            arguments = self.data
         self.data = None
         return {command: arguments}
 

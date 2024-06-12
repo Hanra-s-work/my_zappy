@@ -188,7 +188,7 @@ class LogicsticsThread(Thread):
         """
         pdebug(self.constants, "(logistics) In _can_evolve:207")
         i = 0
-        artificial_delay = 200
+        artificial_delay = 20
         counter = 0
         self.sender.look()
         max_i = len(self.constants.current_buffer)
