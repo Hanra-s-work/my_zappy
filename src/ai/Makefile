@@ -229,6 +229,9 @@ debug: all
 
 re: fclean all
 
+# Clean the slate, remove the environement and start anew
+my_re: fclean fclean_env my_all
+
 # Disable silent build
 noisy:
 	@echo -e "$(C_PINK)Silent mode is $(C_RED)inactive$(C_RESET)"
@@ -257,4 +260,4 @@ run: clean install_dependencies
 .PHONY: all create_environement install_dependencies activate_environement \
 		activate build_binary update_binary_location clean clean_env \
 		clean_coverage fclean tests_run coverage debug re noop silent run \
-		my_all fclean_env
+		my_all fclean_env my_re
