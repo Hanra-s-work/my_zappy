@@ -10,7 +10,13 @@
 #include "utils.h"
 #include "command_parse.h"
 
-int check_command_arg(int i, char **command)
+/**
+ * @brief Verify parameter for command
+ * @param i Index of command in COMMAND_TABLE
+ * @param command array with command and parameter
+ * @return EXIT_SUCCESS or EXIT_FAILURE
+ */
+static int check_command_arg(int i, char **command)
 {
     size_t len_command = get_array_len(command);
 
@@ -19,6 +25,11 @@ int check_command_arg(int i, char **command)
     return (EXIT_SUCCESS);
 }
 
+/**
+ * @brief Verify if command exist and if it is valid
+ * @param command array to verify
+ * @return EXIT_SUCCESS or EXIT_FAILURE
+ */
 int check_command_exist(char **command)
 {
     int r_val;

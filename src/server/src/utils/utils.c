@@ -9,8 +9,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../../include/arg_parse.h"
-#include "../../include/utils.h"
+#include "arg_parse.h"
+#include "utils.h"
 
 int write_error_msg(char *str)
 {
