@@ -15,9 +15,9 @@ int write_error_msg(char *str);
 /**
  * @brief Get array len
  * @param array
- * @return
+ * @return lenght of arrau or UNDEFINED if array not NULL terminated
  */
-size_t get_array_len(char **array)
+size_t get_array_len(char **array);
 
 /**
  * @brief Free any ** array
@@ -47,5 +47,13 @@ void free_array_size_n(void *to_free, size_t n);
  * @return splited string
  */
 char **str_to_word_array(char *str, const char *delim);
+
+/**
+ * @brief Turn an array of string into a simple string
+ * @param ac number of element in the array
+ * @param av Array of string
+ * @return concanated string or NULL on error
+ */
+char *array_to_str(int ac, const char **av);
 
 #endif //SERVER_UTILS_H

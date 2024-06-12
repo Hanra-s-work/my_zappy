@@ -9,6 +9,7 @@ SRC_MAIN	=	./src/main.c
 
 SRC	=	./src/utils/utils.c						\
 		./src/utils/array_utils.c				\
+		./src/utils/array_to_str.c				\
 \
 		./src/sub_main.c						\
 \

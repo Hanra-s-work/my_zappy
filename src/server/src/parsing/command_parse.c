@@ -6,41 +6,94 @@
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "utils.h"
 #include "command_parse.h"
 
-char **parse_command(uint8_t *buffer, ssize_t buf_size)
+int check_command_arg(int i, char **command)
 {
-    char *str = (char *)buffer;
-    char **commands = NULL;
+    size_t len_command = get_array_len(command);
 
-    commands = str_to_word_array(str, "\n");
-    return (commands);
+    if (COMMAND_TABLE[i].arg_nb < len_command - 1)
+        return (EXIT_FAILURE);
+    return (EXIT_SUCCESS);
 }
 
-char ***parse_buffer(uint8_t *buffer, ssize_t buf_size)
+int check_command_exist(char **command)
 {
-    char *str = (char *)buffer;
-    char **buf;
-    char ***commands;
-    size_t command_nb;
+    int r_val;
 
-    buf = str_to_word_array(str, "\n");
-    if (buf  == NULL)
+    for (int i = 0; i < CLIENT_COMMAND_NB + GUI_COMMAND_NB; ++i) {
+        if (strcmp(command[0], COMMAND_TABLE[i].command) == 0) {
+            r_val = check_command_arg(i, command);
+            return (r_val);
+        }
+    }
+    return (EXIT_FAILURE);
+}
+
+char **parse_command(char *str)
+{
+    char **command = NULL;
+
+    command = str_to_word_array(str, COMMAND_DELIMITER);
+    if (command == NULL)
         return (NULL);
-    command_nb = get_array_len(buf);
+    if (check_command_exist(command) == EXIT_FAILURE) {
+        free_array(command);
+        return (NULL);
+    }
+    return (command);
+}
+
+/**
+ * @brief This function split each command received delimited by \\n into an
+ * array of command word
+ * @param command_nb Number of command in buf
+ * @param buf Command list
+ * @return Char *** of size command_nb + 1 or NULL on error
+ */
+static char ***parse_individual_command(char **buf)
+{
+    char ***commands;
+    size_t command_nb = get_array_len(buf);
+
     commands = malloc(sizeof(char **) * (command_nb + 1));
     if (commands == NULL) {
         free_array(buf);
         return (NULL);
     }
     for (size_t i = 0; i < command_nb; ++i) {
-        commands[i] = parse_command();
+        commands[i] = parse_command(buf[i]);
         if (commands[i] == NULL) {
             free_array_size_n(commands, i);
             return (NULL);
         }
     }
     commands[command_nb] = NULL;
+    return (commands);
+}
+
+char ***parse_buffer(uint8_t *buffer, ssize_t buf_size)
+{
+    char *str = malloc(sizeof(char) * (buf_size + 2));
+    char **buf;
+    char ***commands;
+
+    if (str == NULL)
+        return (NULL);
+    (void) memcpy(str, buffer, buf_size);
+    str[buf_size + 1] = '\0';
+    if ((buf = str_to_word_array(str, COMMAND_SEPARATOR)) == NULL) {
+        free(str);
+        return (NULL);
+    }
+    if ((commands = parse_individual_command(buf)) == NULL) {
+        free(str);
+        free_array(buf);
+        return (NULL);
+    }
+    free(str);
+    free_array(buf);
     return (commands);
 }
