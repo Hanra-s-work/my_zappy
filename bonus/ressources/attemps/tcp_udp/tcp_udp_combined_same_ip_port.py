@@ -37,6 +37,9 @@ def start_tcp_server(host: str = HOST, port: int = PORT):
 def start_udp_server(host: str = HOST, port: int = PORT):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind((host, port))
+        s.listen()
+        s.setblocking(False)
+        s.settimeout(5)
         print(f"UDP server listening on {host}:{port}")
 
         while True:

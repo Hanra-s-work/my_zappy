@@ -5,6 +5,7 @@
 # sender.py
 ##
 
+import sys
 from socket import socket, AF_INET, SOCK_STREAM, error as sock_error, timeout as sock_timeout
 from threading import Thread
 
@@ -30,7 +31,7 @@ class SenderThread(Thread):
         Args:
             my_variables (GlobalVariables): _description_
         """
-        super().__init__()
+        super().__init__(name="Sender")
         self.error = error
         self.success = success
         self.my_globals = my_globals
@@ -52,9 +53,9 @@ class SenderThread(Thread):
         """
         converted_data = ConvertData(message)
         cleaned_data = converted_data.to_external()
-        pdebug(self.my_globals, f"Converted data: {cleaned_data}")
+        pdebug(self.my_globals, f"(sender) Converted data: {cleaned_data}")
         data_bytes = cleaned_data.encode()
-        pdebug(self.my_globals, f"Encoded data: {data_bytes}")
+        pdebug(self.my_globals, f"(sender) Encoded data: {data_bytes}")
         self.sent_data[-1]["sent_data"] = data_bytes
         send_status = tcp_socket.send(data_bytes)
         return send_status
@@ -78,7 +79,7 @@ class SenderThread(Thread):
         if converted_data != self.success:
             perror(
                 self.my_globals,
-                f"Received data that could not be processed: {tcp_response}"
+                f"(sender) Received data that could not be processed: {tcp_response}"
             )
             return converted_data
         converted_response = converted_data.to_internal()
@@ -100,20 +101,25 @@ class SenderThread(Thread):
 
         pdebug(
             self.my_globals,
-            f"Sender is listening on: {self.ip}:{self.port}"
+            f"(sender) Sender is listening on: {self.ip}:{self.port}"
         )
         conn, addr = tcp_socket.accept()
-        pinfo(self.my_globals, f"Client {addr} is connected")
+        pinfo(self.my_globals, f"(sender) Client {addr} is connected")
         while self.my_globals.continue_running:
             if self.my_globals.response_buffer == []:
                 continue
+            # conn, addr = tcp_socket.accept()
+            # pinfo(self.my_globals, f"Client {addr} is connected")
             try:
                 index += 1
                 self.sent_data.append({"id": index})
                 message = self.my_globals.response_buffer.pop(0)
                 send_status = self._send_tcp_message(conn, message)
                 if send_status != 0:
-                    perror(self.my_globals, f"Send error code: {send_status}")
+                    perror(
+                        self.my_globals,
+                        f"(sender) Send error code: {send_status}"
+                    )
                     continue
                 psuccess(
                     self.my_globals,
@@ -128,12 +134,15 @@ class SenderThread(Thread):
                 )
 
             except sock_timeout as e:
-                pwarning(self.my_globals, f"Socket operation timed out: {e}")
+                pwarning(
+                    self.my_globals,
+                    f"(sender) Socket operation timed out: {e}"
+                )
 
             except sock_error as e:
                 if e.errno == 11:
                     continue
-                perror(self.my_globals, f"Receiver socket error: {e}")
+                perror(self.my_globals, f"(sender) Receiver socket error: {e}")
                 self.my_globals.continue_running = False
                 error_found = True
 
@@ -144,16 +153,22 @@ class SenderThread(Thread):
             )
         pinfo(
             self.my_globals,
-            "Current buffer is:"
+            "(sender) Current buffer is:"
         )
         pinfo(
             self.my_globals,
             self.sent_data
         )
         if error_found is True:
-            perror(self.my_globals, "Fatal error occurred. Server will now stop")
-        if self.my_globals.continue_running is False:
-            pdebug(self.my_globals, "The receiver loop is exiting with an error.")
+            perror(
+                self.my_globals,
+                "(sender) Fatal error occurred. Server will now stop"
+            )
+        if self.my_globals.continue_running is False and error_found is True:
+            pdebug(
+                self.my_globals,
+                "(sender) The receiver loop is exiting with an error."
+            )
             return self.error
         return self.success
 
@@ -168,29 +183,44 @@ class SenderThread(Thread):
                 family=AF_INET,
                 type=SOCK_STREAM
             )
-            psuccess(self.my_globals, "Tcp socket class initialised")
+            psuccess(self.my_globals, "(sender) Tcp socket class initialised")
         except sock_error as e:
-            perror(self.my_globals, f"Failed to create socket: {e}")
+            perror(self.my_globals, f"(sender) Failed to create socket: {e}")
 
         try:
             socket_tcp.bind((self.ip, self.port))
-            psuccess(self.my_globals, "Socket connected to sender server")
+            psuccess(
+                self.my_globals,
+                "(sender) Socket connected to sender server"
+            )
         except sock_error as e:
-            perror(self.my_globals, f"Failed to connect to sender server: {e}")
+            perror(
+                self.my_globals,
+                f"(sender) Failed to connect to sender server: {e}"
+            )
 
         try:
             socket_tcp.setblocking(self.sender_data.make_tcp_wait)
             socket_tcp.settimeout(self.sender_data.timeout)
             if self.sender_data.make_tcp_wait:
-                psuccess(self.my_globals, "Socket set to blocking mode")
+                psuccess(
+                    self.my_globals,
+                    "(sender) Socket set to blocking mode"
+                )
             else:
-                psuccess(self.my_globals, "Socket set to non-blocking mode")
+                psuccess(
+                    self.my_globals,
+                    "(sender) Socket set to non-blocking mode"
+                )
             psuccess(
                 self.my_globals,
-                f"Timeout is set to {self.sender_data.timeout}"
+                f"(sender) Timeout is set to {self.sender_data.timeout}"
             )
         except sock_error as e:
-            perror(self.my_globals, f"Failed to set socket options: {e}")
+            perror(
+                self.my_globals,
+                f"(sender) Failed to set socket options: {e}"
+            )
 
         # socket_tcp = self.my_globals.socket
         self.my_globals.sender_ready = True
@@ -199,7 +229,7 @@ class SenderThread(Thread):
         except Exception as e:
             perror(
                 self.my_globals,
-                f"An unexpected error occurred in the sender loop: {e}"
+                f"(sender) An unexpected error occurred in the sender loop: {e}"
             )
             return self.my_globals.error
 
@@ -208,5 +238,12 @@ class SenderThread(Thread):
         This is the function that is called when a thread is started
         """
         # time.sleep(5)
-        pinfo(self.my_globals, "The class Thread sender is initialised")
-        return self._start_server()
+        pinfo(self.my_globals, "(sender) The class Thread sender is initialised")
+        status = self._start_server()
+        pwarning(
+            self.my_globals,
+            f"(sender) The class Thread sender has stopped with status: {status}!"
+        )
+        self.my_globals.current_status = status
+        pinfo(self.my_globals, "Exiting Sender thread")
+        sys.exit(status)

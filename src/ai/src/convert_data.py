@@ -5,7 +5,7 @@
 # convert_data.py
 ##
 
-from constants import Commands
+from constants import Commands, Items, TranslationReference
 
 
 class ConvertData:
@@ -19,35 +19,20 @@ class ConvertData:
         self.data = data
         if isinstance(data, bytes):
             self.data = data.decode()
-        print(f"data = '{self.data}'")
-        self.enum_equivalence = {
-            "forward": Commands.FORWARD,
-            "right": Commands.RIGHT,
-            "left": Commands.LEFT,
-            "look": Commands.LOOK,
-            "inventory": Commands.INVENTORY,
-            "broadcast": Commands.BROADCAST_TEXT,
-            "connect_nbr": Commands.CONNECT_NBR,
-            "fork": Commands.FORK,
-            "eject": Commands.EJECT,
-            "take": Commands.TAKE_OBJECT,
-            "set": Commands.SET_OBJECT,
-            "incantation": Commands.INCANTATION,
+        # print(f"data = '{self.data}'")
+        self.tr = TranslationReference()
+        self.enum_equivalence = self.tr.enum_equivalence
+        self.text_equivalence = self.tr.text_equivalence
+        self.item_string_to_class = self.tr.item_string_to_class
+        self.item_class_to_string = self.tr.item_class_to_string
+
+        self.item_equivalence_input = {
+            Commands.LOOK: self._input_parse_look,
+            Commands.BROADCAST_TEXT: self._input_parse_inventory
         }
-        self.text_equivalence = {
-            Commands.FORWARD: "forward",
-            Commands.RIGHT: "right",
-            Commands.LEFT: "left",
-            Commands.LOOK: "look",
-            Commands.INVENTORY: "inventory",
-            Commands.BROADCAST_TEXT: "broadcast",
-            Commands.CONNECT_NBR: "connect_nbr",
-            Commands.FORK: "fork",
-            Commands.EJECT: "eject",
-            Commands.TAKE_OBJECT: "take",
-            Commands.SET_OBJECT: "set",
-            Commands.INCANTATION: "incantation",
-            Commands.UNKNOWN: "none"
+
+        self.item_equivalence_output = {
+            Commands.BROADCAST_TEXT: self._output_parse_inventory
         }
 
     def update_raw_data(self, data: any) -> int:
@@ -68,8 +53,7 @@ class ConvertData:
                 return self.error
             self.data = data
             return self.success
-        else:
-            return self.error
+        return self.error
 
     def set_raw_data(self, data: any) -> int:
         """_summary_
@@ -105,9 +89,114 @@ class ConvertData:
         if data_list[0].lower() in self.enum_equivalence:
             command = self.enum_equivalence[data_list[0].lower()]
         if len(data_list) > 1:
-            arguments = data_list[1:]
+            if command in self.item_equivalence_input:
+                arguments = self.item_equivalence_input[command](data_list[1:])
+            else:
+                arguments = data_list[1:]
         self.data = None
         return {command: arguments}
+
+    def _input_parse_look(self, data: str) -> list[list[str]]:
+        """_summary_
+
+        Input data:
+            "[tile1, tile2, ...]"
+            ex: "[player remedy, ...]"
+        Look, command format (output):
+            {Command.look:[["player", "food", "Linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"], ...  ]}
+                            tile 1                                                                                tile n
+        Args:
+            data (str): _description_: The arguments provided alongside the command
+
+        Returns:
+            list[list[str]]: _description_: The Internal process data
+        """
+        result = []
+        data = data.split(', ')
+        if "[" in data[0]:
+            data[0] = data[0][1:]
+        if "]" in data[-1]:
+            data[-1] = data[-1][:-1]
+        for i in data:
+            print(f"i = {i}")
+            term = i.lower()
+            if term in self.item_string_to_class:
+                term = self.item_string_to_class[term]
+            else:
+                continue
+            result.append(term)
+
+        return result
+
+    def _input_parse_inventory(self, data: str) -> list[dict[Items, int]]:
+        """_summary_
+
+        Input data:
+            "[linemate n, sibur n, ...]"
+            ex: "[linemate 20 sibur 10, ...]"
+        Look, command format (output):
+            {Command.INVENTORY:[{Items.LINEMATE: 20}, {Items.SIBUR, 10}, ...]}
+
+        Args:
+            data (str): _description_: The arguments provided alongside the command
+
+        Returns:
+            list[dict[Items, int | str]]: _description_: The Internal process data
+        """
+        result = []
+        data = data.split(', ')
+
+        if "[" in data[0]:
+            data[0] = data[0][1:]
+        if "]" in data[-1]:
+            data[-1] = data[-1][:-1]
+        for i in data:
+            if " " in i:
+                term, definition = i.split(" ", 1)
+                term = term.lower()
+                if definition.isnumeric():
+                    definition = int(definition)
+                else:
+                    continue
+                if term in self.item_string_to_class:
+                    term = self.item_string_to_class[term]
+                else:
+                    continue
+                result.append({term: definition})
+            else:
+                term = i.lower()
+                if term in self.item_string_to_class:
+                    term = self.item_string_to_class[term]
+                else:
+                    continue
+                result.append({term: definition})
+
+        return result
+
+    def _output_parse_inventory(self, data: list[dict[Items, int]]) -> str:
+        """_summary_
+
+        Input data:
+            {Command.INVENTORY:[{Items.LINEMATE: 20}, {Items.SIBUR, 10}, ...]}
+        Look, command format (output):
+            "[linemate n, sibur n, ...]"
+            ex: "[linemate 20 sibur 10, ...]"
+
+        Args:
+            data (str): _description_: The arguments provided alongside the command
+
+        Returns:
+            list[dict[Items, int]]: _description_: The Internal process data
+        """
+        result = "["
+        nodes = []
+        for i in data:
+            term = list(i)[0]
+            definition = i[term]
+            tmp = term + " " + definition
+            nodes.append(tmp)
+        result += ", ".join(nodes) + "]" + "\n"
+        return result
 
     def to_external(self) -> str:
         """_summary_
@@ -118,20 +207,31 @@ class ConvertData:
         """
         result_order = ""
         if isinstance(self.data, dict) is False:
-            return self.text_equivalence[Commands.UNKNOWN]
+            if isinstance(self.data, str):
+                if self.data == "":
+                    self.data += "\n"
+                if self.data[-1] != '\n':
+                    self.data += '\n'
+                return self.data
+            return (self.text_equivalence[Commands.UNKNOWN] + '\n')
         if len(self.data) == 0:
-            return self.text_equivalence[Commands.UNKNOWN]
-        command, arguments = self.data.keys()
+            return (self.text_equivalence[Commands.UNKNOWN] + '\n')
+        command = list(self.data)[0]
+        arguments = self.data[command]
         if command == Commands.UNKNOWN:
-            return self.text_equivalence[Commands.UNKNOWN]
-        if command.lower() in self.text_equivalence:
+            return (self.text_equivalence[Commands.UNKNOWN] + '\n')
+        if command in self.text_equivalence:
             result_order = self.text_equivalence[command]
         if arguments == "":
+            result_order += '\n'
             return result_order
-        if isinstance(arguments, list) is True:
-            for i in arguments:
-                result_order += " " + str(i)
+        if command in self.item_equivalence_output:
+            arguments = self.item_equivalence_output[command](arguments)
         else:
-            result_order += " " + str(arguments)
+            if isinstance(arguments, list) is True:
+                result_order += " ".join(arguments)
+            else:
+                result_order += " " + str(arguments)
+        result_order += '\n'
         self.data = None
         return result_order

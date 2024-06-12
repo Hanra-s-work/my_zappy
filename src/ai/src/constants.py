@@ -21,11 +21,78 @@ MAX_PORT_RANGE = 9000
 MIN_PORT_RANGE = 1024
 
 # Thread kill delay
-THREAD_TIMEOUT = 5  # None
+THREAD_TIMEOUT = None  # 5  # None
 
 # Disabeling animation
 TOML_CONF['PRETTIFY_OUTPUT'] = False
 TOML_CONF['OUTPUT_MODE'] = OSTRING
+
+
+class TranslationReference:
+    """_summary_
+    This is a class containing the translations enum data
+    From command to string and string to command
+    etc
+    """
+
+    def __init__(self) -> None:
+        self.enum_equivalence = {
+            "forward": Commands.FORWARD,
+            "right": Commands.RIGHT,
+            "left": Commands.LEFT,
+            "look": Commands.LOOK,
+            "inventory": Commands.INVENTORY,
+            "broadcast": Commands.BROADCAST_TEXT,
+            "connect_nbr": Commands.CONNECT_NBR,
+            "fork": Commands.FORK,
+            "eject": Commands.EJECT,
+            "take": Commands.TAKE_OBJECT,
+            "set": Commands.SET_OBJECT,
+            "ok": Commands.OK,
+            "ko": Commands.KO,
+            "incantation": Commands.INCANTATION,
+            "welcome": Commands.WELCOME,
+            "dead": Commands.DEAD
+        }
+        self.text_equivalence = {
+            Commands.FORWARD: "forward",
+            Commands.RIGHT: "right",
+            Commands.LEFT: "left",
+            Commands.LOOK: "look",
+            Commands.INVENTORY: "inventory",
+            Commands.BROADCAST_TEXT: "broadcast",
+            Commands.CONNECT_NBR: "connect_nbr",
+            Commands.FORK: "fork",
+            Commands.EJECT: "eject",
+            Commands.TAKE_OBJECT: "take",
+            Commands.SET_OBJECT: "set",
+            Commands.INCANTATION: "incantation",
+            Commands.OK: "ok",
+            Commands.KO: "ko",
+            Commands.UNKNOWN: "none",
+            Commands.WELCOME: "welcome",
+            Commands.DEAD: "dead"
+        }
+
+        self.item_string_to_class = {
+            "food": Items.FOOD,
+            "linemate": Items.LINEMATE,
+            "deraumere": Items.DERAUMERE,
+            "sibur": Items.SIBUR,
+            "mendiane": Items.MENDIANE,
+            "phiras": Items.PHIRAS,
+            "thystame": Items.THYSTAME
+        }
+
+        self.item_class_to_string = {
+            Items.FOOD: "food",
+            Items.LINEMATE: "linemate",
+            Items.DERAUMERE: "deraumere",
+            Items.SIBUR: "sibur",
+            Items.MENDIANE: "mendiane",
+            Items.PHIRAS: "phiras",
+            Items.THYSTAME: "thystame"
+        }
 
 
 class Commands:
@@ -47,7 +114,13 @@ class Commands:
     TAKE_OBJECT: int = 11
     INCANTATION: int = 12
     BROADCAST_TEXT: int = 13
-    UNKNOWN: int = 14
+    OK: int = 14
+    KO: int = 15
+    UNKNOWN: int = 16
+    WELCOME: int = 17
+    CLIENT_NUMBER: int = 18
+    GRAPHIC_MODE: int = 19
+    DEAD: int = 20
 
 
 class Items:
@@ -56,13 +129,13 @@ class Items:
     This is a python version of an enum.
     This enum hosts a set of variables referencing the available types of objects that can be gathered from the field
     """
-    FOOD = 1
-    LINEMATE = 2
-    DERAUMERE = 3
-    SIBUR = 4
-    MENDIANE = 5
-    PHIRAS = 6
-    THYSTAME = 7
+    FOOD: int = 1
+    LINEMATE: int = 2
+    DERAUMERE: int = 3
+    SIBUR: int = 4
+    MENDIANE: int = 5
+    PHIRAS: int = 6
+    THYSTAME: int = 7
 
 
 class ServerData:
@@ -92,7 +165,7 @@ class SenderData:
         self.ip: str = ip
         self.port: int = port
         self.buffer_size: int = 1024 * 4
-        self.timeout: float = 5  # None
+        self.timeout: float = None  # 5  # None
         self.make_tcp_wait: bool = False
 
 
@@ -178,7 +251,7 @@ class GlobalVariables:
 
         # The converted income from the server
         self.current_buffer: list[dict[Commands, any]] = []
-        self.response_buffer: list[list[dict[Commands, any]]] = []
+        self.response_buffer: list[dict[Commands, any]] = []
 
         # The socket for the server
         self.socket: socket = None
@@ -191,3 +264,6 @@ class GlobalVariables:
             toml_content=TOML_CONF,
             save_to_file=False
         )
+
+        # Translation reference
+        self.translation_reference: TranslationReference = TranslationReference()

@@ -7,13 +7,12 @@
 """! @brief Example program for compilation reasons """
 
 import sys
-from socket import socket, AF_INET, SOCK_STREAM, SOCK_DGRAM
-
 
 from constants import GlobalVariables, MAX_PORT_RANGE, MIN_PORT_RANGE, THREAD_TIMEOUT
 from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
 from sender import SenderThread
 from receiver import TCPThreader
+from convert_data import ConvertData
 from logistics import LogicsticsThread
 
 
@@ -128,12 +127,15 @@ class Main:
         * The thread for the process that will be running the brain
         """
         pdebug(self.constants, "Starting threads")
+        pdebug(self.constants, "Starting sender")
         self.sender.start()
         self.constants.created_threads["sender"] = self.sender
         pdebug(self.constants, "Sender thread started")
+        pdebug(self.constants, "Starting receiver")
         self.server.start()
         self.constants.created_threads["receiver"] = self.server
         pdebug(self.constants, "Receiver thread started")
+        pdebug(self.constants, "Starting logistics")
         self.logistics.start()
         self.constants.created_threads["logistics"] = self.logistics
         pdebug(self.constants, "Logistics thread started")
@@ -172,35 +174,23 @@ class Main:
         This function's role is to check on the threads and know when it is time to stop the program
         """
         while self.constants.continue_running:
+            self.constants.current_status = self.success
             tt = input("pause press enter to continue...\n")
             self.constants.continue_running = False
+            self.constants.current_buffer.append(
+                ConvertData("dead").to_internal()
+            )
         self._stop_threads()
         return self.constants.current_status
 
-    # def _create_socket(self) -> None:
-    #     """_summary_
-    #     """
-    #     # self.constants.socket = socket(
-    #     #     family=AF_INET,
-    #     #     type=SOCK_STREAM
-    #     # )
-    #     # self.constants.socket.connect(
-    #     #     (self.constants.sender_data.ip, self.constants.sender_data.port)
-    #     # )
-    #     # self.constants.socket.setblocking(
-    #     #     self.constants.sender_data.make_tcp_wait
-    #     # )
-    #     self.constants.socket = socket(
-    #         family=AF_INET,
-    #         type=SOCK_DGRAM
-    #     )
-    #     self.constants.socket.bind(
-    #         (self.constants.sender_data.ip, self.constants.server_data.port)
-    #     )
-    #     self.constants.socket.setblocking(
-    #         self.constants.server_data.make_udp_wait
-    #     )
-    #     self.constants.socket.settimeout(self.constants.sender_data.timeout)
+    def _bufferise_team_name(self) -> None:
+        """_summary_
+        Send the current team name to the server.
+        """
+        user_name = self.constants.user_arguments.name
+        if user_name == "":
+            pwarning(self.constants, "The AI name is empty")
+        self.constants.response_buffer.append(user_name)
 
     def main(self) -> int:
         """
@@ -226,7 +216,6 @@ class Main:
             name=response["name"],
             debug=response["debug"]
         )
-        print("ù")
         self.constants.colourise_output.init_pallet()
         self.constants.colourise_error.init_pallet()
         self.constants.colourise_output.display(
@@ -238,18 +227,22 @@ class Main:
             self.constants,
             f"Thread timeout is set to: {THREAD_TIMEOUT} seconds"
         )
+        self._bufferise_team_name()
+
         pinfo(self.constants, "Main class loaded")
+        pinfo(self.constants, "Loading Sender")
         self.sender = SenderThread(self.constants)
         pdebug(self.constants, "Thread Sender is loaded")
+        pinfo(self.constants, "Loading Receiver")
         self.server = TCPThreader(self.constants)
         pdebug(self.constants, "Receiver is loaded")
+        pinfo(self.constants, "Loading Logistics")
         self.logistics = LogicsticsThread(self.constants)
         pdebug(self.constants, "Thread Logistics is loaded")
         pinfo(self.constants, "Thread classes loaded")
         perror(self.constants, "This is a sample error message")
         self._start_threads()
         psuccess(self.constants, "Threads launched")
-        # self._create_socket()
         return self._stay_alive()
 
 
