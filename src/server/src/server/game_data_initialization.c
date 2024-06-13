@@ -86,22 +86,22 @@ static int init_player(server_handler_t *server, const int total, const int i)
 {
     int index = 0;
     int time_life = PLAYER_TIME / server->game_data.frequence;
+    static int num = 1;
 
-    for (int x = 0; x < MAX_CLIENT; x++) {
+    for (int x = 0; x < MAX_CLIENT; x++)
         server->game_data.teams[i].client_num_list[x] = UNKNOWN;
-    }
     for (int nb = 0; nb < total; nb++) {
-        server->game_data.teams[i].client_num_list[nb] = nb + 1;
+        server->game_data.teams[i].client_num_list[nb] = num;
         index = search_unfilled_index(server->game_data.clients);
-        server->game_data.clients[index].client_num = nb + 1;
+        server->game_data.clients[index].client_num = num;
         server->game_data.clients[index].team_name =
         strdup(server->game_data.teams[i].team_name);
-        if (server->game_data.clients[index].team_name == NULL) {
+        if (server->game_data.clients[index].team_name == NULL)
             return (-1);
-        }
         server->game_data.clients[index].level = 1;
         server->game_data.clients[index].time_life = time_life;
         randomize_player_pos_and_dir(server, index);
+        num++;
     }
     return (0);
 }
