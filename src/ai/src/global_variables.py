@@ -47,7 +47,7 @@ class TranslationReference:
             "ok": Commands.OK,
             "ko": Commands.KO,
             "Incantation": Commands.INCANTATION,
-            "Welcome": Commands.WELCOME,
+            "WELCOME": Commands.WELCOME,
             "Dead": Commands.DEAD
         }
         self.text_equivalence = {

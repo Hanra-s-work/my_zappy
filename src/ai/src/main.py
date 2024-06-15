@@ -111,17 +111,22 @@ class Main:
                 debug = True
             else:
                 debug = False
+                print(f"The only flag allowed in the last position is: -d\nYou entered: {sys.argv[7]}")
+                return self.error
             return {"port": port, "name": name, "host": host, "debug": debug}
         return self.error
 
-    def _bufferise_team_name(self) -> None:
+    def _check_team_name(self) -> None:
         """_summary_
         Send the current team name to the server.
         """
         user_name = self.global_variables.user_arguments.name
         if user_name == "":
             pwarning(self.global_variables, "The AI name is empty")
-        self.global_variables.response_buffer.append(user_name)
+        pdebug(
+            self.global_variables,
+            f"Team name is: {self.global_variables.user_arguments.name}"
+        )
 
     def main(self) -> int:
         """
@@ -154,11 +159,8 @@ class Main:
             (),
             ""
         )
-        self._bufferise_team_name()
-        pdebug(
-            self.global_variables,
-            f"Team name is: {self.global_variables.response_buffer[0]}"
-        )
+        self._check_team_name()
+
         pinfo(self.global_variables, "Main class loaded")
         pinfo(self.global_variables, "Loading Server")
         self.server = TCPServer(self.global_variables)

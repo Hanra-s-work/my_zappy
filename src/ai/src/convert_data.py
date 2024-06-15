@@ -20,9 +20,8 @@ class ConvertData:
     def __init__(self, data, error: int = 84, success: int = 0) -> None:
         self.error = error
         self.success = success
-        self.data = data
-        if isinstance(data, bytes):
-            self.data = data.decode()
+        self.data = ""
+        self.update_raw_data(data)
         # print(f"data = '{self.data}'")
         self.tr = TranslationReference()
         self.enum_equivalence = self.tr.enum_equivalence
@@ -118,7 +117,7 @@ class ConvertData:
                 processed_result.append(Items.UNKNOWN)
         return {Commands.LOOK: processed_result}
 
-    def _special_list_treatment(self) -> dict[Commands, any]:
+    def _special_list_treatment(self, previous_command: Commands) -> dict[Commands, any]:
         """_summary_
         Function in charge of the converting a list input to the correct response command.
 
@@ -133,32 +132,53 @@ class ConvertData:
         if data_list[-1] == "":
             data_list.pop(-1)
         if len(data_list) == 0:
-            return {Commands.LOOK: []}
+            return {previous_command: []}
         if " " in data_list[0] and data_list[0][-1].isnumeric():
             return self._process_inventory(data_list)
         return self._process_look(data)
 
-    def to_internal(self) -> dict[Commands, any]:
+    def _get_launch_command(self, triger_command: str) -> Commands:
+        """_summary_
+            This is a function that will extract the command that was used to get the response.
+        Args:
+            triger_command (str): _description_: The command
+
+        Returns:
+            Commands: _description_: The corresponding command but using the internal command tracking.
+        """
+        if isinstance(triger_command, (str, dict)) is not True:
+            return Commands.UNKNOWN
+        if isinstance(triger_command, dict):
+            return list(triger_command.keys())[0]
+        if triger_command == "":
+            return Commands.UNKNOWN
+        if "\n" == triger_command[-1]:
+            triger_command = triger_command[:-1]
+        if " " in triger_command:
+            triger_command = triger_command.split()[0]
+        if triger_command in self.enum_equivalence:
+            return self.enum_equivalence[triger_command]
+        return Commands.UNKNOWN
+
+    def to_internal(self, triger_command: str = "") -> dict[Commands, any]:
         """_summary_
         Convert the raw data to the internal language used by the ai
 
         Returns:
             dict[Commands, any]: _description_: the format of a node of data comming back
         """
-        command = Commands.UNKNOWN
+        command = self._get_launch_command(triger_command)
         arguments = ""
+
         if isinstance(self.data, str) is False:
             return {command: arguments}
         if "[" in self.data:
-            return self._special_list_treatment()
+            return self._special_list_treatment(command)
         if len(self.data) == 0:
             return {command: arguments}
-        if self.data.lower() in self.enum_equivalence:
-            command = self.enum_equivalence[self.data.lower()]
-        else:
-            command = Commands.BROADCAST_TEXT
-            arguments = self.data
-        self.data = None
+        if "\n" == self.data[-1]:
+            self.data = self.data[:-1]
+        arguments = self.data
         return {command: arguments}
 
     def _input_parse_look(self, data: str) -> list[list[str]]:
