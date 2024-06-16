@@ -137,17 +137,19 @@ class TCPServer:
         """_summary_
         This is the function in charge of starting any function that contains the code we wish to run inside the thread we started.
         """
-        psuccess(self.global_variables, "TCP server thread started")
         self._initialise_logistics()
         status = self._start_tcp_socket()
-        pwarning(self.global_variables, "The server is stopping")
+        pwarning(self.global_variables, "The listener is stopping")
         if status != self.global_variables.success:
             perror(
                 self.global_variables,
-                f"The server exited with status: {status}"
+                f"The listener exited with status: {status}"
             )
             return status
-        psuccess(self.global_variables, "The server exited without any errors")
+        psuccess(
+            self.global_variables,
+            "The listener exited without any errors"
+        )
         return self.global_variables.success
 
 

@@ -49,6 +49,7 @@ class Logistics:
         """
         c_time = datetime.now()
         final_seed = c_time.hour + c_time.minute + c_time.second + c_time.microsecond
+        pwarning(self.global_variables, f"Generated seed: {final_seed}")
         return final_seed
 
     def _forward(self) -> None:
@@ -60,7 +61,9 @@ class Logistics:
             error=self.global_variables.error,
             success=self.global_variables.success
         )
-        self.global_variables.response_buffer.append(e.to_external())
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
 
     def _left(self) -> None:
         """_summary_
@@ -71,7 +74,9 @@ class Logistics:
             error=self.global_variables.error,
             success=self.global_variables.success
         )
-        self.global_variables.response_buffer.append(e.to_external())
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
 
     def _right(self) -> None:
         """_summary_
@@ -82,7 +87,9 @@ class Logistics:
             error=self.global_variables.error,
             success=self.global_variables.success
         )
-        self.global_variables.response_buffer.append(e.to_external())
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
 
     def _my_randint(self, minimum: int = 0, maximum: int = 3) -> int:
         """_summary_
@@ -105,8 +112,11 @@ class Logistics:
         This function is the one in charge of creating a random movement
         """
         move = self._my_randint(0, len(self.direction_options) - 1)
+        pinfo(
+            self.global_variables,
+            f"Selected direction: {self.direction_options_list[move]}"
+        )
         self.direction_options[self.direction_options_list[move]]()
-        self.stall_command = True
 
     def _update_ai_status(self, status: int) -> None:
         """_summary_
@@ -115,7 +125,12 @@ class Logistics:
             status (int): _description_: the run status of the previous function
         """
         if status != self.global_variables.success:
+            pwarning(
+                self.global_variables,
+                f"The global status if not a success, error code: {status}"
+            )
             self.global_variables.ai_status = status
+        psuccess(self.global_variables, "The global status is a success.")
 
     def _process_welcome(self, data: str) -> int:
         """_summary_
@@ -124,13 +139,19 @@ class Logistics:
             int: _description_: The processing status
         """
         if "WELCOME" in data:
+            pinfo(
+                self.global_variables,
+                "Welcome key received"
+            )
             self.global_variables.response_buffer.append(
                 self.global_variables.user_arguments.name
             )
             self.welcome_received = True
             return self.global_variables.success
-        pdebug(self.global_variables,
-               f"(logistics): response = {data}, nb_responses = {self.nb_responses}")
+        pdebug(
+            self.global_variables,
+            f"(logistics): response = {data}, nb_responses = {self.nb_responses}"
+        )
         self._exit_error("Did not receive the expected welcome message")
         return self.global_variables.error
 
@@ -178,8 +199,10 @@ class Logistics:
             if dimensions[0].isnumeric() and dimensions[1].isnumeric():
                 self.client_coordinates = (
                     int(dimensions[0]), int(dimensions[1]))
-                pdebug(self.global_variables,
-                       f"Client coordinates = {self.client_coordinates}")
+                pdebug(
+                    self.global_variables,
+                    f"Client coordinates = {self.client_coordinates}"
+                )
                 self.initialisation_complete = True
                 self.global_variables.ai_ready = True
                 self._append_look_command()
@@ -197,7 +220,6 @@ class Logistics:
         Returns:
             bool: _description_: Returns True if the ai can get to the next level, otherwise False is returned.
         """
-        i = 0
         max_i = len(command)
         pdebug(
             self.global_variables,
@@ -209,9 +231,11 @@ class Logistics:
                 "(logistics) _can_evolve: The command is empty"
             )
             return False
-        if Items.LINEMATE in command:
-            psuccess(self.global_variables,
-                     "The item Linemate was found on the ground")
+        if Items.LINEMATE in command or "linemate" in command or "Linemate" in command:
+            psuccess(
+                self.global_variables,
+                "The item Linemate was found on the ground"
+            )
             return True
         pdebug(
             self.global_variables,
@@ -241,7 +265,22 @@ class Logistics:
             error=self.global_variables.error,
             success=self.global_variables.success
         )
-        self.global_variables.response_buffer.append(e.to_external())
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
+
+    def _to_human_readable(self, code: int) -> str:
+        """_summary_
+            Replace the code with the corresponding state.
+        Args:
+            code (int): _description_: The corresponding code
+
+        Returns:
+            str: _description_: The corresponding text that the human can understand
+        """
+        if code in self.global_variables.translation_reference.text_equivalence:
+            return self.global_variables.translation_reference.text_equivalence[code]
+        return code
 
     def _calculate_next_move(self, response: dict[Commands, any]) -> int:
         """_summary_
@@ -255,19 +294,27 @@ class Logistics:
         """
         status = self.global_variables.success
 
+        pdebug(self.global_variables, f"Incoming response =  {response}")
+
         if self.sabotage is True:
             self._left()
 
-        if response[list(response)[0]].lower() == "ko":
+        if response[list(response)[0]] in ("ko", "KO", "Ko", "kO"):
+            perror(
+                self.global_variables,
+                f"Command = '{self._to_human_readable(list(response)[0])}' failed"
+            )
             self._append_look_command()
             return self.global_variables.success
 
-        if Commands.LOOK in response and response[Commands.LOOK].lower() == "ok":
+        if Commands.LOOK in response:
+            psuccess(self.global_variables, f"Look response = {response}")
             self.tile_content = response[Commands.LOOK]
             if self._can_evolve(response[Commands.LOOK]) is True:
                 e = ConvertData(
                     data=self.global_variables.translation_reference.text_equivalence[
-                        Commands.INCANTATION],
+                        Commands.INCANTATION
+                    ],
                     error=self.global_variables.error,
                     success=self.global_variables.success
                 )
@@ -283,6 +330,7 @@ class Logistics:
 
         elif Commands.FORWARD in response and response[Commands.FORWARD].lower() == "ok":
             self._append_look_command()
+
         elif Commands.INCANTATION in response and response[Commands.INCANTATION].lower() == "ok":
             self.sabotage = True
             self._left()
@@ -315,12 +363,6 @@ class Logistics:
             status = self._calculate_next_move(response)
         self._update_ai_status(status)
         return status
-
-    def run(self) -> None:
-        """_summary_
-        This is the function in charge of starting any function that contains the code we wish to run inside the thread we started.
-        """
-        pinfo(self.global_variables, "Logistics thread started")
 
 
 if __name__ == "__main__":

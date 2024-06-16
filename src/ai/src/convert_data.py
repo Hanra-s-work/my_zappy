@@ -125,17 +125,24 @@ class ConvertData:
             dict[Commands, any]: _description_: The converted list
         """
         key = ","
+        if "[" == self.data[0]:
+            self.data = self.data[1:]
+        if "]" == self.data[-1]:
+            self.data = self.data[:-1]
         if key not in self.data:
-            return {Commands.BROADCAST_TEXT: self.data}
-        data = self.data[1:-1]
-        data_list = data.split(key)
+            processed_list = {previous_command: [self.data]}
+            return processed_list
+        data_list = self.data.split(key)
         if data_list[-1] == "":
             data_list.pop(-1)
         if len(data_list) == 0:
-            return {previous_command: []}
+            processed_response = {previous_command: []}
+            return processed_response
         if " " in data_list[0] and data_list[0][-1].isnumeric():
-            return self._process_inventory(data_list)
-        return self._process_look(data)
+            processed_inventory = self._process_inventory(data_list)
+            return processed_inventory
+        processed_look = self._process_look(self.data)
+        return processed_look
 
     def _get_launch_command(self, triger_command: str) -> Commands:
         """_summary_
@@ -172,12 +179,13 @@ class ConvertData:
 
         if isinstance(self.data, str) is False:
             return {command: arguments}
-        if "[" in self.data:
-            return self._special_list_treatment(command)
-        if len(self.data) == 0:
-            return {command: arguments}
         if "\n" == self.data[-1]:
             self.data = self.data[:-1]
+        if "[" in self.data:
+            processed_data = self._special_list_treatment(command)
+            return processed_data
+        if len(self.data) == 0:
+            return {command: arguments}
         arguments = self.data
         return {command: arguments}
 
