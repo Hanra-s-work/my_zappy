@@ -6,8 +6,9 @@
 */
 
 #include <string.h>
-
+#include <stdlib.h>
 #include "arg_parse.h"
+#include "utils.h"
 
 void free_array(void *to_free)
 {
@@ -22,7 +23,16 @@ void free_array(void *to_free)
     free(array);
 }
 
-void free_args(struct arg_s **args, size_t size)
+void free_array_size_n(void *to_free, const size_t n)
+{
+    void **array = (void **)to_free;
+
+    for (size_t i = 0; i < n; ++i) {
+        free(array[i]);
+    }
+}
+
+void free_args(struct arg_s **args, const size_t size)
 {
     char **tmp;
 

@@ -79,5 +79,6 @@ int sub_main(int argc, char **argv)
     if (arguments_handler(argc, argv, &server) == -1) {
         return (ERROR);
     }
+    server_loop(&server);
     return (shutdown_server(&server));
 }

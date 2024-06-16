@@ -7,8 +7,8 @@
 
 #include <string.h>
 
-#include "arg_parse.h"
 #include "utils.h"
+#include "arg_parse.h"
 
 static int number_checker(const struct arg_s **arguments, const int index)
 {

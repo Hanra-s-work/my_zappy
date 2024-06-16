@@ -9,7 +9,7 @@
 
 #include "arg_parse.h"
 
-void *find_value_by_param(const struct arg_s **arguments, char *param)
+void *find_value_by_param(const struct arg_s **arguments, const char *param)
 {
     int index = 0;
 
@@ -24,7 +24,7 @@ void *find_value_by_param(const struct arg_s **arguments, char *param)
     return (NULL);
 }
 
-int find_index_by_param(const struct arg_s **arguments, char *param)
+int find_index_by_param(const struct arg_s **arguments, const char *param)
 {
     int index = 0;
 

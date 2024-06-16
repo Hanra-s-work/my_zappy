@@ -13,15 +13,20 @@ SRC	=	./src/sub_main.c						\
 		./src/utils/free.c						\
 		./src/utils/writer.c					\
 		./src/utils/fill.c						\
+		./src/utils/array_utils.c				\
+		./src/utils/array_to_str.c				\
 \
 		./src/parsing/arg_parse.c				\
 		./src/parsing/check_arg_mandatory.c		\
-		./src/parsing/check_arg_value.c			\
+		./src/parsing/parameter_utils.c			\
 		./src/parsing/check_values_validity.c 	\
+		./src/parsing/command_parse.c			\
 \
 		./src/server/server_initialization.c	\
 		./src/server/game_data_initialization.c	\
 		./src/server/client_management.c 		\
+		./src/server/server_loop.c				\
+		./src/server/command_handling.c			\
 \
 		./src/show/show_game_data.c				\
 

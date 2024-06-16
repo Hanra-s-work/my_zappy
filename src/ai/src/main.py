@@ -4,20 +4,16 @@
 # File description:
 # main.py
 ##
-"""! @brief Example program for compilation reasons """
 
 import sys
 
-from constants import GlobalVariables, MAX_PORT_RANGE, MIN_PORT_RANGE, THREAD_TIMEOUT
+from tcp_server import TCPServer
 from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
-from sender import SenderThread
-from receiver import TCPThreader
-from convert_data import ConvertData
-from logistics import LogicsticsThread
+from global_variables import GlobalVariables, MAX_PORT_RANGE, MIN_PORT_RANGE
 
 
 class Main:
-    """ 
+    """
         This is the main class of the program.
         This class is responsible for calling the three main steps of the program.
         These steps are:
@@ -29,42 +25,42 @@ class Main:
         * When the program ends:
                 * If the reason was an error:
                         * Display the error
-                * Kill all created threads
                 * Free any allocated ressource that was not freed
                 * Exit with the status contained in GlobalVariables
     """
 
     def __init__(self, error: int = 84, success: int = 0) -> None:
-        self.argc = len(sys.argv)
-        self.success = success
-        self.error = error
-        self.help_options = [
+        self.argc: int = len(sys.argv)
+        self.error: int = error
+        self.success: int = success
+        self.help_options: list[str] = [
             "-h", "-help", "-?",
             "--h", "--help", "--?",
             "/h", "/help", "/?"
         ]
-        self.sender = None
-        self.server = None
-        self.logistics = None
-        self.constants = None
+        self.server: TCPServer = None
+        self.global_variables: GlobalVariables = None
 
     def __del__(self) -> None:
         """
         Function in charge of unloading the colour library when the class is destroyed.
         """
-        self._stop_threads()
-        if self.constants is None:
+        if self.global_variables is None:
             return
-        if self.constants.colourise_output is None:
+        if self.global_variables.colourise_output is None:
             return
-        self.constants.colourise_output.display(
+        self.global_variables.colourise_output.display(
             "0A",
             (),
             "Unloading ressources\n"
         )
-        self.constants.colourise_output.display("rr", (), "End of script\n")
-        self.constants.colourise_output.unload_ressources()
-        self.constants.colourise_error.unload_ressources()
+        self.global_variables.colourise_output.display(
+            "rr",
+            (),
+            "End of script\n"
+        )
+        self.global_variables.colourise_output.unload_ressources()
+        self.global_variables.colourise_error.unload_ressources()
 
     def _process_arguments(self) -> int:
         """
@@ -115,82 +111,24 @@ class Main:
                 debug = True
             else:
                 debug = False
+                print(
+                    f"The only flag allowed in the last position is: -d\nYou entered: {sys.argv[7]}"
+                )
+                return self.error
             return {"port": port, "name": name, "host": host, "debug": debug}
         return self.error
 
-    def _start_threads(self) -> None:
-        """
-        _summary_
-        This function is in charge of starting the 3 threads that are used in this program:
-        * The thread for the process that will receive the requests
-        * The thread for the process that will send the requests
-        * The thread for the process that will be running the brain
-        """
-        pdebug(self.constants, "Starting threads")
-        pdebug(self.constants, "Starting sender")
-        self.sender.start()
-        self.constants.created_threads["sender"] = self.sender
-        pdebug(self.constants, "Sender thread started")
-        pdebug(self.constants, "Starting receiver")
-        self.server.start()
-        self.constants.created_threads["receiver"] = self.server
-        pdebug(self.constants, "Receiver thread started")
-        pdebug(self.constants, "Starting logistics")
-        self.logistics.start()
-        self.constants.created_threads["logistics"] = self.logistics
-        pdebug(self.constants, "Logistics thread started")
-
-    def _stop_threads(self) -> None:
-        """_summary_
-        This function is called when we wish to terminate the program.
-        This function will attempt to terminate the threads that have been started in the main function.
-        """
-        if self.constants is None or self.constants.colourise_output is None:
-            data = [self.sender, self.server, self.logistics]
-            for i in data:
-                if i is None:
-                    continue
-                i.join(THREAD_TIMEOUT)
-            return
-        if len(self.constants.created_threads) == 0:
-            return
-        for key, value in self.constants.created_threads.items():
-            pdebug(self.constants, f"Checking {key}")
-            if value is None:
-                pdebug(
-                    self.constants,
-                    f"{key} is empty, there is thus nothing to stop"
-                )
-                continue
-            pdebug(self.constants, f"{key} is not empty, stopping")
-            data = value.join(THREAD_TIMEOUT)
-            self.constants.created_threads[key] = None
-            pdebug(self.constants, f"{key} has stopped and returned: {data}")
-        return
-
-    def _stay_alive(self) -> int:
-        """
-        _sumary_
-        This function's role is to check on the threads and know when it is time to stop the program
-        """
-        while self.constants.continue_running:
-            self.constants.current_status = self.success
-            tt = input("pause press enter to continue...\n")
-            self.constants.continue_running = False
-            self.constants.current_buffer.append(
-                ConvertData("dead").to_internal()
-            )
-        self._stop_threads()
-        return self.constants.current_status
-
-    def _bufferise_team_name(self) -> None:
+    def _check_team_name(self) -> None:
         """_summary_
         Send the current team name to the server.
         """
-        user_name = self.constants.user_arguments.name
+        user_name = self.global_variables.user_arguments.name
         if user_name == "":
-            pwarning(self.constants, "The AI name is empty")
-        self.constants.response_buffer.append(user_name)
+            pwarning(self.global_variables, "The AI name is empty")
+        pdebug(
+            self.global_variables,
+            f"Team name is: {self.global_variables.user_arguments.name}"
+        )
 
     def main(self) -> int:
         """
@@ -208,7 +146,7 @@ class Main:
                     f"One or more errors have occurred\nPlease run {sys.argv[0]} --help for more information"
                 )
             return response
-        self.constants = GlobalVariables(
+        self.global_variables = GlobalVariables(
             error=self.error,
             success=self.success,
             ip=response["host"],
@@ -216,34 +154,29 @@ class Main:
             name=response["name"],
             debug=response["debug"]
         )
-        self.constants.colourise_output.init_pallet()
-        self.constants.colourise_error.init_pallet()
-        self.constants.colourise_output.display(
-            self.constants.message_colours.DEFAULT,
+        self.global_variables.colourise_output.init_pallet()
+        self.global_variables.colourise_error.init_pallet()
+        self.global_variables.colourise_output.display(
+            self.global_variables.message_colours.DEFAULT,
             (),
             ""
         )
-        pdebug(
-            self.constants,
-            f"Thread timeout is set to: {THREAD_TIMEOUT} seconds"
-        )
-        self._bufferise_team_name()
+        self._check_team_name()
 
-        pinfo(self.constants, "Main class loaded")
-        pinfo(self.constants, "Loading Sender")
-        self.sender = SenderThread(self.constants)
-        pdebug(self.constants, "Thread Sender is loaded")
-        pinfo(self.constants, "Loading Receiver")
-        self.server = TCPThreader(self.constants)
-        pdebug(self.constants, "Receiver is loaded")
-        pinfo(self.constants, "Loading Logistics")
-        self.logistics = LogicsticsThread(self.constants)
-        pdebug(self.constants, "Thread Logistics is loaded")
-        pinfo(self.constants, "Thread classes loaded")
-        perror(self.constants, "This is a sample error message")
-        self._start_threads()
-        psuccess(self.constants, "Threads launched")
-        return self._stay_alive()
+        pinfo(self.global_variables, "Main class loaded")
+        pinfo(self.global_variables, "Loading Server")
+        self.server = TCPServer(self.global_variables)
+        psuccess(self.global_variables, "Server is loaded")
+        pinfo(self.global_variables, "Starting server")
+        status = self.server.run()
+        if status != self.success:
+            perror(
+                self.global_variables,
+                f"Server stopped with status: {status}"
+            )
+            return status
+        psuccess(self.global_variables, "Server stopped without any errors")
+        return status
 
 
 if __name__ == "__main__":

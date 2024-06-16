@@ -46,4 +46,19 @@
     #define FORK_TIME 42
     #define INCANTATION_TIME 300
 
+    // !! COMMAND_CONSTANT !!
+
+    #define COMMAND_DELIMITER   ' '
+    #define COMMAND_SEPARATOR   '\n'
+
+    #define CLIENT_COMMAND_NB   13
+    #define GUI_COMMAND_NB      9
+    #define BROADCAST_COMMAND   5
+
+    #define GUI_TEAM_NAME "GRAPHIC"
+
+    //!! MESSAGE !!
+
+    #define CONNEXION_FAILED "Failed to get connexion with the client.\n"
+
 #endif
