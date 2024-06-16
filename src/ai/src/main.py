@@ -111,7 +111,9 @@ class Main:
                 debug = True
             else:
                 debug = False
-                print(f"The only flag allowed in the last position is: -d\nYou entered: {sys.argv[7]}")
+                print(
+                    f"The only flag allowed in the last position is: -d\nYou entered: {sys.argv[7]}"
+                )
                 return self.error
             return {"port": port, "name": name, "host": host, "debug": debug}
         return self.error
