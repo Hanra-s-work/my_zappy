@@ -5,7 +5,7 @@
 # custom_functions.py
 ##
 
-from constants import GlobalVariables
+from global_variables import GlobalVariables
 
 
 def perror(global_variables: GlobalVariables, string: str = "This is an error") -> None:

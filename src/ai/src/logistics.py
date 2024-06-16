@@ -1,157 +1,45 @@
 ##
 # EPITECH PROJECT, 2023
-# my_zappy
+# my_zappy [fed34_prox_vm]
 # File description:
-# logistics.py
+# logistics_thread.py
 ##
 
 import sys
-from time import sleep
-from threading import Thread
 from datetime import datetime
-from constants import Commands, GlobalVariables, Items
+
+from convert_data import ConvertData
+from global_variables import GlobalVariables, Commands, Items
 from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
 
 
-class Sender:
-    """
-    Basic functions that add actions to the send queue
-    """
-
-    def __init__(self, my_globals: GlobalVariables) -> None:
-        self.my_globals = my_globals
-
-    def forward(self) -> None:
-        """
-        Adds the "forward" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.FORWARD: ""}
-        )
-
-    def left(self) -> None:
-        """
-        Adds the "left" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.LEFT: ""}
-        )
-
-    def look(self) -> None:
-        """
-        Adds the "look" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.LOOK: ""}
-        )
-
-    def fork(self) -> None:
-        """
-        Adds the "fork" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.FORK: ""}
-        )
-
-    def right(self) -> None:
-        """
-        Adds the "right" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.RIGHT: ""}
-        )
-
-    def empty(self) -> None:
-        """
-        Adds the "empty" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.EMPTY: ""}
-        )
-
-    def eject(self) -> None:
-        """
-        Adds the "eject" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.EJECT: ""}
-        )
-
-    def inventory(self) -> None:
-        """
-        Adds the "inventory" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.INVENTORY: ""}
-        )
-
-    def connect_nbr(self) -> None:
-        """
-        Adds the "connect_nbr" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.CONNECT_NBR: ""}
-        )
-
-    def set_obj(self) -> None:
-        """
-        Adds the "set_object" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.SET_OBJECT: ""}
-        )
-
-    def take_obj(self) -> None:
-        """
-        Adds the "take_object" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.TAKE_OBJECT: ""}
-        )
-
-    def incantation(self) -> None:
-        """
-        Adds the "incantation" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.INCANTATION: ""}
-        )
-
-    def broadcast(self) -> None:
-        """
-        Adds the "broadcast" command to the send queue
-        """
-        self.my_globals.response_buffer.append(
-            {self.my_globals.commands.BROADCAST_TEXT: ""}
-        )
-
-
-class LogicsticsThread(Thread):
+class Logistics:
     """_summary_
+    This is the class in charge of containing the ai which provides a purpose for this program
 
     Args:
-        Thread (_type_): _description_
+        Thread (_type_): _description_: The class that is to be used in order to start threads
     """
 
-    def __init__(self, my_variables: GlobalVariables) -> None:
-        """_summary_
-
-        Args:
-            my_variables (GlobalVariables): _description_
-        """
-        super().__init__(name="Logistics")
-        self.sender = Sender(my_variables)
-        self.constants = my_variables
+    def __init__(self, global_variables: GlobalVariables) -> None:
+        self.global_variables = global_variables
+        self.global_variables.ai_status = self.global_variables.success
+        self.client_number = ""
+        self.client_coordinates = ()
+        self.welcome_received = False
+        self.client_number_received: bool = False
+        self.initialisation_complete = False
+        self.global_variables.ai_ready = True
+        self.nb_responses = 0
+        self.tile_content = []
+        self.random_seed = self._create_random_seed()
+        self.sabotage = False
         self.direction_options_list = ["forward", "left", "right"]
         self.direction_options = {
-            "forward": self.sender.forward,
-            "left": self.sender.left,
-            "right": self.sender.right
+            "forward": self._forward,
+            "left": self._left,
+            "right": self._right
         }
-        self.text_equivalence = my_variables.translation_reference.text_equivalence
-        self.random_seed = self._create_random_seed()
-        self.stall = False
-        self.stall_command = False
 
     def _create_random_seed(self) -> int:
         """_summary_
@@ -161,7 +49,47 @@ class LogicsticsThread(Thread):
         """
         c_time = datetime.now()
         final_seed = c_time.hour + c_time.minute + c_time.second + c_time.microsecond
+        pwarning(self.global_variables, f"Generated seed: {final_seed}")
         return final_seed
+
+    def _forward(self) -> None:
+        """_summary_
+            Add the forward command
+        """
+        e = ConvertData(
+            data=self.global_variables.translation_reference.text_equivalence[Commands.FORWARD],
+            error=self.global_variables.error,
+            success=self.global_variables.success
+        )
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
+
+    def _left(self) -> None:
+        """_summary_
+            Add the left command
+        """
+        e = ConvertData(
+            data=self.global_variables.translation_reference.text_equivalence[Commands.LEFT],
+            error=self.global_variables.error,
+            success=self.global_variables.success
+        )
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
+
+    def _right(self) -> None:
+        """_summary_
+            Add the right command
+        """
+        e = ConvertData(
+            data=self.global_variables.translation_reference.text_equivalence[Commands.RIGHT],
+            error=self.global_variables.error,
+            success=self.global_variables.success
+        )
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
 
     def _my_randint(self, minimum: int = 0, maximum: int = 3) -> int:
         """_summary_
@@ -170,7 +98,7 @@ class LogicsticsThread(Thread):
         artificial_turn = 200
         counter = 0
         while counter < artificial_turn:
-            pdebug(self.constants, "(logistics) In random")
+            pdebug(self.global_variables, "(logistics) In random")
             c_time = datetime.now()
             current_time = c_time.hour + c_time.minute + c_time.second + c_time.microsecond
             final_number = (current_time + self.random_seed) % (maximum + 1)
@@ -179,127 +107,312 @@ class LogicsticsThread(Thread):
             counter += 1
         return minimum
 
-    def _can_evolve(self) -> bool:
-        """_summary_
-            Check if the AI can evolve.
-
-        Returns:
-            bool: _description_: True if the required ressources are present, False if the required ressources are not present
-        """
-        pdebug(self.constants, "(logistics) In _can_evolve:207")
-        i = 0
-        artificial_delay = 20
-        counter = 0
-        self.sender.look()
-        max_i = len(self.constants.current_buffer)
-        pdebug(self.constants, "(logistics) In _can_evolve:213")
-        while max_i == 0 and counter < artificial_delay:
-            sleep(0.1)
-            pdebug(
-                self.constants,
-                f"(logistics) _can_evolve:Current buffer: {self._process_buffer()}"
-            )
-            pdebug(self.constants, "(logistics) In _can_evolve:220")
-            max_i = len(self.constants.current_buffer)
-            counter += 1
-        if max_i == 0:
-            pdebug(self.constants, "(logistics) In _can_evolve:224")
-            return False
-        while i < max_i:
-            pdebug(self.constants, "(logistics) In _can_evolve:222")
-            if Items.LINEMATE in self.constants.current_buffer[i]:
-                return True
-        pdebug(self.constants, "(logistics) In _can_evolve:230")
-        return False
-
     def _change_my_mind(self) -> None:
         """_summary_
         This function is the one in charge of creating a random movement
         """
         move = self._my_randint(0, len(self.direction_options) - 1)
-        self.direction_options[self.direction_options_list[move]]()
-        self.stall_command = True
-
-    def _process_buffer(self) -> list[dict[str, any]]:
-        """_summary_
-        Convert the buffer data to a human readable version
-
-        Returns:
-            list[dict[str, any]]: _description_: The converted buffer
-        """
-        converted_buffer = []
-        if self.constants.current_buffer == []:
-            return []
-        for i in self.constants.current_buffer:
-            pinfo(self.constants, f"(logistics) _process_buffer:i = {i}")
-            if i == {}:
-                converted_buffer.append(i)
-                continue
-            for j in i:
-                if j in self.text_equivalence:
-                    converted_buffer.append(
-                        {self.text_equivalence[j]: i[j]}
-                    )
-                else:
-                    converted_buffer.append({j: i[j]})
-        return converted_buffer
-
-    def _clear_buffer(self) -> None:
-        """_summary_
-        Clear the generated buffer
-        """
-        i = 0
-        max_length = len(self.constants.current_buffer)
-        while i < max_length:
-            self.constants.current_buffer.pop(0)
-            i += 1
-
-    def _mainloop(self) -> int:
-        """_summary_
-        This is the mainloop for the program that controls the AI.
-
-        Returns:
-            int: _description_: The status of the program
-        """
-
-        self.stall = False
-
-        while self.constants.continue_running is True:
-            pdebug(self.constants, "In logistics:while")
-            pdebug(
-                self.constants,
-                f"(logistics) current_buffer = {self._process_buffer()}"
-            )
-            pinfo(
-                self.constants,
-                f"(logistics) response_buffer = {self.constants.response_buffer}"
-            )
-            if Commands.DEAD in self.constants.current_buffer:
-                pdebug(
-                    self.constants,
-                    "(logistics) The AI was ordered to commit suicide\nDying"
-                )
-                self.constants.continue_running = False
-                self._clear_buffer()
-                break
-            if self.stall is True:
-                pdebug(self.constants, "(logistics)  Stalling")
-                continue
-            if self._can_evolve() is True:
-                pdebug(self.constants, "(logistics) Evolving is possible, evolving")
-                self.sender.incantation()
-            self._change_my_mind()
-        return self.constants.success
-
-    def run(self) -> None:
-        """_summary_
-        This is the function that is called when a thread is started
-        """
-        pinfo(self.constants, "The class Thread logistics is initialised")
-        self.constants.current_status = self._mainloop()
-        pwarning(
-            self.constants,
-            f"AI thread is exiting with {self.constants.current_status}"
+        pinfo(
+            self.global_variables,
+            f"Selected direction: {self.direction_options_list[move]}"
         )
-        pinfo(self.constants, "Exiting Logistics thread")
-        sys.exit(self.constants.current_status)
+        self.direction_options[self.direction_options_list[move]]()
+
+    def _update_ai_status(self, status: int) -> None:
+        """_summary_
+            This function works like a onetime valve, if one error ever gets raised, the variable will never go back to 0.
+        Args:
+            status (int): _description_: the run status of the previous function
+        """
+        if status != self.global_variables.success:
+            pwarning(
+                self.global_variables,
+                f"The global status if not a success, error code: {status}"
+            )
+            self.global_variables.ai_status = status
+        psuccess(self.global_variables, "The global status is a success.")
+
+    def _process_welcome(self, data: str) -> int:
+        """_summary_
+            This function will set the variables corresponding to the initialisation process
+        Returns:
+            int: _description_: The processing status
+        """
+        if "WELCOME" in data:
+            pinfo(
+                self.global_variables,
+                "Welcome key received"
+            )
+            self.global_variables.response_buffer.append(
+                self.global_variables.user_arguments.name
+            )
+            self.welcome_received = True
+            return self.global_variables.success
+        pdebug(
+            self.global_variables,
+            f"(logistics): response = {data}, nb_responses = {self.nb_responses}"
+        )
+        self._exit_error("Did not receive the expected welcome message")
+        return self.global_variables.error
+
+    def _process_client_number(self, data: str) -> int:
+        """_summary_
+            This function will check if we have received the client number
+        Args:
+            data (str): _description_: The incoming data
+
+        Returns:
+            int: _description_: The status of the processed data
+        """
+        if data in ({}, []):
+            response = f"Client number cannot be empty.\nYou entered:'{data}'"
+            perror(self.global_variables, response)
+            return self._exit_error(f"Error: {response}")
+        if isinstance(data, (dict)):
+            data = data[list(data)[0]]
+        if isinstance(data, list):
+            data = data[0]
+        if data.isnumeric():
+            self.client_number = int(data)
+            self.client_number_received = True
+        return self.global_variables.success
+
+    def _process_map_dimensions(self, data: str) -> int:
+        """_summary_
+            This is a function that will make sure that the dimensions of the map.
+        Args:
+            data (str): _description_
+
+        Returns:
+            int: _description_
+        """
+        if " " not in data:
+            response = f"Map dimensions cannot be empty.\nYou entered:'{data}'"
+            perror(self.global_variables, response)
+            return self._exit_error(f"Error: {response}")
+        dimensions = data.split(" ")
+        if len(dimensions) > 0 and dimensions[0] == '':
+            dimensions.pop(0)
+        if len(dimensions) > 0 and dimensions[-1] == '':
+            dimensions.pop(-1)
+        if len(dimensions) == 2:
+            if dimensions[0].isnumeric() and dimensions[1].isnumeric():
+                self.client_coordinates = (
+                    int(dimensions[0]), int(dimensions[1]))
+                pdebug(
+                    self.global_variables,
+                    f"Client coordinates = {self.client_coordinates}"
+                )
+                self.initialisation_complete = True
+                self.global_variables.ai_ready = True
+                self._append_look_command()
+                return self.global_variables.success
+        response = f"Map dimensions cannot be empty.\nYou entered:'{data}'"
+        perror(self.global_variables, response)
+        return self._exit_error(f"Error: {response}")
+
+    def _can_evolve(self, command: str) -> bool:
+        """_summary_
+            This function checks if the ai can evolve.
+        Args:
+            command (str | list): _description_: The content of the Look response
+
+        Returns:
+            bool: _description_: Returns True if the ai can get to the next level, otherwise False is returned.
+        """
+        max_i = len(command)
+        pdebug(
+            self.global_variables,
+            f"(logistic) _can_evolve: max_i = {max_i}, Provided command = {command}"
+        )
+        if max_i == 0:
+            pdebug(
+                self.global_variables,
+                "(logistics) _can_evolve: The command is empty"
+            )
+            return False
+        if Items.LINEMATE in command or "linemate" in command or "Linemate" in command:
+            psuccess(
+                self.global_variables,
+                "The item Linemate was found on the ground"
+            )
+            return True
+        pdebug(
+            self.global_variables,
+            "(logistics) _can_evolve: The Linemate item is not found"
+        )
+        return False
+
+    def _exit_error(self, string: str) -> int:
+        """_summary_
+            This function should never be triggered in a normal use case.
+            This function will send an error message and set the global status to self.global_variable.error
+        Returns:
+            int: _description_: The error status defined in global_variables
+        """
+        self.global_variables.continue_running = False
+        status = self.global_variables.error
+        self._update_ai_status(status)
+        self.global_variables.response_buffer.append(f"Error: {string}\n")
+        return status
+
+    def _append_look_command(self) -> None:
+        """_summary_
+            This function appends the look command to the response buffer.
+        """
+        e = ConvertData(
+            data=self.global_variables.translation_reference.text_equivalence[Commands.LOOK],
+            error=self.global_variables.error,
+            success=self.global_variables.success
+        )
+        output = e.to_external()
+        pinfo(self.global_variables, f"Command sent: {output}")
+        self.global_variables.response_buffer.append(output)
+
+    def _to_human_readable(self, code: int) -> str:
+        """_summary_
+            Replace the code with the corresponding state.
+        Args:
+            code (int): _description_: The corresponding code
+
+        Returns:
+            str: _description_: The corresponding text that the human can understand
+        """
+        if code in self.global_variables.translation_reference.text_equivalence:
+            return self.global_variables.translation_reference.text_equivalence[code]
+        return code
+
+    def _calculate_next_move(self, response: dict[Commands, any]) -> int:
+        """_summary_
+            This function will calculate the next move based on the response from the server.
+
+        Args:
+            response (dict[Commands, any]): _description_: The query that came in from the tcp protocol.
+
+        Returns:
+            int: _description_: The status of the execution.
+        """
+        status = self.global_variables.success
+
+        pdebug(self.global_variables, f"Incoming response =  {response}")
+
+        if self.sabotage is True:
+            self._left()
+
+        if response[list(response)[0]] in ("ko", "KO", "Ko", "kO"):
+            perror(
+                self.global_variables,
+                f"Command = '{self._to_human_readable(list(response)[0])}' failed"
+            )
+            self._append_look_command()
+            return self.global_variables.success
+
+        if Commands.LOOK in response:
+            psuccess(self.global_variables, f"Look response = {response}")
+            self.tile_content = response[Commands.LOOK]
+            if self._can_evolve(response[Commands.LOOK]) is True:
+                e = ConvertData(
+                    data=self.global_variables.translation_reference.text_equivalence[
+                        Commands.INCANTATION
+                    ],
+                    error=self.global_variables.error,
+                    success=self.global_variables.success
+                )
+                self.global_variables.response_buffer.append(e.to_external())
+            else:
+                self._change_my_mind()
+
+        elif Commands.LEFT in response and response[Commands.LEFT].lower() == "ok":
+            self._append_look_command()
+
+        elif Commands.RIGHT in response and response[Commands.RIGHT].lower() == "ok":
+            self._append_look_command()
+
+        elif Commands.FORWARD in response and response[Commands.FORWARD].lower() == "ok":
+            self._append_look_command()
+
+        elif Commands.INCANTATION in response and response[Commands.INCANTATION].lower() == "ok":
+            self.sabotage = True
+            self._left()
+
+        else:
+            self._append_look_command()
+
+        return status
+
+    def dispatcher(self, response: dict[Commands, any]) -> int:
+        """_summary_
+
+        Args:
+            response (str): _description_: The converted response
+
+        Returns:
+            int: _description_: The status response of the program
+        """
+        status = self.global_variables.success
+        self.nb_responses += 1
+        pinfo(self.global_variables, f"data = {response}")
+
+        if Commands.UNKNOWN in response and self.nb_responses == 1:
+            status = self._process_welcome(response[Commands.UNKNOWN])
+        elif Commands.UNKNOWN in response and self.welcome_received is True and self.nb_responses == 2:
+            status = self._process_client_number(response)
+        elif Commands.UNKNOWN in response and self.client_number_received is True and self.nb_responses == 3:
+            status = self._process_map_dimensions(response[Commands.UNKNOWN])
+        elif self.nb_responses >= 4 and self.initialisation_complete is True:
+            status = self._calculate_next_move(response)
+        self._update_ai_status(status)
+        return status
+
+
+if __name__ == "__main__":
+    print("This script is not meant to be run as main.")
+    NAME = "my_zappy"
+    IP = "0.0.0.0"
+    PORT = 4242
+    ERROR = 84
+    SUCCESS = 0
+    CLIENT_NUM = 1
+    MAP_X = 20
+    MAP_Y = 20
+    ASCEND = "ASCEND"
+    LEFT = "LEFT"
+    RIGHT = "RIGHT"
+    FORWARD = "FORWARD"
+    LIFE_LENGTH = 200
+    LIFE_INDEX = 0
+    GI = GlobalVariables(
+        success=0,
+        error=84,
+        ip="0.0.0.0",
+        port=4242,
+        name="my_zappy",
+        debug=True
+    )
+    GI.current_buffer.append(ConvertData("WELCOME").to_internal())
+    LI = Logistics(GI)
+    LI.start()
+    GI.colourise_output.init_pallet()
+    GI.colourise_error.init_pallet()
+    while GI.continue_running is True:
+        if len(GI.sender_data) == 0:
+            continue
+        if GI.response_buffer[0] == NAME:
+            GI.current_buffer.append(
+                ConvertData(f"{CLIENT_NUM}\n").to_internal()
+            )
+            GI.current_buffer.append(
+                ConvertData(f" {MAP_X} {MAP_Y}\n").to_external()
+            )
+        if GI.response_buffer[0] == FORWARD:
+            GI.current_buffer.append(ConvertData("ok\n").to_internal())
+        if GI.response_buffer[0] == LEFT:
+            GI.current_buffer.append(ConvertData("ok\n").to_internal())
+        if GI.response_buffer[0] == RIGHT:
+            GI.current_buffer.append(ConvertData("ok\n").to_internal())
+        if LIFE_INDEX == LIFE_LENGTH:
+            GI.current_buffer.append(ConvertData("Dead").to_internal())
+        LIFE_INDEX += 1
+    pinfo(GI, f"Program stopped with status: {GI.current_status}")
+    GI.colourise_output.unload_ressources()
+    sys.exit(GI.current_status)
