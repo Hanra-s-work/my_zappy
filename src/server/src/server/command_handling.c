@@ -88,6 +88,38 @@ static void set_ai_client(server_handler_t *server,
     }
 }
 
+static void check_which_command(server_handler_t *server,
+    char **parsed_command, const int idx)
+{
+    for (int i = 0; i < GUI_COMMAND_NB + CLIENT_COMMAND_NB; i++) {
+        if (COMMAND_TABLE[i].command_fct == NULL) {
+            continue;
+        }
+        if (strcmp(parsed_command[0], COMMAND_TABLE[i].command) == 0) {
+            COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
+        }
+    }
+}
+
+static void check_inside_buffer(server_handler_t *server,
+    const char buffer[MAX_BUFFER_SIZE], const int idx)
+{
+    char ***parsed_buffer = parse_buffer((unsigned char *)buffer,
+    strlen(buffer) + 1);
+
+    if (parsed_buffer == NULL) {
+        write_to_client(server->game_data.clients[idx].fd, UNKNOWN_COMMAND);
+        return;
+    }
+    for (int i = 0; parsed_buffer[i] != NULL; i++) {
+        check_which_command(server, parsed_buffer[i], idx);
+    }
+    for (int i = 0; parsed_buffer[i] != NULL; i++) {
+        free_array(parsed_buffer[i]);
+    }
+    free(parsed_buffer);
+}
+
 static void launch_command(server_handler_t *server,
     const char buffer[MAX_BUFFER_SIZE], const bool is_in_queue, const int idx)
 {
@@ -100,9 +132,14 @@ static void launch_command(server_handler_t *server,
             set_ai_client(server, buffer, idx);
             return;
         }
-        write_to_client(idx, "ko\n");
+        write_to_client(idx, UNKNOWN_COMMAND);
         return;
     }
+    if (strlen(buffer) < 2) {
+        write_to_client(server->game_data.clients[idx].fd, UNKNOWN_COMMAND);
+        return;
+    }
+    check_inside_buffer(server, buffer, idx);
 }
 
 void command_handling(server_handler_t *server, const int fd)

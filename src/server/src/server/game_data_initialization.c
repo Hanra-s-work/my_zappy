@@ -85,7 +85,7 @@ static void randomize_player_pos_and_dir(server_handler_t *server,
 static int init_player(server_handler_t *server, const int total, const int i)
 {
     int index = 0;
-    int time_life = PLAYER_TIME / server->game_data.frequence;
+    int time_life = PLAYER_TIME;
     static int num = 1;
 
     for (int x = 0; x < MAX_CLIENT; x++)
@@ -159,19 +159,18 @@ int init_game_data(server_handler_t *server, struct arg_s **arguments)
 
     server->game_data.map = NULL;
     server->game_data.teams = NULL;
-    if (value != NULL) {
+    if (value != NULL)
         server->game_data.frequence = atoi(value);
-    } else {
+    else
         server->game_data.frequence = DEFAULT_FREQUENCE;
-    }
     init_client(server->game_data.clients);
     init_map_size(server, arguments);
     init_ressources_quantity(server);
-    if (init_team_data(server, arguments) == -1) {
+    if (init_team_data(server, arguments) == -1)
         return (write_error_msg("Error: Internal server error.\n"));
-    }
-    if (init_map_content(server) == -1) {
+    if (init_map_content(server) == -1)
         return (write_error_msg("Error: Internal server error.\n"));
-    }
+    for (int i = 0; i < MAX_EVENT; i++)
+        server->game_data.event[i] = DEFAULT_EVENT;
     return (show_game_data(server, true));
 }

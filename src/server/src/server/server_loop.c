@@ -64,16 +64,43 @@ static int loop_in_fd(server_handler_t *server)
     return (0);
 }
 
+static int check_select_status(server_handler_t *server, const int status,
+    bool *is_fd)
+{
+    if (status == -1) {
+        return (-1);
+    } else if (status) {
+        *is_fd = true;
+    } else {
+        printf("In event checker\n");
+    }
+    if (*is_fd == true) {
+        if (loop_in_fd(server) == -1) {
+            return (-1);
+        }
+    }
+    return (0);
+}
+
 void server_loop(server_handler_t *server)
 {
+    struct timeval timeout;
+    int status = 0;
+    double time = (double)1 / (double)server->game_data.frequence;
+    bool is_fd = false;
+
+    time *= 1000000;
     FD_ZERO(&server->current_fd);
     FD_SET(server->socket, &server->current_fd);
     while (true) {
-        server->ready_fd = server->current_fd;
-        if (select(FD_SETSIZE, &server->ready_fd, NULL, NULL, NULL) == -1) {
-            break;
+        if (is_fd == false) {
+            timeout.tv_sec = 0;
+            timeout.tv_usec = (int)time;
         }
-        if (loop_in_fd(server) == -1) {
+        is_fd = false;
+        server->ready_fd = server->current_fd;
+        status = select(FD_SETSIZE, &server->ready_fd, NULL, NULL, &timeout);
+        if (check_select_status(server, status, &is_fd) == -1) {
             break;
         }
     }
