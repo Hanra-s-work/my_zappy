@@ -13,16 +13,20 @@
 
 /**
  * @brief Define structure of a command
- * @command being the trigger string
- * @opt Currently unused
- * @arg_nb number of argument taken by command
- * @command_fct Function pointer to command function
+ * @param command being the trigger string
+ * @param opt Currently unused
+ * @param arg_nb number of argument taken by command
+ * @param command_fct Function pointer to command function,
+ * first parameter is the general structure of server,
+ * second parameter is the parsed command,
+ * third parameter is the index where the client data is stored in the
+ * cli_t array structure
  */
 struct command_s {
     char *command;
     char *opt;
     size_t arg_nb;
-    char *(*command_fct)(char *, char *, char *);
+    int (*command_fct)(server_handler_t *, char **, const int);
 };
 
 /**
