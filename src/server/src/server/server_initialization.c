@@ -21,10 +21,6 @@ static int bind_server(server_handler_t *server, char *value)
     addr.sin_port = htons(atoi(value));
     addr.sin_addr.s_addr = INADDR_ANY;
     if (bind(server->socket, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
-        if (shutdown(server->socket, SHUT_RDWR) == -1) {
-            perror("shutdown");
-            return (-1);
-        }
         perror("bind");
         return (-1);
     }
@@ -34,10 +30,6 @@ static int bind_server(server_handler_t *server, char *value)
 static int init_server_queue(server_handler_t *server)
 {
     if (listen(server->socket, MAX_CLIENT) == -1) {
-        if (shutdown(server->socket, SHUT_RDWR) == -1) {
-            perror("shutdown");
-            return (-1);
-        }
         perror("listen");
         return (-1);
     }
