@@ -30,26 +30,6 @@ static int display_helper(void)
     return (0);
 }
 
-static int arguments_handler(int argc, char **argv, server_handler_t *server)
-{
-    struct arg_s **arguments = NULL;
-    int nb_param = get_nb_parameter(argc, (const char **)argv);
-
-    arguments = get_zappy_args(argc, (const char **)argv, SERVER_OPTION);
-    if (arguments == NULL) {
-        return write_error_msg("See the helper with '-help' option.\n");
-    }
-    if (check_values_validity((const struct arg_s **)arguments,
-    nb_param) == -1) {
-        return (-1);
-    }
-    if (server_initialization(server, arguments) == -1) {
-        return (-1);
-    }
-    free_args(arguments, nb_param);
-    return (0);
-}
-
 static int shutdown_server(server_handler_t *server)
 {
     if (server->game_data.map != NULL) {
@@ -65,6 +45,28 @@ static int shutdown_server(server_handler_t *server)
     if (shutdown(server->socket, SHUT_RDWR) == -1) {
         return (ERROR);
     }
+    return (0);
+}
+
+static int arguments_handler(int argc, char **argv, server_handler_t *server)
+{
+    struct arg_s **arguments = NULL;
+    int nb_param = get_nb_parameter(argc, (const char **)argv);
+
+    arguments = get_zappy_args(argc, (const char **)argv, SERVER_OPTION);
+    if (arguments == NULL) {
+        return write_error_msg("See the helper with '-help' option.\n");
+    }
+    if (check_values_validity((const struct arg_s **)arguments,
+    nb_param) == -1) {
+        free_args(arguments, nb_param);
+        return (-1);
+    }
+    if (server_initialization(server, arguments) == -1) {
+        free_args(arguments, nb_param);
+        return (-1);
+    }
+    free_args(arguments, nb_param);
     return (0);
 }
 
