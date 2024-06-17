@@ -25,6 +25,7 @@
     //!! INITIALIZATION VALUE CONSTANTS !!
 
     #define DEFAULT_FREQUENCE 100
+    #define MAX_EVENT 2000
 
     // Ressources density
 
@@ -60,5 +61,6 @@
     //!! MESSAGE !!
 
     #define CONNEXION_FAILED "Failed to get connexion with the client.\n"
+    #define UNKNOWN_COMMAND "ko\n"
 
 #endif

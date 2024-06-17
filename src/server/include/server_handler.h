@@ -41,6 +41,23 @@ typedef enum direction_s {
     DOWN
 } direction_t;
 
+// An enum type to enum every possible event in the game
+typedef enum event_type_s {
+    UNKNOWN_TYPE,
+    FORWARD,
+    LEFT_EVENT,
+    RIGHT_EVENT,
+    LOOK,
+    INVENTORY,
+    BROADCAST,
+    CONNECT_NBR,
+    FORK,
+    EJECT,
+    TAKE,
+    SET,
+    INCANTATION
+} event_type_t;
+
 /** @brief A structure to count ressources in the game
  * @param food_nb
  * @param linemate_nb
@@ -106,6 +123,12 @@ typedef struct team_s {
     int client_num_list[MAX_CLIENT];
 } team_t;
 
+typedef struct event_s {
+    int fd;
+    event_type_t type;
+    int time_counter;
+} event_t;
+
 /**
  * @brief A structure to store the game data
  * @param map_size The size of the map (x = 0, y = 1)
@@ -124,6 +147,7 @@ typedef struct game_data_s {
     team_t *teams;
     cli_t clients[MAX_CLIENT];
     map_t **map;
+    event_t event[MAX_EVENT];
 } game_data_t;
 
 /**
@@ -164,6 +188,12 @@ static const cli_t DEFAULT_CLIENT = {
     { 0, 0, 0, 0, 0, 0, 0}, // Inventory
     UNKNOWN, // Time life
     UNDEFINED // Direction
+};
+
+static const event_t DEFAULT_EVENT = {
+    UNKNOWN,
+    UNKNOWN_TYPE,
+    UNKNOWN
 };
 
 /**
