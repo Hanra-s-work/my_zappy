@@ -49,7 +49,7 @@ class Logistics:
         """
         c_time = datetime.now()
         final_seed = c_time.hour + c_time.minute + c_time.second + c_time.microsecond
-        pwarning(self.global_variables, f"Generated seed: {final_seed}")
+        pinfo(self.global_variables, f"Generated seed: {final_seed}")
         return final_seed
 
     def _forward(self) -> None:

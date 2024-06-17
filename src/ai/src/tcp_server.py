@@ -115,15 +115,28 @@ class TCPServer:
             int: _description_
         """
         status = self.global_variables.success
-        s = socket(AF_INET, SOCK_STREAM)
-        s.connect(
-            (
-                self.global_variables.server_data.ip,
-                self.global_variables.server_data.port
+        try:
+            s = socket(AF_INET, SOCK_STREAM)
+            s.connect(
+                (
+                    self.global_variables.server_data.ip,
+                    self.global_variables.server_data.port
+                )
             )
-        )
-        s.setblocking(self.global_variables.server_data.make_tcp_wait)
-        s.settimeout(self.global_variables.server_data.timeout)
+            s.setblocking(self.global_variables.server_data.make_tcp_wait)
+            s.settimeout(self.global_variables.server_data.timeout)
+        except Exception as e:
+            perror(
+                self.global_variables,
+                f"Failed to connect to: '{self.global_variables.server_data.ip}:{self.global_variables.server_data.port}'\nRaised error: '{e}'"
+            )
+            pwarning(
+                self.global_variables,
+                "A fatal error occured, aborting program"
+            )
+            self.global_variables.current_status = self.global_variables.error
+            self.global_variables.continue_running = False
+            return self.global_variables.error
         pinfo(
             self.global_variables,
             self.global_variables.server_data.startup_message
