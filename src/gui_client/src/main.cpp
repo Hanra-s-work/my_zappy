@@ -19,7 +19,18 @@ int main(int argc, char **argv)
     Graphic graphic;
     graphic.initWindow(1920, 1080, "SFML Window");
     Player player("path/to/player/texture.png");
-    Resource resource("path/to/resource/texture.png");
+    Resource resource("asset/flower_grass.png");
+
+    resource.addMaterial("food", "asset/food.png");
+    resource.addMaterial("linemate", "asset/linemate.png");
+    resource.addMaterial("deraumere", "asset/deraumere.png");
+    resource.addMaterial("sibur", "asset/sibur.png");
+    resource.addMaterial("mendiane", "asset/mendiane.png");
+    resource.addMaterial("phiras", "asset/phiras.png");
+    resource.addMaterial("thystame", "asset/thystame.png");
+
+    resource.generateMap(20, 20);
+    resource.generateMaterials();
     sf::RenderWindow &window = graphic.getWindow();
 
     while (window.isOpen()) {
@@ -29,12 +40,10 @@ int main(int argc, char **argv)
                 window.close();
             }
         }
-
         window.clear();
-        player.draw(window);
         resource.draw(window);
+        player.draw(window);
         window.display();
     }
-
     return 0;
 }
