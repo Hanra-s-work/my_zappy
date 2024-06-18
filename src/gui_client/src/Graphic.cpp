@@ -84,14 +84,14 @@ bool ISprite::loadTexture(const std::string &textureFile)
     return true;
 }
 
-Player::Player(const std::string &textureFile) : ISprite(textureFile)
-{
-}
+// Player::Player(const std::string &textureFile) : ISprite(textureFile)
+// {
+// }
 
-void Player::draw(sf::RenderWindow &window) const
-{
-    window.draw(sprite);
-}
+// void Player::draw(sf::RenderWindow &window) const
+// {
+//     window.draw(sprite);
+// }
 
 Resource::Resource(const std::string &textureFile) : ISprite(textureFile), mapWidth(0), mapHeight(0)
 {
