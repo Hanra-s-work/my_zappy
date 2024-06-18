@@ -17,7 +17,7 @@
 int main(int argc, char **argv)
 {
     Graphic graphic;
-    graphic.initWindow(1920, 1080, "SFML Window");
+    graphic.initWindow(1920, 1080, "My Zappy");
     Player player("path/to/player/texture.png");
     Resource resource("asset/flower_grass.png");
 
@@ -29,8 +29,9 @@ int main(int argc, char **argv)
     resource.addMaterial("phiras", "asset/phiras.png");
     resource.addMaterial("thystame", "asset/thystame.png");
 
-    resource.generateMap(20, 20);
+    resource.generateMap(200, 200);
     resource.generateMaterials();
+    graphic.setMapSize(resource.getMapWidth(), resource.getMapHeight());
     sf::RenderWindow &window = graphic.getWindow();
 
     while (window.isOpen()) {
@@ -40,6 +41,9 @@ int main(int argc, char **argv)
                 window.close();
             }
         }
+
+        graphic.handleInput();
+
         window.clear();
         resource.draw(window);
         player.draw(window);
