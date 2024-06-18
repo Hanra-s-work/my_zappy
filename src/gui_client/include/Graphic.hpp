@@ -19,9 +19,15 @@ class Graphic
         Graphic();
         void initWindow(unsigned int width, unsigned int height, const std::string& title);
         sf::RenderWindow& getWindow();
+        void handleInput();
+        void setMapSize(float width, float height);
 
     private:
         sf::RenderWindow window;
+        sf::View view;
+        float scrollSpeed;
+        float mapWidth;
+        float mapHeight;
 };
 
 class ISprite
@@ -57,6 +63,9 @@ class Resource : public ISprite
         void addMaterial(const std::string& type, const std::string& textureFile);
         void generateMaterials();
         void draw(sf::RenderWindow& window) const override;
+
+        unsigned int getMapWidth() const;
+        unsigned int getMapHeight() const;
 
     private:
         std::vector<sf::Sprite> mapSprites;
