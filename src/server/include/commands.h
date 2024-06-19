@@ -17,18 +17,17 @@
 
 int map_size_request(server_handler_t *server, char **args, const int idx);
 
-int all_team_name_request(server_handler_t *server, char **args, const int idx);
+int all_team_name_request(server_handler_t *server, char **args,
+    const int idx);
 
 int time_unit_request(server_handler_t *server, char **args, const int idx);
 
 int time_unit_modification_request(server_handler_t *server, char **args,
     const int idx);
 
-
 int map_content_request(server_handler_t *server, char **args, const int idx);
 
 int tile_content_request(server_handler_t *server, char **args, const int idx);
-
 
 map_t *get_tile_content(server_handler_t *server, int x, int y);
 

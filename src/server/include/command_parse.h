@@ -9,9 +9,11 @@
     #define MY_ZAPPY_COMMAND_PARSE_H
 
     #include <stdint.h>
-    #include "server_handler.h"
+    #include <sys/types.h>
+
     #include "commands.h"
     #include "constants.h"
+    #include "server_handler.h"
 
 /**
  * @brief Define structure of a command
@@ -47,7 +49,7 @@ char **parse_command(char *str);
  */
 char ***parse_buffer(uint8_t *buffer, ssize_t buf_size);
 
-static const struct command_s CLIENT_COMMAND_TABLE[CLIENT_COMMAND_NB] = {
+static const struct command_s AI_COMMAND_TABLE[AI_COMMAND_NB] = {
     { "Forward", "", 0, NULL },
     { "Right", "", 0, NULL },
     { "Left", "", 0, NULL },
@@ -57,26 +59,37 @@ static const struct command_s CLIENT_COMMAND_TABLE[CLIENT_COMMAND_NB] = {
     { "Connect_nbr", "", 0, NULL },
     { "Fork", "", 0, NULL },
     { "Eject", "", 0, NULL },
-    { "", "", 0, NULL },
     { "Take", "", 1, NULL },
     { "Set", "", 1, NULL },
     { "Incantation", "", 0, NULL },
 };
 
+// static const struct command_s GUI_COMMAND_TABLE[GUI_COMMAND_NB] = {
+//     { "msz", "", 0, &map_size_request },
+//     { "bct", "", 2, &tile_content_request },
+//     { "mct", "", 0, &map_content_request },
+//     { "tna", "", 0, &all_team_name_request },
+//     { "ppo", "", 1, NULL },
+//     { "plv", "", 1, NULL },
+//     { "pin", "", 1, NULL },
+//     { "sgt", "", 0, &time_unit_request },
+//     { "sst", "", 1, &time_unit_modification_request },
+// };
+
 static const struct command_s GUI_COMMAND_TABLE[GUI_COMMAND_NB] = {
-    { "msz", "", 0, &map_size_request },
-    { "bct", "", 2, &tile_content_request },
-    { "mct", "", 0, &map_content_request },
-    { "tna", "", 0, &all_team_name_request },
+    { "msz", "", 0, NULL },
+    { "bct", "", 2, NULL },
+    { "mct", "", 0, NULL },
+    { "tna", "", 0, NULL },
     { "ppo", "", 1, NULL },
     { "plv", "", 1, NULL },
     { "pin", "", 1, NULL },
-    { "sgt", "", 0, &time_unit_request },
-    { "sst", "", 1, &time_unit_modification_request },
+    { "sgt", "", 0, NULL },
+    { "sst", "", 1, NULL },
 };
 
 static const struct command_s
-    COMMAND_TABLE[GUI_COMMAND_NB + CLIENT_COMMAND_NB] = {
+    COMMAND_TABLE[GUI_COMMAND_NB + AI_COMMAND_NB] = {
     { "Forward", "", 0, NULL },
     { "Right", "", 0, NULL },
     { "Left", "", 0, NULL },
@@ -86,7 +99,6 @@ static const struct command_s
     { "Connect_nbr", "", 0, NULL },
     { "Fork", "", 0, NULL },
     { "Eject", "", 0, NULL },
-    { "", "", 0, NULL },
     { "Take", "", 1, NULL },
     { "Set", "", 1, NULL },
     { "Incantation", "", 0, NULL },

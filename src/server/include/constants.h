@@ -20,7 +20,6 @@
     #define NB_PARAM 6
     #define CLIENTS_NB_PARAM "number of authorized clients per team"
     #define FREQUENCE_PARAM "reciprocal of time unit for execution of actions"
-    #define MINIMUM_MAP_SIZE 20
 
     //!! INITIALIZATION VALUE CONSTANTS !!
 
@@ -39,7 +38,7 @@
 
     // Time
 
-    #define SPAWNS_TIME 20
+    #define SPAWN_TIME 20
     #define PLAYER_TIME 1260
     #define ADD_FOOD 126
     #define BASIC_TIME 7
@@ -52,7 +51,7 @@
     #define COMMAND_DELIMITER   ' '
     #define COMMAND_SEPARATOR   '\n'
 
-    #define CLIENT_COMMAND_NB   13
+    #define AI_COMMAND_NB   12
     #define GUI_COMMAND_NB      9
     #define BROADCAST_COMMAND   5
 
@@ -61,6 +60,9 @@
     //!! MESSAGE !!
 
     #define CONNEXION_FAILED "Failed to get connexion with the client.\n"
-    #define UNKNOWN_COMMAND "ko\n"
+    #define AI_UNKNOWN_COMMAND "ko\n"
+    #define GUI_UNKNOWN_COMMAND "suc\n"
+    #define ELEVATION_UNDERWAY "Elevation underway\n"
+    #define AI_DIED "dead\n"
 
 #endif
