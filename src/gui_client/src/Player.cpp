@@ -80,3 +80,8 @@ bool Player::ReachedDestination() const
 {
     return _reachedDest;
 }
+
+void Player::setPosition(const sf::Vector2f &position)
+{
+    sprite.setPosition(position);
+}

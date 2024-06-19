@@ -30,6 +30,7 @@ class Player : public ISprite
         void updateTime(sf::Time elapsed);
         void draw(sf::RenderWindow &window) const override;
         bool ReachedDestination() const;
+        void setPosition(const sf::Vector2f &position);
 
     private:
         sf::Texture _texture;
