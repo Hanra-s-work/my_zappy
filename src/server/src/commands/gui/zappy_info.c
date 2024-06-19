@@ -6,13 +6,13 @@
 */
 
 #include <unistd.h>
-#include "server_handler.h"
+
 #include "commands.h"
+#include "server_handler.h"
 
 int map_size_request(server_handler_t *server, char **args, const int idx)
 {
-    (void) args;
-
+    (void)args;
     write(server->game_data.clients[idx].fd, MAP_SIZE_COMMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1);
@@ -27,7 +27,7 @@ int map_size_request(server_handler_t *server, char **args, const int idx)
 
 int all_team_name_request(server_handler_t *server, char **args, const int idx)
 {
-    (void) args;
+    (void)args;
     return (EXIT_SUCCESS);
 }
 
