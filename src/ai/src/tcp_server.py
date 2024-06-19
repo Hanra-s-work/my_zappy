@@ -39,14 +39,25 @@ class TCPServer:
             pinfo(self.global_variables, "Exit message received")
             self.global_variables.continue_running = False
             return
-        translated_data = ConvertData(
-            data,
-            self.global_variables.error,
-            self.global_variables.success
-        )
-        self.logistics.dispatcher(
-            translated_data.to_internal(self.current_query)
-        )
+        broadcast_item = "message"
+        if data.decode().startswith(broadcast_item):
+            translated_data = ConvertData(
+                data,
+                self.global_variables.error,
+                self.global_variables.success
+            )
+            self.logistics.dispatcher(
+                translated_data.to_internal(broadcast_item)
+            )
+        else:
+            translated_data = ConvertData(
+                data,
+                self.global_variables.error,
+                self.global_variables.success
+            )
+            self.logistics.dispatcher(
+                translated_data.to_internal(self.current_query)
+            )
 
     def _send_output_data(self, tcp_socket: socket) -> bool:
         """_summary_

@@ -48,7 +48,8 @@ class TranslationReference:
             "ko": Commands.KO,
             "Incantation": Commands.INCANTATION,
             "WELCOME": Commands.WELCOME,
-            "Dead": Commands.DEAD
+            "Dead": Commands.DEAD,
+            "message": Commands.MESSAGE
         }
         self.text_equivalence = {
             Commands.FORWARD: "Forward",
@@ -67,7 +68,8 @@ class TranslationReference:
             Commands.KO: "Ko",
             Commands.UNKNOWN: "None",
             Commands.WELCOME: "Welcome",
-            Commands.DEAD: "Dead"
+            Commands.DEAD: "Dead",
+            Commands.MESSAGE: "message"
         }
 
         self.item_string_to_class = {
@@ -120,6 +122,7 @@ class Commands:
     CLIENT_NUMBER: int = 18
     GRAPHIC_MODE: int = 19
     DEAD: int = 20
+    MESSAGE: int = 21
 
 
 class Items:
