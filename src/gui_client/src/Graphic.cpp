@@ -167,3 +167,16 @@ void Resource::draw(sf::RenderWindow &window) const
         window.draw(material.sprite);
     }
 }
+
+void Resource::addResourceAt(const std::string &type, int x, int y)
+{
+    if (materialTextures.find(type) == materialTextures.end()) {
+        return;
+    }
+
+    sf::Sprite materialSprite;
+    materialSprite.setTexture(materialTextures[type]);
+    materialSprite.setPosition(x * 128.0f, y * 128.0f);
+
+    materials.push_back({ materialSprite, type });
+}

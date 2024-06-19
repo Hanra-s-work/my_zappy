@@ -67,6 +67,8 @@ class Resource : public ISprite
         unsigned int getMapWidth() const;
         unsigned int getMapHeight() const;
 
+        void addResourceAt(const std::string &type, int x, int y);
+
     private:
         std::vector<sf::Sprite> mapSprites;
         std::vector<Material> materials;
