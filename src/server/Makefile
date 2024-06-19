@@ -27,6 +27,9 @@ SRC	=	./src/sub_main.c						\
 		./src/server/client_management.c 		\
 		./src/server/server_loop.c				\
 		./src/server/command_handling.c			\
+		./src/server/check_event.c				\
+\
+		./src/commands/ai_event/event_utils.c	\
 \
 		./src/show/show_game_data.c				\
 

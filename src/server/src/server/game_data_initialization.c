@@ -172,5 +172,7 @@ int init_game_data(server_handler_t *server, struct arg_s **arguments)
         return (write_error_msg("Error: Internal server error.\n"));
     for (int i = 0; i < MAX_EVENT; i++)
         server->game_data.event[i] = DEFAULT_EVENT;
+    server->game_data.event[0].type = FOOD_REGEN;
+    server->game_data.event[0].time_counter = SPAWN_TIME;
     return (show_game_data(server, true));
 }
