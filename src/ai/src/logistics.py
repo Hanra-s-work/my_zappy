@@ -33,6 +33,7 @@ class Logistics:
         self.nb_responses = 0
         self.tile_content = []
         self.random_seed = self._create_random_seed()
+        self.stall = False
         self.sabotage = False
         self.direction_options_list = ["forward", "left", "right"]
         self.direction_options = {
@@ -296,8 +297,12 @@ class Logistics:
 
         pdebug(self.global_variables, f"Incoming response =  {response}")
 
+        if self.stall is True and Commands.UNKNOWN in response and response[Commands.UNKNOWN] == 'ok':
+            self.stall = False
+            self.sabotage = True
+
         if self.sabotage is True:
-            self._left()
+            self._change_my_mind()
 
         if response[list(response)[0]] in ("ko", "KO", "Ko", "kO"):
             perror(
@@ -331,9 +336,8 @@ class Logistics:
         elif Commands.FORWARD in response and response[Commands.FORWARD].lower() == "ok":
             self._append_look_command()
 
-        elif Commands.INCANTATION in response and response[Commands.INCANTATION].lower() == "ok":
-            self.sabotage = True
-            self._left()
+        elif Commands.INCANTATION in response and response[Commands.INCANTATION] == "Elevation Underway":
+            self.stall = True
 
         else:
             self._append_look_command()
@@ -361,6 +365,7 @@ class Logistics:
             status = self._process_map_dimensions(response[Commands.UNKNOWN])
         elif self.nb_responses >= 4 and self.initialisation_complete is True:
             status = self._calculate_next_move(response)
+
         self._update_ai_status(status)
         return status
 
