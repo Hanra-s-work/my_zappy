@@ -37,16 +37,6 @@ static void write_tile_resource(server_handler_t *server, map_t *tile,
         tile->ressources.thystame_nb, sizeof(int));
 }
 
-map_t *get_tile_content(server_handler_t *server, int x, int y)
-{
-    map_t *tile = malloc(sizeof(map_t));
-
-    if (tile == NULL)
-        return (NULL);
-    memcpy(tile, &server->game_data.map[x][y], sizeof(map_t));
-    return (tile);
-}
-
 int tile_content_request(server_handler_t *server, char **args, const int idx)
 {
     int x = atoi(args[1]);
