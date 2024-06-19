@@ -42,12 +42,12 @@ class ISprite
         sf::Texture texture;
 };
 
-class Player : public ISprite
-{
-    public:
-        Player(const std::string& textureFile);
-        void draw(sf::RenderWindow& window) const override;
-};
+// class Player : public ISprite
+// {
+//     public:
+//         Player(const std::string& textureFile);
+//         void draw(sf::RenderWindow& window) const override;
+// };
 
 struct Material
 {
@@ -66,6 +66,8 @@ class Resource : public ISprite
 
         unsigned int getMapWidth() const;
         unsigned int getMapHeight() const;
+
+        void addResourceAt(const std::string &type, int x, int y);
 
     private:
         std::vector<sf::Sprite> mapSprites;
