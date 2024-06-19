@@ -64,25 +64,37 @@ static int search_team_name(server_handler_t *server,
     return (0);
 }
 
-static void set_ai_client(server_handler_t *server,
-    const char buffer[MAX_BUFFER_SIZE], const int fd)
+static void send_new_client(cli_t clients[MAX_CLIENT],
+    cli_t client)
+{
+    char str[MAX_BUFFER_SIZE];
+
+    sprintf(str, "pnw #%d %d %d %d %d %s\n",
+    client.client_num, client.pos[0], client.pos[1], client.direction,
+    client.level, client.team_name);
+    write_to_graphics_clients(clients, str);
+}
+
+static void set_ai_client(server_handler_t *s, const char buf[MAX_BUFFER_SIZE],
+    const int fd)
 {
     char str[MAX_BUFFER_SIZE];
 
     for (int i = 0; i < MAX_CLIENT; i++) {
-        if (strncmp(server->game_data.clients[i].team_name, buffer,
-        strlen(buffer) - 1) == 0 &&
-        server->game_data.clients[i].fd == UNKNOWN) {
-            server->game_data.clients[i].fd = fd;
-            server->game_data.clients[i].is_connected = true;
+        if (strncmp(s->game_data.clients[i].team_name, buf,
+        strlen(buf) - 1) == 0 &&
+        s->game_data.clients[i].fd == UNKNOWN) {
+            s->game_data.clients[i].fd = fd;
+            s->game_data.clients[i].is_connected = true;
             memset(str, '\0', MAX_BUFFER_SIZE);
-            sprintf(str, "%d\n", server->game_data.clients[i].client_num);
+            sprintf(str, "%d\n", s->game_data.clients[i].client_num);
             write_to_client(fd, str);
             memset(str, '\0', MAX_BUFFER_SIZE);
-            sprintf(str, "%d %d\n", server->game_data.map_size[0],
-            server->game_data.map_size[1]);
+            sprintf(str, "%d %d\n", s->game_data.map_size[0],
+            s->game_data.map_size[1]);
             write_to_client(fd, str);
-            remove_fd_from_queue(server, fd);
+            send_new_client(s->game_data.clients, s->game_data.clients[i]);
+            remove_fd_from_queue(s, fd);
             break;
         }
     }
@@ -91,13 +103,25 @@ static void set_ai_client(server_handler_t *server,
 static void check_which_command(server_handler_t *server,
     char **parsed_command, const int idx)
 {
-    for (int i = 0; i < GUI_COMMAND_NB + CLIENT_COMMAND_NB; i++) {
-        if (COMMAND_TABLE[i].command_fct == NULL) {
-            continue;
-        }
-        if (strcmp(parsed_command[0], COMMAND_TABLE[i].command) == 0) {
-            COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
-        }
+    int status = 0;
+
+    for (int i = 0; i < GUI_COMMAND_NB; i++) {
+        if (strcmp(server->game_data.clients[idx].team_name,
+        GUI_TEAM_NAME) != 0)
+            break;
+        if (GUI_COMMAND_TABLE[i].command_fct != NULL &&
+        strcmp(parsed_command[0], GUI_COMMAND_TABLE[i].command) == 0)
+            GUI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
+        if (status == -1)
+            status = write_to_client(server->game_data.clients[idx].fd,
+            GUI_UNKNOWN_COMMAND);
+    }
+    for (int i = 0; i < AI_COMMAND_NB; i++) {
+        if (AI_COMMAND_TABLE[i].command_fct != NULL &&
+        strcmp(parsed_command[0], AI_COMMAND_TABLE[i].command) == 0)
+            AI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
+        if (status == -1)
+            write_unknown_command(server->game_data.clients[idx]);
     }
 }
 
@@ -107,14 +131,16 @@ static void check_inside_buffer(server_handler_t *server,
     char ***parsed_buffer = parse_buffer((unsigned char *)buffer,
     strlen(buffer) + 1);
 
+    if (strlen(buffer) < 2) {
+        write_unknown_command(server->game_data.clients[idx]);
+        return;
+    }
     if (parsed_buffer == NULL) {
-        write_to_client(server->game_data.clients[idx].fd, UNKNOWN_COMMAND);
+        write_unknown_command(server->game_data.clients[idx]);
         return;
     }
     for (int i = 0; parsed_buffer[i] != NULL; i++) {
         check_which_command(server, parsed_buffer[i], idx);
-    }
-    for (int i = 0; parsed_buffer[i] != NULL; i++) {
         free_array(parsed_buffer[i]);
     }
     free(parsed_buffer);
@@ -132,11 +158,7 @@ static void launch_command(server_handler_t *server,
             set_ai_client(server, buffer, idx);
             return;
         }
-        write_to_client(idx, UNKNOWN_COMMAND);
-        return;
-    }
-    if (strlen(buffer) < 2) {
-        write_to_client(server->game_data.clients[idx].fd, UNKNOWN_COMMAND);
+        write_to_client(idx, AI_UNKNOWN_COMMAND);
         return;
     }
     check_inside_buffer(server, buffer, idx);
