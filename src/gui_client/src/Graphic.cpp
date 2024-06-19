@@ -84,14 +84,14 @@ bool ISprite::loadTexture(const std::string &textureFile)
     return true;
 }
 
-Player::Player(const std::string &textureFile) : ISprite(textureFile)
-{
-}
+// Player::Player(const std::string &textureFile) : ISprite(textureFile)
+// {
+// }
 
-void Player::draw(sf::RenderWindow &window) const
-{
-    window.draw(sprite);
-}
+// void Player::draw(sf::RenderWindow &window) const
+// {
+//     window.draw(sprite);
+// }
 
 Resource::Resource(const std::string &textureFile) : ISprite(textureFile), mapWidth(0), mapHeight(0)
 {
@@ -166,4 +166,17 @@ void Resource::draw(sf::RenderWindow &window) const
     for (const auto& material : materials) {
         window.draw(material.sprite);
     }
+}
+
+void Resource::addResourceAt(const std::string &type, int x, int y)
+{
+    if (materialTextures.find(type) == materialTextures.end()) {
+        return;
+    }
+
+    sf::Sprite materialSprite;
+    materialSprite.setTexture(materialTextures[type]);
+    materialSprite.setPosition(x * 128.0f, y * 128.0f);
+
+    materials.push_back({ materialSprite, type });
 }
