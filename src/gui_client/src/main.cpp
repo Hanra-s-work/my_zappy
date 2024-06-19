@@ -7,6 +7,7 @@
 
 #include "Graphic.hpp"
 #include "Player.hpp"
+#include "Game.hpp"
 
 /**
  * @brief This is the function the compiler calls to successfully compile the program
@@ -19,7 +20,6 @@ int main(int argc, char **argv)
 {
     Graphic graphic;
     graphic.initWindow(1920, 1080, "My Zappy");
-    // Player player("path/to/player/texture.png");
     Resource resource("asset/flower_grass.png");
 
     sf::Clock clock;
