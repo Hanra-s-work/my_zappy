@@ -297,6 +297,13 @@ class Logistics:
 
         pdebug(self.global_variables, f"Incoming response =  {response}")
 
+        if Commands.MESSAGE in response:
+            pinfo(
+                self.global_variables,
+                f"Received message: {response[Commands.MESSAGE]}"
+            )
+            return status
+
         if self.stall is True and Commands.UNKNOWN in response and response[Commands.UNKNOWN] == 'ok':
             self.stall = False
             self.sabotage = True
