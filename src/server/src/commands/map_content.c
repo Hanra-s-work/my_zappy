@@ -12,36 +12,49 @@
 #include "server_handler.h"
 #include "commands.h"
 
-static void write_tile_resource(server_handler_t *server, int x, int y,
+static void write_tile_resource(server_handler_t *server, map_t *tile,
     const int idx)
 {
     write(server->game_data.clients[idx].fd,
-        server->game_data->map[x][y].ressources.food_nb, sizeof(int));
+        tile->ressources.food_nb, sizeof(int));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
     write(server->game_data.clients[idx].fd,
-        server->game_data->map[x][y].ressources.linemate_nb, sizeof(int));
+        tile->ressources.linemate_nb, sizeof(int));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
     write(server->game_data.clients[idx].fd,
-        server->game_data->map[x][y].ressources.deraumere_nb, sizeof(int));
+        tile->ressources.deraumere_nb, sizeof(int));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
     write(server->game_data.clients[idx].fd,
-        server->game_data->map[x][y].ressources.sibur_nb, sizeof(int));
+        tile->ressources.sibur_nb, sizeof(int));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
     write(server->game_data.clients[idx].fd,
-        server->game_data->map[x][y].ressources.mendiane_nb, sizeof(int));
+        tile->ressources.mendiane_nb, sizeof(int));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
     write(server->game_data.clients[idx].fd,
-        server->game_data->map[x][y].ressources.phiras_nb, sizeof(int));
+        tile->ressources.phiras_nb, sizeof(int));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
     write(server->game_data.clients[idx].fd,
-        server->game_data->map[x][y].ressources.thystame_nb, sizeof(int));
+        tile->ressources.thystame_nb, sizeof(int));
+}
+
+map_t *get_tile_content(server_handler_t *server, int x, int y)
+{
+    map_t *tile = malloc(sizeof(map_t));
+
+    if (tile == NULL)
+        return (NULL);
+    memcpy(tile, &server->game_data.map[x][y], sizeof(map_t));
+    return (tile);
 }
 
 int tile_content_request(server_handler_t *server, char **args, const int idx)
 {
     int x = atoi(args[1]);
     int y = atoi(args[2]);
+    map_t *tile = get_tile_content(server, x, y);
 
+    if (tile == NULL)
+        return (EXIT_FAILURE);
     write(server->game_data.clients[idx].fd, TILE_CONTENT_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
@@ -51,6 +64,7 @@ int tile_content_request(server_handler_t *server, char **args, const int idx)
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
     write_map_resource(server, x, y, idx)
     write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR, 1));
+    free(tile);
     return (EXIT_SUCCESS);
 }
 
@@ -60,7 +74,11 @@ static int get_y_tiles(server_handler_t *server, char **tile_command,
     for (int j = 0; j < server->game_data.map_size[1]; ++j) {
             if (asprintf(&tile_command[2], "%d", j) == -1)
                 return (EXIT_FAILURE);
-            tile_content_request(server, tile_command, idx);
+            if (tile_content_request(server, tile_command, idx)
+                == EXIT_FAILURE) {
+                free(tile_command[2]);
+                return (EXIT_FAILURE);
+            }
             free(tile_command[2]);
     }
     return (EXIT_SUCCESS);
