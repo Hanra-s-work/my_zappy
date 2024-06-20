@@ -5,6 +5,7 @@
 # logistics_thread.py
 ##
 
+import os
 import sys
 from datetime import datetime
 
@@ -41,6 +42,12 @@ class Logistics:
             "left": self._left,
             "right": self._right
         }
+        # Internal name
+        self.internal_name = 0
+        # Message vars
+        self.message_key: str = f"e56r4ze56r4ze56{self.global_variables.user_arguments.name}: "
+        self.nb_sent_messages: int = 0
+        self.message_sent: list = []
 
     def _create_random_seed(self) -> int:
         """_summary_
@@ -50,8 +57,22 @@ class Logistics:
         """
         c_time = datetime.now()
         final_seed = c_time.hour + c_time.minute + c_time.second + c_time.microsecond
+        final_seed += os.getpid()
         pinfo(self.global_variables, f"Generated seed: {final_seed}")
         return final_seed
+
+    def send_message(self, message: str) -> None:
+        """_summary_
+        This function is in charge of sending a message to the server
+        Args:
+            message (str): _description_: The message to be sent
+        """
+        self.global_variables.response_buffer.append(
+            f"{self.message_key} {self.message_sent} '{message}'\n"
+        )
+        self.nb_sent_messages += 1
+        self.message_sent.append(message)
+        self.global_variables.response_buffer.append(message)
 
     def _forward(self) -> None:
         """_summary_
@@ -307,7 +328,8 @@ class Logistics:
             return status
 
         node = list(response)[0]
-        if self.stall is True and isinstance(response[node], str) is True and "Current level:" in response:
+
+        if self.stall is True and isinstance(response[node], str) is True and "Current level:" in response[node]:
             self.stall = False
             data: list[str] = response[node].split(" ")
             while '' == data[-1]:
@@ -318,11 +340,21 @@ class Logistics:
                     self.evolution_level += 1
                 else:
                     self.evolution_level = level
-
-        if Commands.INCANTATION in response and response[Commands.INCANTATION].lower() == "ko" and self.evolution_level > 1:
+                psuccess(
+                    self.global_variables,
+                    f"Evolution to level {self.evolution_level}"
+                )
+            else:
+                perror(
+                    self.global_variables,
+                    f"Evolution failed\nNumber not found in the response: '{response[node]}'"
+                )
             self._change_my_mind()
 
-        if response[list(response)[0]] in ("ko", "KO", "Ko", "kO"):
+        elif Commands.INCANTATION in response and response[Commands.INCANTATION].lower() == "ko" and self.evolution_level > 1:
+            self._change_my_mind()
+
+        elif isinstance(response[node], str) and response[node].lower() == "ko":
             perror(
                 self.global_variables,
                 f"Command = '{self._to_human_readable(list(response)[0])}' failed"
@@ -330,7 +362,7 @@ class Logistics:
             self._append_look_command()
             return self.global_variables.success
 
-        if Commands.LOOK in response:
+        elif Commands.LOOK in response:
             psuccess(self.global_variables, f"Look response = {response}")
             self.tile_content = response[Commands.LOOK]
             if self._can_evolve(response[Commands.LOOK]) is True:
