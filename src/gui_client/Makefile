@@ -11,6 +11,9 @@ SRC	=	./src/sub_main.cpp	\
 		./src/ArgumentHandling.cpp	\
 		./src/Parsing.cpp	\
 		./src/Graphic.cpp	\
+		./src/Player.cpp	\
+		./src/NetworkClient.cpp	\
+		./src/Game.cpp
 
 CXX	=	g++
 
@@ -20,11 +23,13 @@ OBJ	=	$(SRC:.cpp=.o)
 
 OBJ_MAIN	=	$(SRC_MAIN:.cpp=.o)
 
-CXXFLAGS	=	-Wall -Wextra
+CXXFLAGS	=	 -Wall -Wextra
+
+THREAD_FLAGS	=	-pthread
 
 CPPFLAGS	=	-iquote ./include
 
-LDLIBS	=	-lsfml-audio -lsfml-graphics -lsfml-window -lsfml-system
+LDLIBS	=	-lsfml-audio -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network
 
 LDFLAGS	=	-L.
 
