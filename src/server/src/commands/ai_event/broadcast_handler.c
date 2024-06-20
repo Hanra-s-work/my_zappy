@@ -29,7 +29,7 @@ void do_broadcast(server_handler_t *server, event_t event)
 int add_broadcast(server_handler_t *server, char **parsed_command,
     const int idx)
 {
-    int i = 0;
+    int i = 1;
 
     if (get_array_len(parsed_command) != 2) {
         return (-1);

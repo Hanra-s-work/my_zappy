@@ -5,14 +5,28 @@
 ** forward_handler
 */
 
+#include "show.h"
 #include "utils.h"
+#include "ai_event.h"
 #include "command_parse.h"
 #include "server_handler.h"
+#include "client_management.h"
+
+void do_forward(server_handler_t *server, event_t event)
+{
+    int idx = get_client(server->game_data.clients, event.fd);
+
+    go_in_good_direction(&server->game_data, idx,
+    &server->game_data.clients[idx].pos[0],
+    &server->game_data.clients[idx].pos[1]);
+    write_to_client(event.fd, ALL_FINE);
+    show_game_data(server, true);
+}
 
 int add_forward(server_handler_t *server, char **parsed_command,
     const int idx)
 {
-    int i = 0;
+    int i = 1;
 
     if (get_array_len(parsed_command) != 1) {
         return (-1);

@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+#include "show.h"
 #include "utils.h"
 #include "ai_event.h"
 #include "server_handler.h"
@@ -40,35 +41,38 @@ static void check_food_spawn(game_data_t *game)
     game->event[0].time_counter = SPAWN_TIME;
 }
 
-static void check_which_event_2(game_data_t *game, const int idx)
+static void check_which_event_2(server_handler_t *server, const int idx)
 {
-    if (game->event[idx].type == FORK)
-        return;
-    if (game->event[idx].type == EJECT)
-        return;
-    if (game->event[idx].type == TAKE)
-        return;
-    if (game->event[idx].type == SET)
-        return;
-    if (game->event[idx].type == INCANTATION)
-        return;
+    int i = get_client(server->game_data.clients,
+    server->game_data.event[idx].fd);
+
+    if (server->game_data.event[idx].type == FORK)
+        do_fork(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == EJECT)
+        do_eject(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == TAKE)
+        do_eject(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == SET)
+        do_set(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == INCANTATION)
+        check_incantation_condition(&server->game_data, idx, i, false);
 }
 
-static void check_which_event(game_data_t *game, const int idx)
+static void check_which_event(server_handler_t *server, const int idx)
 {
-    if (game->event[idx].type == FORWARD)
-        return;
-    if (game->event[idx].type == LEFT_EVENT)
-        return;
-    if (game->event[idx].type == RIGHT_EVENT)
-        return;
-    if (game->event[idx].type == LOOK)
-        return;
-    if (game->event[idx].type == INVENTORY)
-        return;
-    if (game->event[idx].type == BROADCAST)
-        return;
-    check_which_event_2(game, idx);
+    if (server->game_data.event[idx].type == FORWARD)
+        do_forward(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == LEFT_EVENT)
+        do_left(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == RIGHT_EVENT)
+        do_right(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == LOOK)
+        do_look(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == INVENTORY)
+        do_inventory(server, server->game_data.event[idx]);
+    if (server->game_data.event[idx].type == BROADCAST)
+        do_broadcast(server, server->game_data.event[idx]);
+    check_which_event_2(server, idx);
 }
 
 void check_event(server_handler_t *server)
@@ -81,7 +85,7 @@ void check_event(server_handler_t *server)
         }
         server->game_data.event[i].time_counter--;
         if (server->game_data.event[i].time_counter == 0) {
-            check_which_event(&server->game_data, i);
+            check_which_event(server, i);
             delete_event(&server->game_data.event[i]);
         }
     }

@@ -8,11 +8,36 @@
 #include "utils.h"
 #include "command_parse.h"
 #include "server_handler.h"
+#include "client_management.h"
+
+void do_left(server_handler_t *server, event_t event)
+{
+    int idx = get_client(server->game_data.clients, event.fd);
+    bool turned = false;
+
+    if (server->game_data.clients[idx].direction == UP && turned == false) {
+        server->game_data.clients[idx].direction = LEFT;
+        turned = true;
+    }
+    if (server->game_data.clients[idx].direction == LEFT && turned == false) {
+        server->game_data.clients[idx].direction = DOWN;
+        turned = true;
+    }
+    if (server->game_data.clients[idx].direction == DOWN && turned == false) {
+        server->game_data.clients[idx].direction = RIGHT;
+        turned = true;
+    }
+    if (server->game_data.clients[idx].direction == RIGHT && turned == false) {
+        server->game_data.clients[idx].direction = UP;
+        turned = true;
+    }
+    write_to_client(event.fd, ALL_FINE);
+}
 
 int add_left(server_handler_t *server, char **parsed_command,
     const int idx)
 {
-    int i = 0;
+    int i = 1;
 
     if (get_array_len(parsed_command) != 1) {
         return (-1);

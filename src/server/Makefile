@@ -7,31 +7,44 @@
 
 SRC_MAIN	=	./src/main.c
 
-SRC	=	./src/sub_main.c						\
+SRC	=	./src/sub_main.c								\
 \
-		./src/utils/finder.c					\
-		./src/utils/free.c						\
-		./src/utils/writer.c					\
-		./src/utils/fill.c						\
-		./src/utils/array_utils.c				\
-		./src/utils/array_to_str.c				\
+		./src/utils/finder.c							\
+		./src/utils/free.c								\
+		./src/utils/writer.c							\
+		./src/utils/fill.c								\
+		./src/utils/array_utils.c						\
+		./src/utils/array_to_str.c						\
 \
-		./src/parsing/arg_parse.c				\
-		./src/parsing/check_arg_mandatory.c		\
-		./src/parsing/parameter_utils.c			\
-		./src/parsing/check_values_validity.c 	\
-		./src/parsing/command_parse.c			\
+		./src/parsing/arg_parse.c						\
+		./src/parsing/check_arg_mandatory.c				\
+		./src/parsing/parameter_utils.c					\
+		./src/parsing/check_values_validity.c 			\
+		./src/parsing/command_parse.c					\
 \
-		./src/server/server_initialization.c	\
-		./src/server/game_data_initialization.c	\
-		./src/server/client_management.c 		\
-		./src/server/server_loop.c				\
-		./src/server/command_handling.c			\
-		./src/server/check_event.c				\
+		./src/server/server_initialization.c			\
+		./src/server/game_data_initialization.c			\
+		./src/server/client_management.c 				\
+		./src/server/server_loop.c						\
+		./src/server/command_handling.c					\
+		./src/server/check_event.c						\
 \
-		./src/commands/ai_event/event_utils.c	\
+		./src/commands/ai_event/event_utils.c			\
+		./src/commands/ai_event/broadcast_handler.c		\
+		./src/commands/ai_event/connect_handler.c		\
+		./src/commands/ai_event/eject_handler.c			\
+		./src/commands/ai_event/fork_handler.c			\
+		./src/commands/ai_event/forward_handler.c		\
+		./src/commands/ai_event/incantation_handler.c	\
+		./src/commands/ai_event/incantation_sender.c	\
+		./src/commands/ai_event/inventory_handler.c		\
+		./src/commands/ai_event/left_handler.c			\
+		./src/commands/ai_event/right_handler.c			\
+		./src/commands/ai_event/set_handler.c			\
+		./src/commands/ai_event/take_handler.c			\
+		./src/commands/ai_event/look_handler.c			\
 \
-		./src/show/show_game_data.c				\
+		./src/show/show_game_data.c						\
 
 SRC_TEST	=	./tests/arg_parser_test.c
 

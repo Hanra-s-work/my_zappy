@@ -9,10 +9,16 @@
 #include "command_parse.h"
 #include "server_handler.h"
 
+void do_take(server_handler_t *server, event_t event)
+{
+    (void)server;
+    (void)event;
+}
+
 int add_take(server_handler_t *server, char **parsed_command,
     const int idx)
 {
-    int i = 0;
+    int i = 1;
 
     if (get_array_len(parsed_command) != 2) {
         return (-1);

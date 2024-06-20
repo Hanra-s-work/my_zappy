@@ -15,8 +15,7 @@
 static int search_player(game_data_t *game, const int i, const int idx,
     const size_t size)
 {
-    int player_pos[2] = game->clients[idx].pos;
-    int nb = 0;
+    size_t nb = 0;
 
     game->event[i].indexes = malloc(sizeof(int) * (size + 1));
     if (game->event[i].indexes == NULL)
@@ -40,7 +39,7 @@ static int search_player(game_data_t *game, const int i, const int idx,
 static int check_level_1(game_data_t *game, const int i, const int idx,
     const bool is_start)
 {
-    int player_pos[2] = game->clients[idx].pos;
+    int *player_pos = game->clients[idx].pos;
 
     if (game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 1) {
         return (-1);
@@ -51,7 +50,7 @@ static int check_level_1(game_data_t *game, const int i, const int idx,
 static int check_level_2(game_data_t *game, const int i, const int idx,
     const bool is_start)
 {
-    int player_pos[2] = game->clients[idx].pos;
+    int *player_pos = game->clients[idx].pos;
 
     if (game->map[player_pos[1]][player_pos[0]].player_nb < 2 ||
     game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 1 ||
@@ -67,31 +66,87 @@ static int check_level_2(game_data_t *game, const int i, const int idx,
 static int check_level_3(game_data_t *game, const int i, const int idx,
     const bool is_start)
 {
-    return (0);
+    int *player_pos = game->clients[idx].pos;
+
+    if (game->map[player_pos[1]][player_pos[0]].player_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb < 1)
+        return (-1);
+    if (search_player(game, i, idx, 1) == -1) {
+        return (-1);
+    }
+    return (send_success(game, i, idx, is_start));
 }
 
 static int check_level_4(game_data_t *game, const int i, const int idx,
     const bool is_start)
 {
-    return (0);
+    int *player_pos = game->clients[idx].pos;
+
+    if (game->map[player_pos[1]][player_pos[0]].player_nb < 4 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 1 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb < 1 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb < 1 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb < 2)
+        return (-1);
+    if (search_player(game, i, idx, 3) == -1) {
+        return (-1);
+    }
+    return (send_success(game, i, idx, is_start));
 }
 
 static int check_level_5(game_data_t *game, const int i, const int idx,
     const bool is_start)
 {
-    return (0);
+    int *player_pos = game->clients[idx].pos;
+
+    if (game->map[player_pos[1]][player_pos[0]].player_nb < 4 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 1 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.mendiane_nb < 3 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb < 1)
+        return (-1);
+    if (search_player(game, i, idx, 3) == -1) {
+        return (-1);
+    }
+    return (send_success(game, i, idx, is_start));
 }
 
 static int check_level_6(game_data_t *game, const int i, const int idx,
     const bool is_start)
 {
-    return (0);
+    int *player_pos = game->clients[idx].pos;
+
+    if (game->map[player_pos[1]][player_pos[0]].player_nb < 6 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 1 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb < 1 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb < 3)
+        return (-1);
+    if (search_player(game, i, idx, 5) == -1) {
+        return (-1);
+    }
+    return (send_success(game, i, idx, is_start));
 }
 
 static int check_level_7(game_data_t *game, const int i, const int idx,
     const bool is_start)
 {
-    return (0);
+    int *player_pos = game->clients[idx].pos;
+
+    if (game->map[player_pos[1]][player_pos[0]].player_nb < 6 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.mendiane_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb < 2 ||
+    game->map[player_pos[1]][player_pos[0]].ressources.thystame_nb < 1)
+        return (-1);
+    if (search_player(game, i, idx, 5) == -1) {
+        return (-1);
+    }
+    return (send_success(game, i, idx, is_start));
 }
 
 int check_incantation_condition(game_data_t *game, const int i, const int idx,
@@ -119,7 +174,7 @@ int check_incantation_condition(game_data_t *game, const int i, const int idx,
 int add_incantation(server_handler_t *server, char **parsed_command,
     const int idx)
 {
-    int i = 0;
+    int i = 1;
 
     if (get_array_len(parsed_command) != 1)
         return (-1);

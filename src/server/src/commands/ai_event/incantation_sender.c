@@ -15,7 +15,7 @@
 static char *start_other(game_data_t game, const int *indexes, const int idx,
     const int x)
 {
-    char str[MAX_BUFFER_SIZE];
+    char *str = NULL;
 
     if (x == 3)
         sprintf(str, "pic %d %d %d #%d #%d #%d #%d\n",
@@ -60,10 +60,67 @@ static void send_start(game_data_t game, const int *indexes, const int idx)
     write_to_graphics_clients(game.clients, str);
 }
 
-static void send_end(game_data_t *game, const int *indexes, const idx)
+static void remove_ressources_lvl_7(game_data_t *game, const int idx,
+    const int *player_pos)
+{
+    if (game->clients[idx].level == 7) {
+        game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.mendiane_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.thystame_nb--;
+    }
+}
+
+static void remove_ressources_2(game_data_t *game, const int idx,
+    const int *player_pos)
+{
+    if (game->clients[idx].level == 4) {
+        game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb--;
+    }
+    if (game->clients[idx].level == 5) {
+        game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.mendiane_nb -= 3;
+    }
+    if (game->clients[idx].level == 6) {
+        game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb -= 3;
+        game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb--;
+    }
+    remove_ressources_lvl_7(game, idx, player_pos);
+}
+
+static void remove_ressources(game_data_t *game, const int idx)
+{
+    int *player_pos = game->clients[idx].pos;
+
+    if (game->clients[idx].level == 1)
+        game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb--;
+    if (game->clients[idx].level == 2) {
+        game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.deraumere_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb--;
+    }
+    if (game->clients[idx].level == 3) {
+        game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb -= 2;
+        game->map[player_pos[1]][player_pos[0]].ressources.sibur_nb--;
+        game->map[player_pos[1]][player_pos[0]].ressources.phiras_nb -= 2;
+    }
+    remove_ressources_2(game, idx, player_pos);
+}
+
+static void send_end(game_data_t *game, const int *indexes, const int idx)
 {
     char str[MAX_BUFFER_SIZE];
 
+    remove_ressources(game, idx);
     game->clients[idx].level++;
     sprintf(str, "Current level: %d\n", game->clients[idx].level);
     write_to_client(game->clients[idx].fd, str);
@@ -71,7 +128,6 @@ static void send_end(game_data_t *game, const int *indexes, const idx)
         game->clients[indexes[i]].level++;
         write_to_client(game->clients[indexes[i]].fd, str);
     }
-    memset(str, '\0', MAX_BUFFER_SIZE);
     sprintf(str, "pie %d %d success\n", game->clients[idx].pos[0],
     game->clients[idx].pos[1]);
     write_to_graphics_clients(game->clients, str);

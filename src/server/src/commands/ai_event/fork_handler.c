@@ -5,9 +5,17 @@
 ** fork_handler
 */
 
+#include <stdio.h>
+
 #include "utils.h"
 #include "command_parse.h"
 #include "server_handler.h"
+
+void do_fork(server_handler_t *server, event_t event)
+{
+    (void)server;
+    (void)event;
+}
 
 static void send_to_gui_fork_started(server_handler_t *server,
     const cli_t client)
@@ -21,7 +29,7 @@ static void send_to_gui_fork_started(server_handler_t *server,
 int add_fork(server_handler_t *server, char **parsed_command,
     const int idx)
 {
-    int i = 0;
+    int i = 1;
 
     if (get_array_len(parsed_command) != 1)
         return (-1);
