@@ -45,7 +45,7 @@ static int check_level_1(game_data_t *game, const int i, const int idx,
     if (game->map[player_pos[1]][player_pos[0]].ressources.linemate_nb < 1) {
         return (-1);
     }
-    return (0);
+    return (send_success(game, i, idx, is_start));
 }
 
 static int check_level_2(game_data_t *game, const int i, const int idx,
@@ -61,7 +61,7 @@ static int check_level_2(game_data_t *game, const int i, const int idx,
     if (search_player(game, i, idx, 1) == -1) {
         return (-1);
     }
-    return (send_success(&game, i, idx, is_start));
+    return (send_success(game, i, idx, is_start));
 }
 
 static int check_level_3(game_data_t *game, const int i, const int idx,

@@ -5,9 +5,26 @@
 ** broadcast_handler
 */
 
+#include <string.h>
+
 #include "utils.h"
 #include "command_parse.h"
 #include "server_handler.h"
+#include "client_management.h"
+
+void do_broadcast(server_handler_t *server, event_t event)
+{
+    int idx = get_client(server->game_data.clients, event.fd);
+
+    write_to_client(event.fd, ALL_FINE);
+    for (int i = 0; i < MAX_CLIENT; i++) {
+        if (i == idx || server->game_data.clients[i].team_name == NULL ||
+        strcmp(server->game_data.clients[i].team_name, GUI_TEAM_NAME) == 0) {
+            continue;
+        }
+        write_to_client(server->game_data.clients[i].fd, ALL_FINE);
+    }
+}
 
 int add_broadcast(server_handler_t *server, char **parsed_command,
     const int idx)

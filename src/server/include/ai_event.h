@@ -13,8 +13,13 @@
 // EVENT UTILS
 
 void delete_event(event_t *event);
+
 void delete_all_event(event_t event[MAX_EVENT]);
-int send_success(game_data_t *game, const int *indexes, const int idx,
+
+int send_success(game_data_t *game, const int i, const int idx,
+    const bool is_start);
+
+int check_incantation_condition(game_data_t *game, const int i, const int idx,
     const bool is_start);
 
 
@@ -58,5 +63,9 @@ int add_take(server_handler_t *server, char **parsed_command,
 
 int do_connect(server_handler_t *server, char **parsed_command,
     const int idx);
+
+void do_broadcast(server_handler_t *server, event_t event);
+
+void do_eject(server_handler_t *server, event_t event);
 
 #endif /* !AI_EVENT_H_ */
