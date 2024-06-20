@@ -49,8 +49,11 @@
 
     // !! COMMAND_CONSTANT !!
 
-    #define COMMAND_DELIMITER   ' '
-    #define COMMAND_SEPARATOR   '\n'
+    #define COMMAND_DELIMITER       ' '
+    #define COMMAND_SEPARATOR       '\n'
+
+    #define COMMAND_DELIMITER_STR   " "
+    #define COMMAND_SEPARATOR_STR   "\n"
 
     #define CLIENT_COMMAND_NB   13
     #define GUI_COMMAND_NB      9

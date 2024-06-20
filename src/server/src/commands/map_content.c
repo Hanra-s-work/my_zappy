@@ -16,25 +16,25 @@ static void write_tile_resource(server_handler_t *server, map_t *tile,
     const int idx)
 {
     write(server->game_data.clients[idx].fd,
-        tile->ressources.food_nb, sizeof(int));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+        &tile->ressources.food_nb, sizeof(int));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        tile->ressources.linemate_nb, sizeof(int));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+        &tile->ressources.linemate_nb, sizeof(int));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        tile->ressources.deraumere_nb, sizeof(int));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+        &tile->ressources.deraumere_nb, sizeof(int));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        tile->ressources.sibur_nb, sizeof(int));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+        &tile->ressources.sibur_nb, sizeof(int));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        tile->ressources.mendiane_nb, sizeof(int));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+        &tile->ressources.mendiane_nb, sizeof(int));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        tile->ressources.phiras_nb, sizeof(int));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+        &tile->ressources.phiras_nb, sizeof(int));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        tile->ressources.thystame_nb, sizeof(int));
+        &tile->ressources.thystame_nb, sizeof(int));
 }
 
 int tile_content_request(server_handler_t *server, char **args, const int idx)
@@ -47,13 +47,13 @@ int tile_content_request(server_handler_t *server, char **args, const int idx)
         return (EXIT_FAILURE);
     write(server->game_data.clients[idx].fd, TILE_CONTENT_COMMAND,
         COMMAND_ID_LEN);
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd, args[1], strlen(args[1]));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd, args[2], strlen(args[2]));
-    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1));
-    write_map_resource(server, x, y, idx)
-    write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR, 1));
+    write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
+    write_tile_resource(server, tile, idx);
+    write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR_STR, 1);
     free(tile);
     return (EXIT_SUCCESS);
 }

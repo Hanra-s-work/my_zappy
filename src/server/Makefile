@@ -9,6 +9,12 @@ SRC_MAIN	=	./src/main.c
 
 SRC	=	./src/sub_main.c						\
 \
+		./src/commands/gui/zappy_info.c			\
+		./src/commands/map_content.c		\
+		./src/commands/player_info.c		\
+		./src/commands/sbp.c				\
+		./src/commands/tile_content.c		\
+\
 		./src/utils/finder.c					\
 		./src/utils/free.c						\
 		./src/utils/writer.c					\

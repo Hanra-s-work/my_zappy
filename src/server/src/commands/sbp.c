@@ -6,6 +6,7 @@
 */
 
 #include <unistd.h>
+#include "commands.h"
 
 int command_parameter_error(server_handler_t *server, char **args, const int
     idx)
@@ -13,6 +14,6 @@ int command_parameter_error(server_handler_t *server, char **args, const int
     (void) args;
     write(server->game_data.clients[idx].fd, COMMAND_PARAMETER_ERROR,
             COMMAND_ID_LEN);
-    write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR, 1);
+    write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR_STR, 1);
     return (0);
 }
