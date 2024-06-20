@@ -12,6 +12,7 @@
     #include <sys/types.h>
 
     #include "commands.h"
+    #include "ai_event.h"
     #include "constants.h"
     #include "server_handler.h"
 
@@ -50,18 +51,18 @@ char **parse_command(char *str);
 char ***parse_buffer(uint8_t *buffer, ssize_t buf_size);
 
 static const struct command_s AI_COMMAND_TABLE[AI_COMMAND_NB] = {
-    { "Forward", "", 0, NULL },
-    { "Right", "", 0, NULL },
-    { "Left", "", 0, NULL },
-    { "Look", "", 0, NULL },
-    { "Inventory", "", 0, NULL },
-    { "Broadcast", "", 1, NULL },
-    { "Connect_nbr", "", 0, NULL },
-    { "Fork", "", 0, NULL },
-    { "Eject", "", 0, NULL },
-    { "Take", "", 1, NULL },
-    { "Set", "", 1, NULL },
-    { "Incantation", "", 0, NULL },
+    { "Forward", "", 0, &add_forward },
+    { "Right", "", 0, &add_right },
+    { "Left", "", 0, &add_left },
+    { "Look", "", 0, &add_look },
+    { "Inventory", "", 0, &add_inventory },
+    { "Broadcast", "", 1, &add_broadcast },
+    { "Connect_nbr", "", 0, &do_connect },
+    { "Fork", "", 0, &add_fork },
+    { "Eject", "", 0, &add_eject },
+    { "Take", "", 1, &add_take },
+    { "Set", "", 1, &add_set },
+    { "Incantation", "", 0, &add_incantation },
 };
 
 // static const struct command_s GUI_COMMAND_TABLE[GUI_COMMAND_NB] = {
@@ -90,18 +91,18 @@ static const struct command_s GUI_COMMAND_TABLE[GUI_COMMAND_NB] = {
 
 static const struct command_s
     COMMAND_TABLE[GUI_COMMAND_NB + AI_COMMAND_NB] = {
-    { "Forward", "", 0, NULL },
-    { "Right", "", 0, NULL },
-    { "Left", "", 0, NULL },
-    { "Look", "", 0, NULL },
-    { "Inventory", "", 0, NULL },
-    { "Broadcast", "", 1, NULL },
-    { "Connect_nbr", "", 0, NULL },
-    { "Fork", "", 0, NULL },
-    { "Eject", "", 0, NULL },
-    { "Take", "", 1, NULL },
-    { "Set", "", 1, NULL },
-    { "Incantation", "", 0, NULL },
+    { "Forward", "", 0, &add_forward },
+    { "Right", "", 0, &add_right },
+    { "Left", "", 0, &add_left },
+    { "Look", "", 0, &add_look },
+    { "Inventory", "", 0, &add_inventory },
+    { "Broadcast", "", 1, &add_broadcast },
+    { "Connect_nbr", "", 0, &do_connect },
+    { "Fork", "", 0, &add_fork },
+    { "Eject", "", 0, &add_eject },
+    { "Take", "", 1, &add_take },
+    { "Set", "", 1, &add_set },
+    { "Incantation", "", 0, &add_incantation },
     { "msz", "", 0, NULL },
     { "bct", "", 2, NULL },
     { "mct", "", 0, NULL },

@@ -12,6 +12,7 @@
 
     #define ERROR 84
     #define MAX_BUFFER_SIZE 1024
+    #define INSANE_BUFFER_SIZE 5000
     #define MAX_CLIENT 1024
     #define UNKNOWN -1
 

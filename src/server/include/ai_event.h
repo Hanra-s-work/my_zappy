@@ -22,6 +22,8 @@ int send_success(game_data_t *game, const int i, const int idx,
 int check_incantation_condition(game_data_t *game, const int i, const int idx,
     const bool is_start);
 
+void go_in_good_direction(game_data_t *game, const int idx, int *x, int *y);
+
 
 
 // COMMAND ADDER
@@ -67,5 +69,21 @@ int do_connect(server_handler_t *server, char **parsed_command,
 void do_broadcast(server_handler_t *server, event_t event);
 
 void do_eject(server_handler_t *server, event_t event);
+
+void do_forward(server_handler_t *server, event_t event);
+
+void do_fork(server_handler_t *server, event_t event);
+
+void do_left(server_handler_t *server, event_t event);
+
+void do_look(server_handler_t *server, event_t event);
+
+void do_right(server_handler_t *server, event_t event);
+
+void do_set(server_handler_t *server, event_t event);
+
+void do_take(server_handler_t *server, event_t event);
+
+void do_inventory(server_handler_t *server, event_t event);
 
 #endif /* !AI_EVENT_H_ */
