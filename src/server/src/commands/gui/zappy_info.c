@@ -6,6 +6,7 @@
 */
 
 #include <unistd.h>
+#include <string.h>
 #include "server_handler.h"
 #include "commands.h"
 
@@ -27,7 +28,14 @@ int map_size_request(server_handler_t *server, char **args, const int idx)
 
 int all_team_name_request(server_handler_t *server, char **args, const int idx)
 {
-    (void) args;
+    for (int i = 0; server->game_data.teams[i].team_name != NULL; ++i) {
+        write(server->game_data.clients[idx].fd, ALL_TEAM_COMMAND,
+            COMMAND_ID_LEN);
+        write(server->game_data.clients[idx].fd, COMMAND_DELIMITER, 1);
+        write(server->game_data.clients[idx].fd, server->game_data.teams[i]
+            .team_name, strlen(server->game_data.teams->team_name));
+        write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR, 1);
+    }
     return (EXIT_SUCCESS);
 }
 

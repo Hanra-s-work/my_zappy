@@ -12,7 +12,7 @@
 
     #define COMMAND_ID_LEN          3
     #define MAP_SIZE_COMMMAND           "msz"
-    #define TEAM_NAME_COMMAND           "tna"
+    #define ALL_TEAM_COMMAND            "tna"
     #define PLAYER_POSITION_COMMAND     "ppo"
     #define PLAYER_LEVEL_COMMAND        "plv"
     #define PLAYER_INVENTORY_COMMAND    "pin"
