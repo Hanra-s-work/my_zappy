@@ -306,7 +306,7 @@ class Logistics:
 
         if self.stall is True and Commands.UNKNOWN in response and response[Commands.UNKNOWN] == 'ok':
             self.stall = False
-            self.sabotage = True
+            self.sabotage = False
 
         if self.sabotage is True:
             self._change_my_mind()
