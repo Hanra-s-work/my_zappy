@@ -40,6 +40,6 @@ void write_unknown_command(const cli_t client)
     if (strcmp(client.team_name, GUI_TEAM_NAME) == 0) {
         write_to_client(client.fd, GUI_UNKNOWN_COMMAND);
     } else {
-        write_to_client(client.fd, AI_UNKNOWN_COMMAND);
+        write_to_client(client.fd, AI_COMMAND_FAILED);
     }
 }

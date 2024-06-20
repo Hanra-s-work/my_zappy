@@ -158,7 +158,7 @@ static void launch_command(server_handler_t *server,
             set_ai_client(server, buffer, idx);
             return;
         }
-        write_to_client(idx, AI_UNKNOWN_COMMAND);
+        write_to_client(idx, AI_COMMAND_FAILED);
         return;
     }
     check_inside_buffer(server, buffer, idx);

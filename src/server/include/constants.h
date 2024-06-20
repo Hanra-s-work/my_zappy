@@ -60,9 +60,10 @@
     //!! MESSAGE !!
 
     #define CONNEXION_FAILED "Failed to get connexion with the client.\n"
-    #define AI_UNKNOWN_COMMAND "ko\n"
+    #define AI_COMMAND_FAILED "ko\n"
     #define GUI_UNKNOWN_COMMAND "suc\n"
     #define ELEVATION_UNDERWAY "Elevation underway\n"
     #define AI_DIED "dead\n"
+    #define ALL_FINE "ok\n"
 
 #endif
