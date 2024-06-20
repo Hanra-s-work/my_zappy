@@ -75,35 +75,34 @@ static void send_new_client(cli_t clients[MAX_CLIENT],
     write_to_graphics_clients(clients, str);
 }
 
-static void set_ai_client(server_handler_t *s, const char buf[MAX_BUFFER_SIZE],
+static int set_ai_client(server_handler_t *s, const char b[MAX_BUFFER_SIZE],
     const int fd)
 {
     char str[MAX_BUFFER_SIZE];
 
     for (int i = 0; i < MAX_CLIENT; i++) {
-        if (strncmp(s->game_data.clients[i].team_name, buf,
-        strlen(buf) - 1) == 0 &&
+        if (s->game_data.clients[i].team_name != NULL &&
+        strncmp(s->game_data.clients[i].team_name, b, strlen(b) - 1) == 0 &&
         s->game_data.clients[i].fd == UNKNOWN) {
             s->game_data.clients[i].fd = fd;
             s->game_data.clients[i].is_connected = true;
-            memset(str, '\0', MAX_BUFFER_SIZE);
             sprintf(str, "%d\n", s->game_data.clients[i].client_num);
             write_to_client(fd, str);
-            memset(str, '\0', MAX_BUFFER_SIZE);
             sprintf(str, "%d %d\n", s->game_data.map_size[0],
             s->game_data.map_size[1]);
             write_to_client(fd, str);
             send_new_client(s->game_data.clients, s->game_data.clients[i]);
             remove_fd_from_queue(s, fd);
-            break;
+            return (0);
         }
     }
+    return (-1);
 }
 
 static void check_which_command(server_handler_t *server,
     char **parsed_command, const int idx)
 {
-    int status = 0;
+    int r = 0;
 
     for (int i = 0; i < GUI_COMMAND_NB; i++) {
         if (strcmp(server->game_data.clients[idx].team_name,
@@ -111,16 +110,16 @@ static void check_which_command(server_handler_t *server,
             break;
         if (GUI_COMMAND_TABLE[i].command_fct != NULL &&
         strcmp(parsed_command[0], GUI_COMMAND_TABLE[i].command) == 0)
-            GUI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
-        if (status == -1)
-            status = write_to_client(server->game_data.clients[idx].fd,
+            r = GUI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
+        if (r == -1)
+            r = write_to_client(server->game_data.clients[idx].fd,
             GUI_UNKNOWN_COMMAND);
     }
     for (int i = 0; i < AI_COMMAND_NB; i++) {
         if (AI_COMMAND_TABLE[i].command_fct != NULL &&
         strcmp(parsed_command[0], AI_COMMAND_TABLE[i].command) == 0)
-            AI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
-        if (status == -1)
+            r = AI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
+        if (r == -1)
             write_unknown_command(server->game_data.clients[idx]);
     }
 }
@@ -154,8 +153,8 @@ static void launch_command(server_handler_t *server,
             set_gui_client(server, idx);
             return;
         }
-        if (search_team_name(server, buffer) == 0) {
-            set_ai_client(server, buffer, idx);
+        if (search_team_name(server, buffer) == 0 &&
+        set_ai_client(server, buffer, idx) == 0) {
             return;
         }
         write_to_client(idx, AI_COMMAND_FAILED);

@@ -6,6 +6,8 @@
 */
 
 #include <unistd.h>
+
+#include "commands.h"
 #include "server_handler.h"
 
 int map_size_request(server_handler_t *server, char **args, const int idx)
