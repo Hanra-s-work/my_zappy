@@ -33,8 +33,8 @@ class Logistics:
         self.nb_responses = 0
         self.tile_content = []
         self.random_seed = self._create_random_seed()
+        self.evolution_level = 1
         self.stall = False
-        self.sabotage = False
         self.direction_options_list = ["forward", "left", "right"]
         self.direction_options = {
             "forward": self._forward,
@@ -232,6 +232,8 @@ class Logistics:
                 "(logistics) _can_evolve: The command is empty"
             )
             return False
+        if self.evolution_level > 1:
+            return True
         if Items.LINEMATE in command or "linemate" in command or "Linemate" in command:
             psuccess(
                 self.global_variables,
@@ -304,11 +306,20 @@ class Logistics:
             )
             return status
 
-        if self.stall is True and Commands.UNKNOWN in response and response[Commands.UNKNOWN] == 'ok':
+        node = list(response)[0]
+        if self.stall is True and isinstance(response[node], str) is True and "Current level:" in response:
             self.stall = False
-            self.sabotage = False
+            data: list[str] = response[node].split(" ")
+            while '' == data[-1]:
+                data.pop(-1)
+            if data[-1].isnumeric():
+                level = int(data[-1])
+                if self.evolution_level + 1 == level:
+                    self.evolution_level += 1
+                else:
+                    self.evolution_level = level
 
-        if self.sabotage is True:
+        if Commands.INCANTATION in response and response[Commands.INCANTATION].lower() == "ko" and self.evolution_level > 1:
             self._change_my_mind()
 
         if response[list(response)[0]] in ("ko", "KO", "Ko", "kO"):
@@ -343,7 +354,7 @@ class Logistics:
         elif Commands.FORWARD in response and response[Commands.FORWARD].lower() == "ok":
             self._append_look_command()
 
-        elif Commands.INCANTATION in response and response[Commands.INCANTATION] == "Elevation Underway":
+        elif Commands.INCANTATION in response and response[Commands.INCANTATION] == "Elevation underway":
             self.stall = True
 
         else:
