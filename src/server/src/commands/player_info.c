@@ -6,6 +6,7 @@
 */
 
 #include <unistd.h>
+
 #include "commands.h"
 
 int player_position_request(server_handler_t *server, char **args,

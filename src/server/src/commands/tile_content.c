@@ -6,6 +6,7 @@
 */
 
 #include <string.h>
+
 #include "server_handler.h"
 
 map_t *get_tile_content(server_handler_t *server, int x, int y)

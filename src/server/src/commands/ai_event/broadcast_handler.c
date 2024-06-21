@@ -22,7 +22,6 @@ void do_broadcast(server_handler_t *server, event_t event)
         strcmp(server->game_data.clients[i].team_name, GUI_TEAM_NAME) == 0) {
             continue;
         }
-        write_to_client(server->game_data.clients[i].fd, ALL_FINE);
     }
 }
 

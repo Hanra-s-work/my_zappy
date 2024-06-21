@@ -12,29 +12,42 @@
 #include "server_handler.h"
 #include "client_management.h"
 
-static void fill_str(server_handler_t *server, const int x,
+static void check_next(game_data_t game, const int x,
     const int y, char str[INSANE_BUFFER_SIZE])
 {
-    for (int l = 0; l < server->game_data.map[y][x].player_nb; l++)
-        strcat(str, "player ");
-    for (int l = 0; l < server->game_data.map[y][x].ressources.food_nb; l++)
-        strcat(str, "food ");
-    for (int l = 0; l < server->game_data.map[y][x].ressources.linemate_nb;
-    l++)
-        strcat(str, "linemate ");
-    for (int l = 0; l < server->game_data.map[y][x].ressources.deraumere_nb;
-    l++)
-        strcat(str, "deraumere ");
-    for (int l = 0; l < server->game_data.map[y][x].ressources.sibur_nb; l++)
-        strcat(str, "sibur ");
-    for (int l = 0; l < server->game_data.map[y][x].ressources.mendiane_nb;
-    l++)
-        strcat(str, "mendiane ");
-    for (int l = 0; l < server->game_data.map[y][x].ressources.phiras_nb; l++)
-        strcat(str, "phiras ");
-    for (int l = 0; l < server->game_data.map[y][x].ressources.thystame_nb;
-    l++)
-        strcat(str, "thystame ");
+    if (game.map[y][x].ressources.food_nb != 0 &&
+        game.map[y][x].ressources.linemate_nb != 0 &&
+        game.map[y][x].ressources.deraumere_nb != 0 &&
+        game.map[y][x].ressources.sibur_nb != 0 &&
+        game.map[y][x].ressources.mendiane_nb != 0 &&
+        game.map[y][x].ressources.phiras_nb != 0 &&
+        game.map[y][x].ressources.thystame_nb != 0) {
+            strcat(str, " ");
+        }
+}
+
+static void fill_str(game_data_t game, const int x,
+    const int y, char str[INSANE_BUFFER_SIZE])
+{
+    for (int l = 0; l < game.map[y][x].player_nb; l++) {
+        strcat(str, "player");
+        if (l != game.map[y][x].player_nb - 1)
+            check_next(game, x, y, str);
+    }
+    for (int l = 0; l < game.map[y][x].ressources.food_nb; l++)
+        strcat(str, " food");
+    for (int l = 0; l < game.map[y][x].ressources.linemate_nb; l++)
+        strcat(str, " linemate");
+    for (int l = 0; l < game.map[y][x].ressources.deraumere_nb; l++)
+        strcat(str, " deraumere");
+    for (int l = 0; l < game.map[y][x].ressources.sibur_nb; l++)
+        strcat(str, " sibur");
+    for (int l = 0; l < game.map[y][x].ressources.mendiane_nb; l++)
+        strcat(str, " mendiane");
+    for (int l = 0; l < game.map[y][x].ressources.phiras_nb; l++)
+        strcat(str, " phiras");
+    for (int l = 0; l < game.map[y][x].ressources.thystame_nb; l++)
+        strcat(str, " thystame");
 }
 
 static void check_values(server_handler_t *server, int *x, int *y)
@@ -64,7 +77,7 @@ static void look_up(server_handler_t *server, const int idx, int **pos,
     player_y += 2;
     for (int i = 0; i < (*pos)[0] - 1; i++) {
         check_values(server, (&player_x), &player_y);
-        fill_str(server, player_x, player_y, str);
+        fill_str(server->game_data, player_x, player_y, str);
         player_x++;
         if (i != (*pos)[0] - 2)
             strcat(str, ", ");
@@ -88,7 +101,7 @@ static void look_left(server_handler_t *server, const int idx, int **pos,
     player_y += loop_y;
     for (int i = 0; i < (*pos)[1] - 1; i++) {
         check_values(server, &player_x, &player_y);
-        fill_str(server, player_x, player_y, str);
+        fill_str(server->game_data, player_x, player_y, str);
         player_y--;
         if (i != (*pos)[1] - 2)
             strcat(str, ", ");
@@ -112,10 +125,10 @@ static void look_down(server_handler_t *server, const int idx, int **pos,
     player_y -= 2;
     for (int i = 0; i < (*pos)[0] - 1; i++) {
         check_values(server, &player_x, &player_y);
-        fill_str(server, player_x, player_y, str);
+        fill_str(server->game_data, player_x, player_y, str);
         player_x++;
         if (i != (*pos)[0] - 2)
-            strcat(str, ", ");
+            strcat(str, ",");
     }
     (*pos)[0] += 2;
     (*pos)[1] += 1;
@@ -136,7 +149,7 @@ static void look_right(server_handler_t *server, const int idx, int **pos,
     player_y += loop_y;
     for (int i = 0; i < (*pos)[1] - 1; i++) {
         check_values(server, &player_x, &player_y);
-        fill_str(server, player_x, player_y, str);
+        fill_str(server->game_data, player_x, player_y, str);
         player_y++;
         if (i != (*pos)[1] - 2)
             strcat(str, ", ");

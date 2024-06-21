@@ -26,7 +26,8 @@ int do_connect(server_handler_t *server, char **parsed_command,
             continue;
         }
         if (strcmp(server->game_data.clients[i].team_name,
-        server->game_data.clients[idx].team_name) == 0) {
+        server->game_data.clients[idx].team_name) == 0 &&
+        server->game_data.clients[i].is_connected == false) {
             nbr++;
         }
     }

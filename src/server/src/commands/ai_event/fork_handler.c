@@ -6,15 +6,72 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "utils.h"
 #include "command_parse.h"
 #include "server_handler.h"
+#include "client_management.h"
+
+static void add_new_player_data(server_handler_t *server, const int new_num,
+    char *name, const int idx)
+{
+    int i = 0;
+    int dir = rand() % 4;
+
+    for (; i < MAX_CLIENT; i++) {
+        if (server->game_data.clients[i].team_name == NULL) {
+            break;
+        }
+    }
+    server->game_data.clients[i].client_num = new_num;
+    server->game_data.clients[i].direction = dir + 1;
+    server->game_data.clients[i].pos[0] =
+    server->game_data.clients[idx].pos[0];
+    server->game_data.clients[i].pos[1] =
+    server->game_data.clients[idx].pos[1];
+    server->game_data.clients[i].ressources = DEFAULT_RESSOURCES;
+    server->game_data.clients[i].level = 1;
+    server->game_data.clients[i].team_name = name;
+    server->game_data.clients[i].time_life = PLAYER_TIME;
+    server->game_data.clients[i].is_connected = false;
+    server->game_data.clients[i].fd = UNKNOWN;
+}
+
+static void send_successful_fork(server_handler_t *server, const int new_num,
+    const int idx)
+{
+    char str[MAX_BUFFER_SIZE];
+
+    write_to_client(server->game_data.clients[idx].fd, ALL_FINE);
+    sprintf(str, "enw #%d #%d %d %d\n",
+    new_num,
+    server->game_data.clients[idx].client_num,
+    server->game_data.clients[idx].pos[0],
+    server->game_data.clients[idx].pos[1]);
+    write_to_graphics_clients(server->game_data.clients, str);
+}
 
 void do_fork(server_handler_t *server, event_t event)
 {
-    (void)server;
-    (void)event;
+    int new_num = 1;
+    int idx = get_client(server->game_data.clients, event.fd);
+    char *name = NULL;
+
+    for (int i = 0; server->game_data.teams[i].team_name != NULL; i++) {
+        new_num += server->game_data.teams[i].client_total;
+        if (strcmp(server->game_data.teams[i].team_name,
+        server->game_data.clients[idx].team_name) == 0) {
+            server->game_data.teams[i].client_total++;
+        }
+    }
+    name = strdup(server->game_data.clients[idx].team_name);
+    if (name == NULL) {
+        write_to_client(event.fd, AI_COMMAND_FAILED);
+        return;
+    }
+    add_new_player_data(server, new_num, name, idx);
+    send_successful_fork(server, new_num, idx);
 }
 
 static void send_to_gui_fork_started(server_handler_t *server,

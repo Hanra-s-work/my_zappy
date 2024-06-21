@@ -51,7 +51,7 @@ static void check_which_event_2(server_handler_t *server, const int idx)
     if (server->game_data.event[idx].type == EJECT)
         do_eject(server, server->game_data.event[idx]);
     if (server->game_data.event[idx].type == TAKE)
-        do_eject(server, server->game_data.event[idx]);
+        do_take(server, server->game_data.event[idx]);
     if (server->game_data.event[idx].type == SET)
         do_set(server, server->game_data.event[idx]);
     if (server->game_data.event[idx].type == INCANTATION)

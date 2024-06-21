@@ -29,6 +29,13 @@ SRC	=	./src/sub_main.c								\
 		./src/server/command_handling.c					\
 		./src/server/check_event.c						\
 \
+		./src/commands/map_content.c					\
+		./src/commands/player_info.c					\
+		./src/commands/sbp.c							\
+		./src/commands/tile_content.c					\
+\
+		./src/commands/gui/zappy_info.c					\
+\
 		./src/commands/ai_event/event_utils.c			\
 		./src/commands/ai_event/broadcast_handler.c		\
 		./src/commands/ai_event/connect_handler.c		\

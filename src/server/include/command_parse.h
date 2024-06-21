@@ -62,31 +62,19 @@ static const struct command_s AI_COMMAND_TABLE[AI_COMMAND_NB] = {
     { "Eject", "", 0, &add_eject },
     { "Take", "", 1, &add_take },
     { "Set", "", 1, &add_set },
-    { "Incantation", "", 0, &add_incantation },
+    { "Incantation", "", 0, &add_incantation }
 };
 
-// static const struct command_s GUI_COMMAND_TABLE[GUI_COMMAND_NB] = {
-//     { "msz", "", 0, &map_size_request },
-//     { "bct", "", 2, &tile_content_request },
-//     { "mct", "", 0, &map_content_request },
-//     { "tna", "", 0, &all_team_name_request },
-//     { "ppo", "", 1, NULL },
-//     { "plv", "", 1, NULL },
-//     { "pin", "", 1, NULL },
-//     { "sgt", "", 0, &time_unit_request },
-//     { "sst", "", 1, &time_unit_modification_request },
-// };
-
 static const struct command_s GUI_COMMAND_TABLE[GUI_COMMAND_NB] = {
-    { "msz", "", 0, NULL },
-    { "bct", "", 2, NULL },
-    { "mct", "", 0, NULL },
-    { "tna", "", 0, NULL },
+    { "msz", "", 0, &map_size_request },
+    { "bct", "", 2, &tile_content_request },
+    { "mct", "", 0, &map_content_request },
+    { "tna", "", 0, &all_team_name_request },
     { "ppo", "", 1, NULL },
     { "plv", "", 1, NULL },
     { "pin", "", 1, NULL },
-    { "sgt", "", 0, NULL },
-    { "sst", "", 1, NULL },
+    { "sgt", "", 0, &time_unit_request },
+    { "sst", "", 1, &time_unit_modification_request }
 };
 
 static const struct command_s
@@ -103,15 +91,15 @@ static const struct command_s
     { "Take", "", 1, &add_take },
     { "Set", "", 1, &add_set },
     { "Incantation", "", 0, &add_incantation },
-    { "msz", "", 0, NULL },
-    { "bct", "", 2, NULL },
-    { "mct", "", 0, NULL },
-    { "tna", "", 0, NULL },
+    { "msz", "", 0, &map_size_request },
+    { "bct", "", 2, &tile_content_request },
+    { "mct", "", 0, &map_content_request },
+    { "tna", "", 0, &all_team_name_request },
     { "ppo", "", 1, NULL },
     { "plv", "", 1, NULL },
     { "pin", "", 1, NULL },
-    { "sgt", "", 0, NULL },
-    { "sst", "", 1, NULL },
+    { "sgt", "", 0, &time_unit_request },
+    { "sst", "", 1, &time_unit_modification_request }
 };
 
 #endif //MY_ZAPPY_COMMAND_PARSE_H

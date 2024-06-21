@@ -41,7 +41,7 @@
 
     #define SPAWN_TIME 20
     #define PLAYER_TIME 1260
-    #define ADD_FOOD 126
+    #define ADD_TIME_LIFE 126
     #define BASIC_TIME 7
     #define INVENTORY_TIME 1
     #define FORK_TIME 42

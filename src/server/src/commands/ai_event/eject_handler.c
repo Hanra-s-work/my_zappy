@@ -5,11 +5,21 @@
 ** eject_handler
 */
 
+#include <stdio.h>
+
 #include "utils.h"
 #include "ai_event.h"
 #include "command_parse.h"
 #include "server_handler.h"
 #include "client_management.h"
+
+static void write_eject_to_gui(server_handler_t *server, const int num)
+{
+    char str[MAX_BUFFER_SIZE];
+
+    sprintf(str, "pex #%d\n", num);
+    write_to_graphics_clients(server->game_data.clients, str);
+}
 
 void do_eject(server_handler_t *server, event_t event)
 {
@@ -28,6 +38,7 @@ void do_eject(server_handler_t *server, event_t event)
             &server->game_data.clients[i].pos[1]);
         }
     }
+    write_eject_to_gui(server, server->game_data.clients[idx].client_num);
 }
 
 int add_eject(server_handler_t *server, char **parsed_command,

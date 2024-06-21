@@ -20,7 +20,6 @@ void do_forward(server_handler_t *server, event_t event)
     &server->game_data.clients[idx].pos[0],
     &server->game_data.clients[idx].pos[1]);
     write_to_client(event.fd, ALL_FINE);
-    show_game_data(server, true);
 }
 
 int add_forward(server_handler_t *server, char **parsed_command,

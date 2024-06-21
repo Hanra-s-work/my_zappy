@@ -7,6 +7,8 @@
 
 #include <unistd.h>
 
+#include "commands.h"
+
 int command_parameter_error(server_handler_t *server, char **args, const int
     idx)
 {
