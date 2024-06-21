@@ -12,19 +12,54 @@
 #include "ai_event.h"
 #include "server_handler.h"
 
-static char *start_other(game_data_t game, const int *indexes, const int idx,
+static char *fill_one(game_data_t game, const int *indexes, const int idx,
     const int x)
 {
     char *str = NULL;
 
-    if (x == 3)
+    if (x == 1) {
+        str = malloc(sizeof(char) * MAX_BUFFER_SIZE);
+        if (str == NULL) {
+            return (NULL);
+        }
+        sprintf(str, "pic %d %d %d #%d #%d\n",
+        game.map_size[0], game.map_size[1],
+        game.clients[idx].level, game.clients[idx].client_num,
+        game.clients[indexes[0]].client_num);
+    }
+    return (str);
+}
+
+static char *fill_three(game_data_t game, const int *indexes, const int idx,
+    const int x)
+{
+    char *str = NULL;
+
+    if (x == 3) {
+        str = malloc(sizeof(char) * MAX_BUFFER_SIZE);
+        if (str == NULL) {
+            return (NULL);
+        }
         sprintf(str, "pic %d %d %d #%d #%d #%d #%d\n",
         game.map_size[0], game.map_size[1],
         game.clients[idx].level, game.clients[idx].client_num,
         game.clients[indexes[0]].client_num,
         game.clients[indexes[1]].client_num,
         game.clients[indexes[2]].client_num);
-    if (x == 5)
+    }
+    return (str);
+}
+
+static char *fill_five(game_data_t game, const int *indexes, const int idx,
+    const int x)
+{
+    char *str = NULL;
+
+    if (x == 5) {
+        str = malloc(sizeof(char) * MAX_BUFFER_SIZE);
+        if (str == NULL) {
+            return (NULL);
+        }
         sprintf(str, "pic %d %d %d #%d #%d #%d #%d #%d #%d\n",
         game.map_size[0], game.map_size[1],
         game.clients[idx].level, game.clients[idx].client_num,
@@ -33,7 +68,33 @@ static char *start_other(game_data_t game, const int *indexes, const int idx,
         game.clients[indexes[2]].client_num,
         game.clients[indexes[3]].client_num,
         game.clients[indexes[4]].client_num);
-    return str;
+    }
+    return (str);
+}
+
+static char *fill_str(game_data_t game, const int *indexes, const int idx,
+    const int x)
+{
+    char *str = NULL;
+
+    if (x == 0) {
+        str = malloc(sizeof(char) * MAX_BUFFER_SIZE);
+        if (str == NULL)
+            return (NULL);
+        sprintf(str, "pic %d %d %d #%d\n",
+        game.map_size[0], game.map_size[1],
+        game.clients[idx].level, game.clients[idx].client_num);
+    }
+    if (str == NULL) {
+        fill_one(game, indexes, idx, x);
+    }
+    if (str == NULL) {
+        fill_three(game, indexes, idx, x);
+    }
+    if (str == NULL) {
+        fill_five(game, indexes, idx, x);
+    }
+    return (str);
 }
 
 static void send_start(game_data_t game, const int *indexes, const int idx)
@@ -46,18 +107,12 @@ static void send_start(game_data_t game, const int *indexes, const int idx)
         for (; indexes[x] != -1; x++)
             write_to_client(game.clients[indexes[x]].fd, ELEVATION_UNDERWAY);
     }
-    if (x == 0)
-        sprintf(str, "pic %d %d %d #%d\n",
-        game.map_size[0], game.map_size[1],
-        game.clients[idx].level, game.clients[idx].client_num);
-    if (x == 1)
-        sprintf(str, "pic %d %d %d #%d #%d\n",
-        game.map_size[0], game.map_size[1],
-        game.clients[idx].level, game.clients[idx].client_num,
-        game.clients[indexes[0]].client_num);
-    if (x > 1)
-        str = start_other(game, indexes, idx, x);
+    str = fill_str(game, indexes, idx, x);
+    if (str == NULL) {
+        return;
+    }
     write_to_graphics_clients(game.clients, str);
+    free(str);
 }
 
 static void remove_ressources_lvl_7(game_data_t *game, const int idx,
@@ -124,11 +179,13 @@ static void send_end(game_data_t *game, const int *indexes, const int idx)
     game->clients[idx].level++;
     sprintf(str, "Current level: %d\n", game->clients[idx].level);
     write_to_client(game->clients[idx].fd, str);
-    for (int i = 0; indexes[i] != -1; i++) {
-        game->clients[indexes[i]].level++;
-        write_to_client(game->clients[indexes[i]].fd, str);
+    if (indexes != NULL) {
+        for (int i = 0; indexes[i] != -1; i++) {
+            game->clients[indexes[i]].level++;
+            write_to_client(game->clients[indexes[i]].fd, str);
+        }
     }
-    sprintf(str, "pie %d %d success\n", game->clients[idx].pos[0],
+    sprintf(str, "pie %d %d 1\n", game->clients[idx].pos[0],
     game->clients[idx].pos[1]);
     write_to_graphics_clients(game->clients, str);
 }

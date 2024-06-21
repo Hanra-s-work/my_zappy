@@ -27,9 +27,16 @@ void free_array_size_n(void *to_free, const size_t n)
 {
     void **array = (void **)to_free;
 
+    if (to_free == NULL) {
+        return;
+    }
     for (size_t i = 0; i < n; ++i) {
+        if (array[i] == NULL) {
+            break;
+        }
         free(array[i]);
     }
+    free(array);
 }
 
 void free_args(struct arg_s **args, const size_t size)

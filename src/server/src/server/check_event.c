@@ -41,6 +41,16 @@ static void check_food_spawn(game_data_t *game)
     game->event[0].time_counter = SPAWN_TIME;
 }
 
+static void send_failed_incantation(server_handler_t *server, int idx)
+{
+    char str[MAX_BUFFER_SIZE];
+
+    sprintf(str, "pie %d %d 0\n",
+    server->game_data.clients[idx].pos[0],
+    server->game_data.clients[idx].pos[1]);
+    write_to_graphics_clients(server->game_data.clients, str);
+}
+
 static void check_which_event_2(server_handler_t *server, const int idx)
 {
     int i = get_client(server->game_data.clients,
@@ -54,8 +64,12 @@ static void check_which_event_2(server_handler_t *server, const int idx)
         do_take(server, server->game_data.event[idx]);
     if (server->game_data.event[idx].type == SET)
         do_set(server, server->game_data.event[idx]);
-    if (server->game_data.event[idx].type == INCANTATION)
-        check_incantation_condition(&server->game_data, idx, i, false);
+    if (server->game_data.event[idx].type == INCANTATION) {
+        if (check_incantation_condition(&server->game_data, idx, i,
+        false) == -1) {
+            send_failed_incantation(server, idx);
+        }
+    }
 }
 
 static void check_which_event(server_handler_t *server, const int idx)

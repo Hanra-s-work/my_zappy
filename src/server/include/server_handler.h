@@ -12,15 +12,6 @@
 
     #include "arg_parse.h"
 
-/* Important informations:
-** - Ressources spawns every 20 units of times
-** - Ressource quantity formula: map_width * map_height * density
-** - A player time life start is 1260 / f
-** - One food add to the time life of a player 126 units of time
-** - A player starts with a random direction
-*/
-
-
 // An enum type to enum every ressources in the game
 typedef enum ressources_type_s {
     FOOD,

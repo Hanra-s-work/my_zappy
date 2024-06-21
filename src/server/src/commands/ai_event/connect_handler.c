@@ -15,7 +15,7 @@
 int do_connect(server_handler_t *server, char **parsed_command,
     const int idx)
 {
-    char *str = NULL;
+    char str[MAX_BUFFER_SIZE];
     int nbr = 0;
 
     if (get_array_len(parsed_command) != 1) {

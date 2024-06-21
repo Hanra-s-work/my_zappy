@@ -49,8 +49,11 @@
 
     // !! COMMAND_CONSTANT !!
 
-    #define COMMAND_DELIMITER   ' '
-    #define COMMAND_SEPARATOR   '\n'
+    #define COMMAND_DELIMITER       ' '
+    #define COMMAND_SEPARATOR       '\n'
+
+    #define COMMAND_DELIMITER_STR   " "
+    #define COMMAND_SEPARATOR_STR   "\n"
 
     #define AI_COMMAND_NB   12
     #define GUI_COMMAND_NB      9
@@ -62,7 +65,7 @@
 
     #define CONNEXION_FAILED "Failed to get connexion with the client.\n"
     #define AI_COMMAND_FAILED "ko\n"
-    #define GUI_UNKNOWN_COMMAND "suc\n"
+    #define GUI_UNKNOWN "suc\n"
     #define ELEVATION_UNDERWAY "Elevation underway\n"
     #define AI_DIED "dead\n"
     #define ALL_FINE "ok\n"

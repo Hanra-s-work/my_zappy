@@ -70,9 +70,9 @@ static const struct command_s GUI_COMMAND_TABLE[GUI_COMMAND_NB] = {
     { "bct", "", 2, &tile_content_request },
     { "mct", "", 0, &map_content_request },
     { "tna", "", 0, &all_team_name_request },
-    { "ppo", "", 1, NULL },
-    { "plv", "", 1, NULL },
-    { "pin", "", 1, NULL },
+    { "ppo", "", 1, &player_position_request },
+    { "plv", "", 1, &player_level_request },
+    { "pin", "", 1, &player_inventory_request },
     { "sgt", "", 0, &time_unit_request },
     { "sst", "", 1, &time_unit_modification_request }
 };
@@ -95,9 +95,9 @@ static const struct command_s
     { "bct", "", 2, &tile_content_request },
     { "mct", "", 0, &map_content_request },
     { "tna", "", 0, &all_team_name_request },
-    { "ppo", "", 1, NULL },
-    { "plv", "", 1, NULL },
-    { "pin", "", 1, NULL },
+    { "ppo", "", 1, &player_position_request },
+    { "plv", "", 1, &player_level_request },
+    { "pin", "", 1, &player_inventory_request },
     { "sgt", "", 0, &time_unit_request },
     { "sst", "", 1, &time_unit_modification_request }
 };

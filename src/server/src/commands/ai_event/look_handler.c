@@ -104,7 +104,7 @@ static void look_left(server_handler_t *server, const int idx, int **pos,
         fill_str(server->game_data, player_x, player_y, str);
         player_y--;
         if (i != (*pos)[1] - 2)
-            strcat(str, ", ");
+            strcat(str, ",");
     }
     (*pos)[0] += 1;
     (*pos)[1] += 2;

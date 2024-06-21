@@ -188,9 +188,9 @@ int add_incantation(server_handler_t *server, char **parsed_command,
             break;
         }
     }
-    if (server->game_data.event[i].args != NULL ||
-    check_incantation_condition(&server->game_data, i, idx, true) == -1)
-        return (-1);
+    if (server->game_data.event[i].args != NULL &&
+    check_incantation_condition(&server->game_data, i, idx, true) == 0)
+        return (0);
     delete_event(&server->game_data.event[i]);
     return (-1);
 }

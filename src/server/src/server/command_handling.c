@@ -99,41 +99,41 @@ static int set_ai_client(server_handler_t *s, const char b[MAX_BUFFER_SIZE],
     return (-1);
 }
 
-static void check_which_command(server_handler_t *server,
-    char **parsed_command, const int idx)
+static void check_which_command(server_handler_t *sv, char **parsed_command,
+    const int idx)
 {
     int r = 0;
 
     for (int i = 0; i < GUI_COMMAND_NB; i++) {
-        if (strcmp(server->game_data.clients[idx].team_name,
-        GUI_TEAM_NAME) != 0)
+        if (strcmp(sv->game_data.clients[idx].team_name, GUI_TEAM_NAME) != 0)
             break;
-        if (GUI_COMMAND_TABLE[i].command_fct != NULL &&
-        strcmp(parsed_command[0], GUI_COMMAND_TABLE[i].command) == 0)
-            r = GUI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
-        if (r == -1)
-            r = write_to_client(server->game_data.clients[idx].fd,
-            GUI_UNKNOWN_COMMAND);
+        if (strcmp(parsed_command[0], GUI_COMMAND_TABLE[i].command) == 0)
+            r = GUI_COMMAND_TABLE[i].command_fct(sv, parsed_command, idx);
+        if (r == -1) {
+            r = write_to_client(sv->game_data.clients[idx].fd, GUI_UNKNOWN);
+            break;
+        }
     }
     for (int i = 0; i < AI_COMMAND_NB; i++) {
-        if (AI_COMMAND_TABLE[i].command_fct != NULL &&
-        strcmp(parsed_command[0], AI_COMMAND_TABLE[i].command) == 0)
-            r = AI_COMMAND_TABLE[i].command_fct(server, parsed_command, idx);
-        if (r == -1)
-            write_unknown_command(server->game_data.clients[idx]);
+        if (strcmp(parsed_command[0], AI_COMMAND_TABLE[i].command) == 0)
+            r = AI_COMMAND_TABLE[i].command_fct(sv, parsed_command, idx);
+        if (r == -1) {
+            write_unknown_command(sv->game_data.clients[idx]);
+            break;
+        }
     }
 }
 
 static void check_inside_buffer(server_handler_t *server,
     const char buffer[MAX_BUFFER_SIZE], const int idx)
 {
-    char ***parsed_buffer = parse_buffer((unsigned char *)buffer,
-    strlen(buffer) + 1);
+    char ***parsed_buffer = NULL;
 
     if (strlen(buffer) < 2) {
         write_unknown_command(server->game_data.clients[idx]);
         return;
     }
+    parsed_buffer = parse_buffer((unsigned char *)buffer, strlen(buffer) + 1);
     if (parsed_buffer == NULL) {
         write_unknown_command(server->game_data.clients[idx]);
         return;

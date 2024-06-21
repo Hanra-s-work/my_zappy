@@ -31,15 +31,27 @@ static int check_player_ressources(int *player_ressources, int *map_ressources)
     return (0);
 }
 
-static int check_other_player_ressources(server_handler_t *server,
+static int check_other_player_ressources_2(server_handler_t *server,
     event_t event, const int idx, const int *pos)
 {
-    int status = 0;
+    int status = 1;
 
+    if (strcmp(event.args[0], "deraumere") == 0)
+        status = check_player_ressources(
+        &server->game_data.clients[idx].ressources.deraumere_nb,
+        &server->game_data.map[pos[1]][pos[0]].ressources.deraumere_nb);
     if (strcmp(event.args[0], "sibur") == 0)
         status = check_player_ressources(
         &server->game_data.clients[idx].ressources.sibur_nb,
         &server->game_data.map[pos[1]][pos[0]].ressources.sibur_nb);
+    return (status);
+}
+
+static int check_other_player_ressources(server_handler_t *server,
+    event_t event, const int idx, const int *pos)
+{
+    int status = 1;
+
     if (strcmp(event.args[0], "mendiane") == 0)
         status = check_player_ressources(
         &server->game_data.clients[idx].ressources.mendiane_nb,
@@ -57,7 +69,7 @@ static int check_other_player_ressources(server_handler_t *server,
 
 static int check_food(server_handler_t *server, event_t event)
 {
-    int status = 0;
+    int status = 1;
     int idx = get_client(server->game_data.clients, event.fd);
     int *pos = server->game_data.clients[idx].pos;
 
@@ -76,18 +88,18 @@ void do_take(server_handler_t *server, event_t event)
 {
     int idx = get_client(server->game_data.clients, event.fd);
     int *pos = server->game_data.clients[idx].pos;
-    int status = 0;
+    int status = 1;
 
-    status = check_food(server, event);
     if (strcmp(event.args[0], "linemate") == 0)
         status = check_player_ressources(
         &server->game_data.clients[idx].ressources.linemate_nb,
         &server->game_data.map[pos[1]][pos[0]].ressources.linemate_nb);
-    if (strcmp(event.args[0], "deraumere") == 0)
-        status = check_player_ressources(
-        &server->game_data.clients[idx].ressources.deraumere_nb,
-        &server->game_data.map[pos[1]][pos[0]].ressources.deraumere_nb);
-    status = check_other_player_ressources(server, event, idx, pos);
+    if (status == 1)
+        status = check_other_player_ressources_2(server, event, idx, pos);
+    if (status == 1)
+        status = check_other_player_ressources(server, event, idx, pos);
+    if (status == 1)
+        status = check_food(server, event);
     if (status == 0) {
         write_to_client(event.fd, ALL_FINE);
         write_take_to_gui(server, server->game_data.clients[idx].client_num);
