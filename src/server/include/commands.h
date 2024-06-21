@@ -19,7 +19,7 @@
     #define TILE_CONTENT_COMMAND        "bct"
     #define TIME_UNIT_COMMAND           "sgt"
     #define COMMAND_PARAMETER_ERROR     "sbp"
-
+    #define BROADCAST_MESSAGE           "message"
 
 int map_size_request(server_handler_t *server, char **args, const int idx);
 

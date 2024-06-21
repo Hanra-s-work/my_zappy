@@ -64,10 +64,10 @@ int tile_content_request(server_handler_t *server, char **args, const int idx)
     return (EXIT_SUCCESS);
 }
 
-static int get_y_tiles(server_handler_t *server, char **tile_command,
+static int get_x_tiles(server_handler_t *server, char **tile_command,
     const int idx)
 {
-    for (int j = 0; j < server->game_data.map_size[1]; ++j) {
+    for (int j = 0; j < server->game_data.map_size[0]; ++j) {
         if (asprintf(&tile_command[2], "%d", j) == -1)
             return (EXIT_FAILURE);
         if (tile_content_request(server, tile_command, idx) == EXIT_FAILURE) {
@@ -82,10 +82,10 @@ static int get_y_tiles(server_handler_t *server, char **tile_command,
 static int get_all_tiles(server_handler_t *server, char **tile_command,
     const int idx)
 {
-    for (int i = 0; i < server->game_data.map_size[0]; ++i) {
+    for (int i = 0; i < server->game_data.map_size[1]; ++i) {
         if (asprintf(&tile_command[1], "%d", i) == -1)
             return (EXIT_FAILURE);
-        if (get_y_tiles(server, tile_command, idx) == EXIT_FAILURE)
+        if (get_x_tiles(server, tile_command, idx) == EXIT_FAILURE)
             return (EXIT_FAILURE);
         free(tile_command[1]);
     }
