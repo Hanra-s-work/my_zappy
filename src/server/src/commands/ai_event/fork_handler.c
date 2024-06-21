@@ -44,7 +44,7 @@ static void send_successful_fork(server_handler_t *server, const int new_num,
     char str[MAX_BUFFER_SIZE];
 
     write_to_client(server->game_data.clients[idx].fd, ALL_FINE);
-    sprintf(str, "enw #%d #%d %d %d\n",
+    sprintf(str, "enw %d %d %d %d\n",
     new_num,
     server->game_data.clients[idx].client_num,
     server->game_data.clients[idx].pos[0],
@@ -79,7 +79,7 @@ static void send_to_gui_fork_started(server_handler_t *server,
 {
     char str[MAX_BUFFER_SIZE];
 
-    sprintf(str, "pfk #%d\n", client.client_num);
+    sprintf(str, "pfk %d\n", client.client_num);
     write_to_graphics_clients(server->game_data.clients, str);
 }
 

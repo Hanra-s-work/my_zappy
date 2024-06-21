@@ -22,7 +22,7 @@ static char *fill_one(game_data_t game, const int *indexes, const int idx,
         if (str == NULL) {
             return (NULL);
         }
-        sprintf(str, "pic %d %d %d #%d #%d\n",
+        sprintf(str, "pic %d %d %d %d %d\n",
         game.map_size[0], game.map_size[1],
         game.clients[idx].level, game.clients[idx].client_num,
         game.clients[indexes[0]].client_num);
@@ -40,7 +40,7 @@ static char *fill_three(game_data_t game, const int *indexes, const int idx,
         if (str == NULL) {
             return (NULL);
         }
-        sprintf(str, "pic %d %d %d #%d #%d #%d #%d\n",
+        sprintf(str, "pic %d %d %d %d %d %d %d\n",
         game.map_size[0], game.map_size[1],
         game.clients[idx].level, game.clients[idx].client_num,
         game.clients[indexes[0]].client_num,
@@ -60,7 +60,7 @@ static char *fill_five(game_data_t game, const int *indexes, const int idx,
         if (str == NULL) {
             return (NULL);
         }
-        sprintf(str, "pic %d %d %d #%d #%d #%d #%d #%d #%d\n",
+        sprintf(str, "pic %d %d %d %d %d %d %d %d %d\n",
         game.map_size[0], game.map_size[1],
         game.clients[idx].level, game.clients[idx].client_num,
         game.clients[indexes[0]].client_num,
@@ -81,7 +81,7 @@ static char *fill_str(game_data_t game, const int *indexes, const int idx,
         str = malloc(sizeof(char) * MAX_BUFFER_SIZE);
         if (str == NULL)
             return (NULL);
-        sprintf(str, "pic %d %d %d #%d\n",
+        sprintf(str, "pic %d %d %d %d\n",
         game.map_size[0], game.map_size[1],
         game.clients[idx].level, game.clients[idx].client_num);
     }

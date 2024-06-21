@@ -17,7 +17,7 @@ static void write_set_to_gui(server_handler_t *server, const int num)
 {
     char str[MAX_BUFFER_SIZE];
 
-    sprintf(str, "pdr #%d 1\n", num);
+    sprintf(str, "pdr %d 1\n", num);
     write_to_graphics_clients(server->game_data.clients, str);
 }
 

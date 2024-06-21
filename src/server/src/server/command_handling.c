@@ -69,7 +69,7 @@ static void send_new_client(cli_t clients[MAX_CLIENT],
 {
     char str[MAX_BUFFER_SIZE];
 
-    sprintf(str, "pnw #%d %d %d %d %d %s\n",
+    sprintf(str, "pnw %d %d %d %d %d %s\n",
     client.client_num, client.pos[0], client.pos[1], client.direction,
     client.level, client.team_name);
     write_to_graphics_clients(clients, str);

@@ -17,7 +17,7 @@ static void write_eject_to_gui(server_handler_t *server, const int num)
 {
     char str[MAX_BUFFER_SIZE];
 
-    sprintf(str, "pex #%d\n", num);
+    sprintf(str, "pex %d\n", num);
     write_to_graphics_clients(server->game_data.clients, str);
 }
 

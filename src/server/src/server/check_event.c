@@ -23,7 +23,7 @@ static void check_players_life(server_handler_t *server)
         }
         if (server->game_data.clients[i].time_life == 0) {
             write_to_client(server->game_data.clients[i].fd, AI_DIED);
-            sprintf(str, "pdi #%d\n", server->game_data.clients[i].client_num);
+            sprintf(str, "pdi %d\n", server->game_data.clients[i].client_num);
             write_to_graphics_clients(server->game_data.clients, str);
             FD_CLR(server->game_data.clients[i].fd, &server->current_fd);
             delete_client(server->game_data.clients,
