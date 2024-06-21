@@ -5,6 +5,8 @@
 ** zappy_info.c
 */
 
+#define _GNU_SOURCE
+#include <stdio.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -15,18 +17,25 @@
 
 int map_size_request(server_handler_t *server, char **args, const int idx)
 {
+    char *x;
+    char *y;
+
     if (get_array_len(args) != 1) {
         return (command_parameter_error(server, idx));
     }
+    asprintf(&x, "%d", server->game_data.map_size[0]);
+    asprintf(&y, "%d", server->game_data.map_size[1]);
+    if (x == NULL || y == NULL)
+        return (EXIT_FAILURE);
     write(server->game_data.clients[idx].fd, MAP_SIZE_COMMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
-    write(server->game_data.clients[idx].fd, &server->game_data.map_size[0],
-        sizeof(int));
+    write(server->game_data.clients[idx].fd, x, strlen(x));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
-    write(server->game_data.clients[idx].fd, &server->game_data.map_size[1],
-        sizeof(int));
+    write(server->game_data.clients[idx].fd, y, strlen(y));
     write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR_STR, 1);
+    free(x);
+    free(y);
     return (EXIT_SUCCESS);
 }
 
@@ -48,15 +57,20 @@ int all_team_name_request(server_handler_t *server, char **args, const int idx)
 
 int time_unit_request(server_handler_t *server, char **args, const int idx)
 {
+    char *str_frequence;
+
     if (get_array_len(args) != 1) {
         return (command_parameter_error(server, idx));
     }
+    if (asprintf(&str_frequence, "%d", server->game_data.frequence) == -1)
+        return (EXIT_FAILURE);
     write(server->game_data.clients[idx].fd, TIME_UNIT_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
-    write(server->game_data.clients[idx].fd, &server->game_data.frequence,
-        sizeof(int));
+    write(server->game_data.clients[idx].fd, str_frequence,
+        strlen(str_frequence));
     write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR_STR, 1);
+    free(str_frequence);
     return (EXIT_SUCCESS);
 }
 
@@ -74,8 +88,7 @@ int time_unit_modification_request(server_handler_t *server, char **args,
     write(server->game_data.clients[idx].fd, TIME_UNIT_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
-    write(server->game_data.clients[idx].fd, &new_frequency,
-        sizeof(int));
+    write(server->game_data.clients[idx].fd, args[1], strlen(args[1]));
     write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR_STR, 1);
     return (EXIT_SUCCESS);
 }

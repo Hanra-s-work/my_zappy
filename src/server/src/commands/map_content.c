@@ -5,6 +5,8 @@
 ** map_content.c
 */
 
+#define _GNU_SOURCE
+#include <stdio.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -16,26 +18,37 @@
 static void write_tile_resource(server_handler_t *server, map_t *tile,
     const int idx)
 {
+    char **int_to_str_data = malloc(sizeof(char *) * 7);
+
+    if (int_to_str_data == NULL)
+        return;
+    asprintf(&int_to_str_data[0], "%d", tile->ressources.food_nb);
+    asprintf(&int_to_str_data[1], "%d", tile->ressources.linemate_nb);
+    asprintf(&int_to_str_data[2], "%d", tile->ressources.deraumere_nb);
+    asprintf(&int_to_str_data[3], "%d", tile->ressources.sibur_nb);
+    asprintf(&int_to_str_data[4], "%d", tile->ressources.mendiane_nb);
+    asprintf(&int_to_str_data[5], "%d", tile->ressources.phiras_nb);
+    asprintf(&int_to_str_data[6], "%d", tile->ressources.thystame_nb);
     write(server->game_data.clients[idx].fd,
-        &tile->ressources.food_nb, sizeof(int));
+        int_to_str_data[0], strlen(int_to_str_data[0]));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        &tile->ressources.linemate_nb, sizeof(int));
+        int_to_str_data[1], strlen(int_to_str_data[1]));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        &tile->ressources.deraumere_nb, sizeof(int));
+        int_to_str_data[2], strlen(int_to_str_data[2]));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        &tile->ressources.sibur_nb, sizeof(int));
+        int_to_str_data[3], strlen(int_to_str_data[3]));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        &tile->ressources.mendiane_nb, sizeof(int));
+        int_to_str_data[4], strlen(int_to_str_data[4]));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        &tile->ressources.phiras_nb, sizeof(int));
+        int_to_str_data[5], strlen(int_to_str_data[5]));
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd,
-        &tile->ressources.thystame_nb, sizeof(int));
+        int_to_str_data[6], strlen(int_to_str_data[6]));
 }
 
 int tile_content_request(server_handler_t *server, char **args, const int idx)

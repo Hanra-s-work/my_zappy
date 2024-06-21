@@ -14,12 +14,11 @@
 #include "server_handler.h"
 #include "client_management.h"
 
-static int *direction_to_adjacent_tile(server_handler_t *server, cli_t *sender,
-    cli_t *receiver)
+static int *direction_to_adjacent_tile(cli_t *sender, cli_t *receiver)
 {
     int s_r_vector_x = sender->pos[0] - receiver->pos[0];
     int s_r_vector_y = sender->pos[1] - receiver->pos[1];
-    int adjacent_tile = malloc(sizeof(int) * 2);
+    int *adjacent_tile = malloc(sizeof(int) * 2);
 
     if (adjacent_tile == NULL)
         return (NULL);
@@ -52,7 +51,7 @@ static char *create_broadcast_message(char *text, int *direction)
     if (msg == NULL)
         return (NULL);
     msg[0] = '\0';
-    strcat(msg, BROADCAST_COMMAND);
+    strcat(msg, BROADCAST_MESSAGE);
     strcat(msg, " ");
     strcat(msg, x);
     strcat(msg, " ");
@@ -74,11 +73,11 @@ void do_broadcast(server_handler_t *server, event_t event)
         strcmp(server->game_data.clients[i].team_name, GUI_TEAM_NAME) == 0) {
             continue;
         }
-        direction = direction_to_adjacent_tile(server,
-            &server->game_data.clients[idx], server->game_data.clients[i]);
+        direction = direction_to_adjacent_tile(&server->game_data
+            .clients[idx], &server->game_data.clients[i]);
         if (direction == NULL)
             continue;
-        msg = create_broadcast_msg(event.args[1], direction);
+        msg = create_broadcast_message(event.args[1], direction);
         write_to_client(i, msg);
         write_to_client(i, "\n");
         free(msg);
