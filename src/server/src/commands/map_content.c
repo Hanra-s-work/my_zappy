@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "utils.h"
 #include "commands.h"
 #include "server_handler.h"
 
@@ -39,10 +40,15 @@ static void write_tile_resource(server_handler_t *server, map_t *tile,
 
 int tile_content_request(server_handler_t *server, char **args, const int idx)
 {
-    int x = atoi(args[1]);
-    int y = atoi(args[2]);
-    map_t *tile = get_tile_content(server, x, y);
+    int x = 0;
+    int y = 0;
+    map_t *tile = NULL;
 
+    if (get_array_len(args) != 3)
+        return (command_parameter_error(server, idx));
+    x = atoi(args[1]);
+    x = atoi(args[2]);
+    tile = get_tile_content(server, x, y);
     if (tile == NULL)
         return (EXIT_FAILURE);
     write(server->game_data.clients[idx].fd, TILE_CONTENT_COMMAND,
@@ -88,9 +94,11 @@ static int get_all_tiles(server_handler_t *server, char **tile_command,
 
 int map_content_request(server_handler_t *server, char **args, const int idx)
 {
-    char **tile_command = malloc(sizeof(char *) * 4);
+    char **tile_command = NULL;
 
-    (void) args;
+    if (get_array_len(args) != 1)
+        return (command_parameter_error(server, idx));
+    tile_command = malloc(sizeof(char *) * 4);
     if (tile_command == NULL)
         return (EXIT_FAILURE);
     tile_command[0] = strdup(TILE_CONTENT_COMMAND);

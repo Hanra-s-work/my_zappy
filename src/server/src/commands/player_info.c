@@ -7,12 +7,14 @@
 
 #include <unistd.h>
 
+#include "utils.h"
 #include "commands.h"
 
 int player_position_request(server_handler_t *server, char **args,
     const int idx)
 {
-    (void) args;
+    if (get_array_len(args) != 2)
+        return (command_parameter_error(server, idx));
     write(server->game_data.clients[idx].fd, PLAYER_POSITION_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR,
@@ -35,7 +37,8 @@ int player_position_request(server_handler_t *server, char **args,
 int player_level_request(server_handler_t *server, char **args,
     const int idx)
 {
-    (void) args;
+    if (get_array_len(args) != 2)
+        return (command_parameter_error(server, idx));
     write(server->game_data.clients[idx].fd, PLAYER_LEVEL_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR,
@@ -78,7 +81,8 @@ static void write_end_of_inv_content(server_handler_t *server, const int idx)
 int player_inventory_request(server_handler_t *server, char **args,
     const int idx)
 {
-    (void) args;
+    if (get_array_len(args) != 2)
+        return (command_parameter_error(server, idx));
     write(server->game_data.clients[idx].fd, PLAYER_INVENTORY_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR,

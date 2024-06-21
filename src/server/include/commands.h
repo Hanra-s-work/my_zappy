@@ -48,7 +48,6 @@ int player_inventory_request(server_handler_t *server, char **args,
     const int idx);
 
 
-int command_parameter_error(server_handler_t *server, char **args, const int
-    idx);
+int command_parameter_error(server_handler_t *server, const int idx);
 
 #endif //MY_ZAPPY_COMMANDS_H

@@ -8,12 +8,16 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "utils.h"
+#include "command_parse.h"
 #include "commands.h"
 #include "server_handler.h"
 
 int map_size_request(server_handler_t *server, char **args, const int idx)
 {
-    (void)args;
+    if (get_array_len(args) != 1) {
+        return (command_parameter_error(server, idx));
+    }
     write(server->game_data.clients[idx].fd, MAP_SIZE_COMMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
@@ -28,7 +32,9 @@ int map_size_request(server_handler_t *server, char **args, const int idx)
 
 int all_team_name_request(server_handler_t *server, char **args, const int idx)
 {
-    (void) args;
+    if (get_array_len(args) != 1) {
+        return (command_parameter_error(server, idx));
+    }
     for (int i = 0; server->game_data.teams[i].team_name != NULL; ++i) {
         write(server->game_data.clients[idx].fd, ALL_TEAM_COMMAND,
             COMMAND_ID_LEN);
@@ -42,7 +48,9 @@ int all_team_name_request(server_handler_t *server, char **args, const int idx)
 
 int time_unit_request(server_handler_t *server, char **args, const int idx)
 {
-    (void) args;
+    if (get_array_len(args) != 1) {
+        return (command_parameter_error(server, idx));
+    }
     write(server->game_data.clients[idx].fd, TIME_UNIT_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
@@ -55,12 +63,13 @@ int time_unit_request(server_handler_t *server, char **args, const int idx)
 int time_unit_modification_request(server_handler_t *server, char **args,
     const int idx)
 {
-    int new_frequency = atoi(args[1]);
+    int new_frequency = 0;
 
-    if (new_frequency <= 0) {
-        command_parameter_error(server, args, idx);
-        return (EXIT_SUCCESS);
-    }
+    if (get_array_len(args) != 2)
+        return (command_parameter_error(server, idx));
+    new_frequency = atoi(args[1]);
+    if (new_frequency <= 0)
+        return (command_parameter_error(server, idx));
     server->game_data.frequence = new_frequency;
     write(server->game_data.clients[idx].fd, TIME_UNIT_COMMAND,
         COMMAND_ID_LEN);
