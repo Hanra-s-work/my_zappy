@@ -12,15 +12,6 @@
 
     #include "arg_parse.h"
 
-/* Important informations:
-** - Ressources spawns every 20 units of times
-** - Ressource quantity formula: map_width * map_height * density
-** - A player time life start is 1260 / f
-** - One food add to the time life of a player 126 units of time
-** - A player starts with a random direction
-*/
-
-
 // An enum type to enum every ressources in the game
 typedef enum ressources_type_s {
     FOOD,
@@ -35,18 +26,18 @@ typedef enum ressources_type_s {
 // An enum type to enum every player directions in the game
 typedef enum direction_s {
     UNDEFINED,
-    LEFT,
-    RIGHT,
     UP,
-    DOWN
+    LEFT,
+    DOWN,
+    RIGHT
 } direction_t;
 
 // An enum type to enum every possible event in the game
 typedef enum event_type_s {
     UNKNOWN_TYPE,
     FORWARD,
-    LEFT_EVENT,
     RIGHT_EVENT,
+    LEFT_EVENT,
     LOOK,
     INVENTORY,
     BROADCAST,
@@ -55,7 +46,8 @@ typedef enum event_type_s {
     EJECT,
     TAKE,
     SET,
-    INCANTATION
+    INCANTATION,
+    FOOD_REGEN
 } event_type_t;
 
 /** @brief A structure to count ressources in the game
@@ -126,7 +118,9 @@ typedef struct team_s {
 typedef struct event_s {
     int fd;
     event_type_t type;
+    char **args;
     int time_counter;
+    int *indexes;
 } event_t;
 
 /**
@@ -142,6 +136,7 @@ typedef struct event_s {
 typedef struct game_data_s {
     int map_size[2];
     int frequence;
+    double time;
     ressources_t ressources_quantity;
     ressources_t total_ressources;
     team_t *teams;
@@ -191,9 +186,11 @@ static const cli_t DEFAULT_CLIENT = {
 };
 
 static const event_t DEFAULT_EVENT = {
-    UNKNOWN,
-    UNKNOWN_TYPE,
-    UNKNOWN
+    UNKNOWN, // fd
+    UNKNOWN_TYPE, // Event type
+    NULL, // Command arguments
+    UNKNOWN, // Time counter
+    NULL // Indexes
 };
 
 /**
@@ -224,5 +221,11 @@ void server_loop(server_handler_t *server);
  * @param fd The file descriptor where the message come from
 */
 void command_handling(server_handler_t *server, const int fd);
+
+/**
+ * @brief Check every event in the game
+ * @param server A pointer to the server_handler_t structure
+*/
+void check_event(server_handler_t *server);
 
 #endif
