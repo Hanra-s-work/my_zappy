@@ -6,8 +6,9 @@
 */
 
 #include "Graphic.hpp"
-#include "Player.hpp"
-#include "Game.hpp"
+#include <vector>
+// #include "Player.hpp"
+// #include "Game.hpp"
 
 /**
  * @brief This is the function the compiler calls to successfully compile the program
@@ -23,15 +24,10 @@ int main(int argc, char **argv)
     Resource resource("asset/flower_grass.png");
 
     sf::Clock clock;
-    Player player("asset/player_left.png", {700, 300}, {200, 300}, 100.0f, 0.3f);
+    sf::Vector2f randomStartPosition(static_cast<float>(std::rand() % (200 * 128)), static_cast<float>(std::rand() % (200 * 128)));
+    Player player("asset/walk.png", randomStartPosition, 200.0f, 140.0f);
 
-    std::vector<std::pair<Direction, sf::Vector2f>> directions = {
-        {Direction::Left, {200, 300}},
-        {Direction::Right, {600, 300}},
-        {Direction::Up, {600, 100}},
-        {Direction::Down, {600, 500}}
-    };
-    size_t currentDirection = 0;
+    bool followPlayer = false;
 
     resource.addMaterial("food", "asset/food.png");
     resource.addMaterial("linemate", "asset/linemate.png");
@@ -53,13 +49,10 @@ int main(int argc, char **argv)
                 window.close();
             }
         }
-        graphic.handleInput();
-        sf::Time elapsed = clock.restart();
-        if (player.ReachedDestination() && currentDirection < directions.size() - 1) {
-            currentDirection++;
-            player.setDirection(directions[currentDirection].first, directions[currentDirection].second);
-        }
+        graphic.handleInput(followPlayer, player.getPosition());
+        player.handleInput();
 
+        sf::Time elapsed = clock.restart();
         player.updateTime(elapsed);
 
         window.clear();

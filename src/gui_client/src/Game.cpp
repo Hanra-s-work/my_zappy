@@ -11,8 +11,8 @@
 #include <iostream>
 #include <sstream>
 
-Game::Game(const std::string& ip, int port)
-    : player("asset/player_left.png", {700, 300}, {200, 300}, 100.0f, 0.3f),
+Game::Game(const std::string &ip, int port)
+    : player("asset/player_left.png", 100.0f, 0.3f),
     resource("asset/flower_grass.png"),
     running(true)
     // networkClient()

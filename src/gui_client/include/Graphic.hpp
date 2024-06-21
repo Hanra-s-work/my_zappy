@@ -8,10 +8,13 @@
 #ifndef GRAPHIC_HPP_
 #define GRAPHIC_HPP_
 
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <string>
-#include <map>
+    #include <SFML/Graphics.hpp>
+    #include <vector>
+    #include <string>
+    #include <map>
+    #include <iostream>
+    #include <cmath>
+    #include <unordered_map>
 
 class Graphic
 {
@@ -19,7 +22,7 @@ class Graphic
         Graphic();
         void initWindow(unsigned int width, unsigned int height, const std::string& title);
         sf::RenderWindow& getWindow();
-        void handleInput();
+        void handleInput(bool& followPlayer, const sf::Vector2f& playerPosition);
         void setMapSize(float width, float height);
 
     private:
@@ -42,12 +45,38 @@ class ISprite
         sf::Texture texture;
 };
 
-// class Player : public ISprite
-// {
-//     public:
-//         Player(const std::string& textureFile);
-//         void draw(sf::RenderWindow& window) const override;
-// };
+enum class Direction
+{
+    Right,
+    Left,
+    Up,
+    Down
+};
+
+class Player : public ISprite
+{
+    public:
+        Player(const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed);
+        void handleInput();
+        void updateTime(sf::Time elapsed);
+        void draw(sf::RenderWindow &window) const override;
+        void setPosition(const sf::Vector2f &position);
+        sf::Vector2f getPosition() const;
+
+    private:
+        sf::Texture _texture;
+        sf::Sprite _sprite;
+        sf::IntRect _rect;
+        sf::Vector2f _direction;
+        sf::Vector2f _destPosition;
+        float _moveSpeed;
+        float _animationSpeed;
+        bool _reachedDest;
+        sf::Time _elapsedTime;
+        void updateDirection();
+        void updateAnimation();
+        Direction _currentDir;
+};
 
 struct Material
 {

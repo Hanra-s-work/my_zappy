@@ -15,7 +15,7 @@ void Graphic::initWindow(unsigned int width, unsigned int height, const std::str
 {
     window.create(sf::VideoMode(width, height), title);
     view.setSize(sf::Vector2f(width, height));
-    view.setCenter(sf::Vector2f(width / 2.0f, height / 2.0f));
+    view.setCenter(sf::Vector2f(width / 1.0f, height / 1.0f));
     window.setView(view);
 }
 
@@ -30,28 +30,46 @@ void Graphic::setMapSize(float width, float height)
     mapHeight = height;
 }
 
-void Graphic::handleInput()
+void Graphic::handleInput(bool& followPlayer, const sf::Vector2f& playerPosition)
 {
     const float deltaTime = 1.0f / 60.0f;
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     sf::Vector2u windowSize = window.getSize();
     sf::Vector2f viewMove(0.0f, 0.0f);
 
-    if (mousePosition.x <= 100) {
-        viewMove.x = -scrollSpeed * deltaTime;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Add) || sf::Keyboard::isKeyPressed(sf::Keyboard::Equal)) {
+        scrollSpeed += 50.0f;
     }
-    if (mousePosition.x >= windowSize.x - 100) {
-        viewMove.x = scrollSpeed * deltaTime;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) || sf::Keyboard::isKeyPressed(sf::Keyboard::Dash)) {
+        scrollSpeed -= 50.0f;
+        if (scrollSpeed < 0) {
+            scrollSpeed = 0;
+        }
     }
-    if (mousePosition.y <= 100) {
-        viewMove.y = -scrollSpeed * deltaTime;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
+        followPlayer = true;
     }
-    if (mousePosition.y >= windowSize.y - 100) {
-        viewMove.y = scrollSpeed * deltaTime;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
+        followPlayer = false;
     }
 
-    sf::Vector2f newCenter = view.getCenter() + viewMove;
-    sf::Vector2f halfSize = view.getSize() / 2.0f;
+    if (!followPlayer) {
+        if (mousePosition.x <= 100) {
+            viewMove.x = -scrollSpeed * deltaTime;
+        }
+        if (mousePosition.x >= windowSize.x - 100) {
+            viewMove.x = scrollSpeed * deltaTime;
+        }
+        if (mousePosition.y <= 100) {
+            viewMove.y = -scrollSpeed * deltaTime;
+        }
+        if (mousePosition.y >= windowSize.y - 100) {
+            viewMove.y = scrollSpeed * deltaTime;
+        }
+    }
+
+    sf::Vector2f newCenter = followPlayer ? playerPosition : view.getCenter() + viewMove;
+    sf::Vector2f halfSize = view.getSize() / 1.0f;
 
     if (newCenter.x - halfSize.x < 0) {
         newCenter.x = halfSize.x;
@@ -84,18 +102,76 @@ bool ISprite::loadTexture(const std::string &textureFile)
     return true;
 }
 
-// Player::Player(const std::string &textureFile) : ISprite(textureFile)
-// {
-// }
+Player::Player(const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed)
+: ISprite(textureFile), _direction(0, 0), _destPosition(startPosition), _moveSpeed(moveSpeed), _animationSpeed(animationSpeed), _reachedDest(false)
+{
+    _rect = sf::IntRect(0, 0, 80, 80);
+    sprite.setTextureRect(_rect);
+    sprite.setPosition(startPosition);
+    sprite.setScale(3.0f, 3.0f);
+}
 
-// void Player::draw(sf::RenderWindow &window) const
-// {
-//     window.draw(sprite);
-// }
+void Player::handleInput()
+{
+    _direction = {0, 0};
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
+        _direction.y = -1;
+        _currentDir = Direction::Up;
+        _rect.top = 240;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        _direction.y = 1;
+        _currentDir = Direction::Down;
+        _rect.top = 160;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+        _direction.x = -1;
+        _currentDir = Direction::Left;
+        _rect.top = 80;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        _direction.x = 1;
+        _currentDir = Direction::Right;
+        _rect.top = 0;
+    }
+}
+
+void Player::updateTime(sf::Time elapsed)
+{
+    _elapsedTime += elapsed;
+    if (_elapsedTime.asSeconds() > 1.0f / _animationSpeed) {
+        sprite.move(_direction * _moveSpeed * _elapsedTime.asSeconds());
+        _elapsedTime = sf::Time::Zero;
+        updateAnimation();
+    }
+}
+
+void Player::updateAnimation()
+{
+    _rect.left += 80;
+    if (_rect.left >= _texture.getSize().x) {
+        _rect.left = 0;
+    }
+    sprite.setTextureRect(_rect);
+}
+
+void Player::draw(sf::RenderWindow &window) const
+{
+    window.draw(sprite);
+}
+
+void Player::setPosition(const sf::Vector2f &position)
+{
+    sprite.setPosition(position);
+}
+
+sf::Vector2f Player::getPosition() const
+{
+    return sprite.getPosition();
+}
 
 Resource::Resource(const std::string &textureFile) : ISprite(textureFile), mapWidth(0), mapHeight(0)
 {
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 }
 
 void Resource::generateMap(unsigned int width, unsigned int height)

@@ -11,9 +11,9 @@ SRC	=	./src/sub_main.cpp	\
 		./src/ArgumentHandling.cpp	\
 		./src/Parsing.cpp	\
 		./src/Graphic.cpp	\
-		./src/Player.cpp	\
 		./src/NetworkClient.cpp	\
-		./src/Game.cpp
+#		./src/Player.cpp	\
+#		./src/Game.cpp
 
 CXX	=	g++
 
