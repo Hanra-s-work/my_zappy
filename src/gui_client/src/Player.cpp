@@ -5,70 +5,113 @@
 ** Player.cpp
 */
 
+#include <iostream>
 #include "Player.hpp"
-#include "Graphic.hpp"
 
-Player::Player(const std::string &textureFile, const sf::Vector2f &startPosition, const sf::Vector2f &destPosition, float moveSpeed, float animationSpeed) : ISprite(textureFile)
+Player::Player(const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, Sound &sound)
+    : ISprite(textureFile), _direction(0, 0), _destPosition(startPosition), _moveSpeed(moveSpeed), _animationSpeed(animationSpeed), _reachedDest(false), _sound(sound)
 {
     if (!_texture.loadFromFile(textureFile)) {
-        throw std::runtime_error("Error when loading texture");
+        throw std::runtime_error("Failed to load texture");
+    }
+    if (!_idleTexture.loadFromFile("asset/pictures/character/idle.png")) {
+        throw std::runtime_error("Failed to load idle texture");
     }
     _sprite.setTexture(_texture);
-    _rect = sf::IntRect(0, 0, 48, 69);
+    _rect = sf::IntRect(0, 0, 80, 80);
     _sprite.setTextureRect(_rect);
     _sprite.setPosition(startPosition);
-
-    _textures = {
-        {Direction::Right, "asset/player_right.png"},
-        {Direction::Left, "asset/player_left.png"},
-        {Direction::Up, "asset/player_up.png"},
-        {Direction::Down, "asset/player_down.png"},
-    };
-    _currentDir = Direction::Left;
-    updateDirection();
+    _sprite.setScale(3.0f, 3.0f);
 }
 
-void Player::setDirection(Direction dir, const sf::Vector2f &newDestPosition)
+void Player::handleInput()
 {
-    _currentDir = dir;
-    _destPosition = newDestPosition;
-    updateDirection();
-
-    if (!_texture.loadFromFile(_textures[_currentDir])) {
-        throw std::runtime_error("Error when loading texture for direction");
+    sf::Vector2f oldDirection = _direction;
+    _direction = {0, 0};
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
+        _direction.y = -1;
+        _currentDir = Direction::Up;
+        _rect.top = 240;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        _direction.y = 1;
+        _currentDir = Direction::Down;
+        _rect.top = 160;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+        _direction.x = -1;
+        _currentDir = Direction::Left;
+        _rect.top = 80;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        _direction.x = 1;
+        _currentDir = Direction::Right;
+        _rect.top = 0;
+    } else {
+        _currentDir = Direction::Idle;
     }
-    _sprite.setTexture(_texture);
-    _reachedDest = false;
-}
-
-void Player::updateDirection()
-{
-    sf::Vector2f directionVec = _destPosition - _sprite.getPosition();
-    float distance = std::sqrt(directionVec.x * directionVec.x + directionVec.y * directionVec.y);
-    _direction = directionVec / distance;
+    if (_direction != sf::Vector2f(0, 0)) {
+        if (oldDirection == sf::Vector2f(0, 0)) {
+            _sound.playSound("footsteps", true);
+        }
+        _lastDir = _currentDir;
+    } else {
+        _sound.stopSound("footsteps");
+    }
 }
 
 void Player::updateTime(sf::Time elapsed)
 {
-    if (!_reachedDest) {
-        sf::Vector2f movement = _direction * _moveSpeed * elapsed.asSeconds();
-        _sprite.move(movement);
-
-        _elapsedTime += elapsed;
-        if (_elapsedTime.asSeconds() > _animationSpeed) {
-            _elapsedTime = sf::Time::Zero;
-            _rect.left += _rect.width;
-            if (_rect.left >= 350)
-                _rect.left = 0;
-
-            _sprite.setTextureRect(_rect);
+    _elapsedTime += elapsed;
+    if (_elapsedTime.asSeconds() > 0.5f / _animationSpeed) {
+        if (_currentDir != Direction::Idle) {
+            _sprite.move(_direction * _moveSpeed * _elapsedTime.asSeconds());
+            updateAnimation();
+            if (_usingIdleTexture) {
+                _sprite.setTexture(_texture);
+                _usingIdleTexture = false;
+            }
+        } else {
+            updateIdlePose();
         }
-        if (std::abs(_sprite.getPosition().x - _destPosition.x) < 1.0f &&
-            std::abs(_sprite.getPosition().y - _destPosition.y) < 1.0f) {
-            _sprite.setPosition(_destPosition);
-            _reachedDest = true;
-        }
+        _elapsedTime = sf::Time::Zero;
     }
+}
+
+void Player::updateAnimation()
+{
+    _rect.left += 80;
+    if (_rect.left >= _texture.getSize().x) {
+        _rect.left = 0;
+    }
+    _sprite.setTextureRect(_rect);
+}
+
+void Player::updateIdlePose()
+{
+    if (!_usingIdleTexture) {
+        _sprite.setTexture(_idleTexture);
+        _usingIdleTexture = true;
+    }
+    _sprite.setTexture(_idleTexture);
+    switch (_lastDir) {
+        case Direction::Up:
+            _rect.top = 240;
+            break;
+        case Direction::Down:
+            _rect.top = 160;
+            break;
+        case Direction::Left:
+            _rect.top = 80;
+            break;
+        case Direction::Right:
+        case Direction::Idle:
+        default:
+            _rect.top = 0;
+            break;
+    }
+    _rect.left += 80;
+    if (_rect.left >= _idleTexture.getSize().x) {
+        _rect.left = 0;
+    }
+    _sprite.setTextureRect(_rect);
 }
 
 void Player::draw(sf::RenderWindow &window) const
@@ -76,12 +119,46 @@ void Player::draw(sf::RenderWindow &window) const
     window.draw(_sprite);
 }
 
-bool Player::ReachedDestination() const
-{
-    return _reachedDest;
-}
-
 void Player::setPosition(const sf::Vector2f &position)
 {
-    sprite.setPosition(position);
+    _sprite.setPosition(position);
+}
+
+sf::Vector2f Player::getPosition() const
+{
+    return _sprite.getPosition();
+}
+
+Team::Team(int index, const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, Sound &sound)
+: Player(textureFile, startPosition, moveSpeed, animationSpeed, sound), _index(index), _incantationActive(false)
+{
+}
+
+void Team::performIncantation()
+{
+    _incantationActive = true;
+    _incantationTime = sf::Time::Zero;
+}
+
+void Team::spawnEgg()
+{
+    sf::Sprite eggSprite;
+    eggSprite.setTexture(_eggTexture);
+    eggSprite.setPosition(_sprite.getPosition());
+    _eggs.push_back(eggSprite);
+}
+
+void Team::hatchEgg()
+{
+    if (!_eggs.empty()) {
+        _eggs.erase(_eggs.begin());
+    }
+}
+
+void Team::draw(sf::RenderWindow &window) const
+{
+    Player::draw(window);
+    for (const auto& egg : _eggs) {
+        window.draw(egg);
+    }
 }
