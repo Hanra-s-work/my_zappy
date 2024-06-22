@@ -6,6 +6,7 @@
 ##
 
 import sys
+import signal
 
 from tcp_server import TCPServer
 from custom_functions import pinfo,  psuccess, perror, pdebug, pwarning
@@ -131,6 +132,16 @@ class Main:
             f"Team name is: {self.global_variables.user_arguments.name}"
         )
 
+    def _gracefully_exit(self, sig, frame) -> None:
+        """
+        _summary_
+        This function is in charge of exiting the program gracefully when ctrl+c is pressed.
+        """
+        # pinfo(self.global_variables, "CTRL-C captured, gracefully exiting.")
+        self.global_variables.continue_running = False
+        my_status = self.global_variables.current_status
+        sys.exit(my_status)
+
     def main(self) -> int:
         """
         _sumary_
@@ -163,6 +174,7 @@ class Main:
             ""
         )
         self._check_team_name()
+        signal.signal(signal.SIGINT, self._gracefully_exit)
 
         pinfo(self.global_variables, "Main class loaded")
         pinfo(self.global_variables, "Loading Server")
@@ -189,8 +201,5 @@ if __name__ == "__main__":
         error=ERROR,
         success=SUCCESS
     )
-    try:
-        sys.exit(MI.main())
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        sys.exit(ERROR)
+    status = MI.main()
+    sys.exit(status)
