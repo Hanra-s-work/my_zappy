@@ -255,7 +255,7 @@ class Logistics:
             return False
         if self.evolution_level > 1:
             return True
-        if Items.LINEMATE in command or "linemate" in command or "Linemate" in command:
+        if Items.LINEMATE in command or (isinstance(command, str) is True and command.lower() == "linemate"):
             psuccess(
                 self.global_variables,
                 "The item Linemate was found on the ground"
