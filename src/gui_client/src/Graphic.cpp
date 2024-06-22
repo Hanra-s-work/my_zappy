@@ -30,6 +30,20 @@ void Graphic::setMapSize(float width, float height)
     mapHeight = height;
 }
 
+void Graphic::zoomIn()
+{
+    view.zoom(0.5f);
+    isZoomed = true;
+    window.setView(view);
+}
+
+void Graphic::zoomOut()
+{
+    view.zoom(2.0f);
+    isZoomed = false;
+    window.setView(view);
+}
+
 void Graphic::handleInput(bool &followPlayer, const sf::Vector2f &playerPosition)
 {
     const float deltaTime = 1.0f / 60.0f;
@@ -48,9 +62,15 @@ void Graphic::handleInput(bool &followPlayer, const sf::Vector2f &playerPosition
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) {
         followPlayer = true;
+        if (!isZoomed) {
+            zoomIn();
+        }
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
         followPlayer = false;
+        if (isZoomed) {
+            zoomOut();
+        }
     }
 
     if (!followPlayer) {
@@ -67,8 +87,9 @@ void Graphic::handleInput(bool &followPlayer, const sf::Vector2f &playerPosition
             viewMove.y = scrollSpeed * deltaTime;
         }
     }
+
     sf::Vector2f newCenter = followPlayer ? playerPosition : view.getCenter() + viewMove;
-    sf::Vector2f halfSize = view.getSize() / 1.0f;
+    sf::Vector2f halfSize = view.getSize() / 2.0f;
     if (newCenter.x - halfSize.x < 0) {
         newCenter.x = halfSize.x;
     }

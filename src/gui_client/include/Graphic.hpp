@@ -20,6 +20,8 @@ class Graphic
         sf::RenderWindow &getWindow();
         void handleInput(bool &followPlayer, const sf::Vector2f &playerPosition);
         void setMapSize(float width, float height);
+        void zoomIn();
+        void zoomOut();
 
     private:
         sf::RenderWindow window;
@@ -27,6 +29,7 @@ class Graphic
         float scrollSpeed;
         float mapWidth;
         float mapHeight;
+        bool isZoomed;
 };
 
 class ISprite
