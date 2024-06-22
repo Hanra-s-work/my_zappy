@@ -8,7 +8,7 @@ alias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PA
 # Unset irrelevant variables.
 deactivate nondestructive
 
-setenv VIRTUAL_ENV "/home/hhh/Documents/my_repositories/Hanra-s-work/my_zappy/src/ai/ai_env"
+setenv VIRTUAL_ENV "/home/eletellier/Documents/001_github/Hanra-s-work/my_zappy/src/ai/ai_env"
 
 set _OLD_VIRTUAL_PATH="$PATH"
 setenv PATH "$VIRTUAL_ENV/bin:$PATH"

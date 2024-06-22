@@ -5,6 +5,7 @@
 ** game_data_initialization
 */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "show.h"
@@ -47,19 +48,8 @@ static int search_unfilled_index(cli_t client[MAX_CLIENT])
 {
     int index = 0;
 
-    for (; client[index].client_num != UNKNOWN; index++);
+    for (; client[index].team_name != NULL; index++);
     return index;
-}
-
-static bool check_if_already_taken_pos(cli_t clients[MAX_CLIENT], const int x,
-    const int y)
-{
-    for (int i = 0; i < MAX_CLIENT; i++) {
-        if (clients[i].pos[0] == x && clients[i].pos[1] == y) {
-            return true;
-        }
-    }
-    return false;
 }
 
 static void randomize_player_pos_and_dir(server_handler_t *server,
@@ -69,14 +59,9 @@ static void randomize_player_pos_and_dir(server_handler_t *server,
     int y = 0;
     int dir = 0;
 
-    while (check_if_already_taken_pos(server->game_data.clients,
-    x, y) == true) {
-        for (int i = 0; i < 10; i++) {
-            x = rand() % server->game_data.map_size[0];
-            y = rand() % server->game_data.map_size[1];
-            dir = rand() % 4;
-        }
-    }
+    x = rand() % server->game_data.map_size[0];
+    y = rand() % server->game_data.map_size[1];
+    dir = rand() % 4;
     server->game_data.clients[index].pos[0] = x;
     server->game_data.clients[index].pos[1] = y;
     server->game_data.clients[index].direction = dir + 1;
@@ -172,5 +157,7 @@ int init_game_data(server_handler_t *server, struct arg_s **arguments)
         return (write_error_msg("Error: Internal server error.\n"));
     for (int i = 0; i < MAX_EVENT; i++)
         server->game_data.event[i] = DEFAULT_EVENT;
+    server->game_data.event[0].type = FOOD_REGEN;
+    server->game_data.event[0].time_counter = SPAWN_TIME;
     return (show_game_data(server, true));
 }

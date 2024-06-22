@@ -5,8 +5,6 @@
 ** main.cpp
 */
 
-#include "Graphic.hpp"
-#include "Player.hpp"
 #include "Game.hpp"
 
 /**
@@ -16,30 +14,31 @@
  * @param argv
  * @return int
  */
+
 int main(int argc, char **argv)
 {
     Graphic graphic;
     graphic.initWindow(1920, 1080, "My Zappy");
-    Resource resource("asset/flower_grass.png");
+    Resource resource("asset/pictures/resources/flower_grass.png");
+
+    Sound sound;
+    sound.loadMusic("asset/sound/C418 - Moog City.ogg");
+    sound.playMusic();
+    sound.loadSound("footsteps", "asset/sound/footstep.ogg");
 
     sf::Clock clock;
-    Player player("asset/player_left.png", {700, 300}, {200, 300}, 100.0f, 0.3f);
+    sf::Vector2f randomStartPosition(static_cast<float>(std::rand() % (200 * 128)), static_cast<float>(std::rand() % (200 * 128)));
+    Team team(1, "asset/pictures/character/walk.png", randomStartPosition, 200.0f, 16.0f, sound);
 
-    std::vector<std::pair<Direction, sf::Vector2f>> directions = {
-        {Direction::Left, {200, 300}},
-        {Direction::Right, {600, 300}},
-        {Direction::Up, {600, 100}},
-        {Direction::Down, {600, 500}}
-    };
-    size_t currentDirection = 0;
+    bool followPlayer = false;
 
-    resource.addMaterial("food", "asset/food.png");
-    resource.addMaterial("linemate", "asset/linemate.png");
-    resource.addMaterial("deraumere", "asset/deraumere.png");
-    resource.addMaterial("sibur", "asset/sibur.png");
-    resource.addMaterial("mendiane", "asset/mendiane.png");
-    resource.addMaterial("phiras", "asset/phiras.png");
-    resource.addMaterial("thystame", "asset/thystame.png");
+    resource.addMaterial("food", "asset/pictures/resources/food.png");
+    resource.addMaterial("linemate", "asset/pictures/resources/linemate.png");
+    resource.addMaterial("deraumere", "asset/pictures/resources/deraumere.png");
+    resource.addMaterial("sibur", "asset/pictures/resources/sibur.png");
+    resource.addMaterial("mendiane", "asset/pictures/resources/mendiane.png");
+    resource.addMaterial("phiras", "asset/pictures/resources/phiras.png");
+    resource.addMaterial("thystame", "asset/pictures/resources/thystame.png");
 
     resource.generateMap(200, 200);
     resource.generateMaterials();
@@ -53,19 +52,24 @@ int main(int argc, char **argv)
                 window.close();
             }
         }
-        graphic.handleInput();
-        sf::Time elapsed = clock.restart();
-        if (player.ReachedDestination() && currentDirection < directions.size() - 1) {
-            currentDirection++;
-            player.setDirection(directions[currentDirection].first, directions[currentDirection].second);
-        }
+        graphic.handleInput(followPlayer, team.getPosition());
+        team.handleInput();
 
-        player.updateTime(elapsed);
+        sf::Time elapsed = clock.restart();
+        team.updateTime(elapsed);
 
         window.clear();
         resource.draw(window);
-        player.draw(window);
+        team.draw(window);
         window.display();
     }
     return 0;
 }
+
+/*
+rajouter la condition "si le player passe sur une ressource alors elle disparait et réaparait ailleurs"
+rajouter des bordures sur la map au extremité pour ne pas laissé passer le player
+rajouter un pitit zoom quand on passe sur la cam d'un player
+gérer le volume de la musique avec + et -
+gérer le zoom de la cam libre avec + et -
+*/

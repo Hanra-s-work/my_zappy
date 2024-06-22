@@ -72,7 +72,7 @@ static int check_select_status(server_handler_t *server, const int status,
     } else if (status) {
         *is_fd = true;
     } else {
-        printf("In event checker\n");
+        check_event(server);
     }
     if (*is_fd == true) {
         if (loop_in_fd(server) == -1) {
@@ -86,16 +86,16 @@ void server_loop(server_handler_t *server)
 {
     struct timeval timeout;
     int status = 0;
-    double time = (double)1 / (double)server->game_data.frequence;
     bool is_fd = false;
 
-    time *= 1000000;
+    server->game_data.time = (double)1 / (double)server->game_data.frequence;
+    server->game_data.time *= 1000000;
     FD_ZERO(&server->current_fd);
     FD_SET(server->socket, &server->current_fd);
     while (true) {
         if (is_fd == false) {
             timeout.tv_sec = 0;
-            timeout.tv_usec = (int)time;
+            timeout.tv_usec = (int)server->game_data.time;
         }
         is_fd = false;
         server->ready_fd = server->current_fd;

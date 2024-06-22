@@ -147,5 +147,6 @@ int show_game_data(server_handler_t *server, bool need_to_show)
     show_teams_data(server);
     show_clients_data(server);
     show_map_content(server);
+    printf("\n\n");
     return (0);
 }

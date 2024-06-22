@@ -8,26 +8,29 @@
 #ifndef GAME_HPP_
     #define GAME_HPP_
 
+    #include <SFML/Graphics.hpp>
     #include "Graphic.hpp"
     #include "Player.hpp"
-    #include "NetworkClient.hpp"
-    #include <string>
+    #include "Resource.hpp"
+    #include "Sound.hpp"
 
 class Game
 {
-public:
-    Game(const std::string &ip, int port);
-    ~Game();
-    void run();
+    public:
+        Game();
+        void run();
 
-private:
-    Graphic graphic;
-    Player player;
-    Resource resource;
-    NetworkClient networkClient;
-    std::atomic<bool> running;
+    private:
+        void processEvents();
+        void update(sf::Time deltaTime);
+        void render();
 
-    void handleServerMessage(const std::string &message);
+        Graphic graphic;
+        Player player;
+        Resource resource;
+        Sound sound;
+
+        bool followPlayer;
 };
 
 #endif

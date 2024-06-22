@@ -36,7 +36,7 @@ int check_command_exist(char **command)
 {
     int r_val;
 
-    for (int i = 0; i < CLIENT_COMMAND_NB + GUI_COMMAND_NB; ++i) {
+    for (int i = 0; i < AI_COMMAND_NB + GUI_COMMAND_NB; ++i) {
         if (strcmp(command[0], COMMAND_TABLE[i].command) == 0) {
             r_val = check_command_arg(i, command);
             return (r_val);

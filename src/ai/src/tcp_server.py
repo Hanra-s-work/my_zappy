@@ -25,28 +25,94 @@ class TCPServer:
         self.logistics: Logistics = None
         self.current_query = ""
 
-    def _process_incoming(self, tcp_socket: socket) -> None:
+    def _hard_to_crash(self, raw_data: bytes) -> str:
+        """_summary_
+        This function is in charge of converting the data into a string
+        Args:
+            raw_data (bytes): _description_: The data to be converted
+        Returns:
+            str: _description_: The converted data
+        """
+        encodings = [
+            'utf-8', 'latin1', 'ascii', 'utf-16', 'utf-32',
+            'utf-7', 'utf-8-sig', 'unicode_escape', 'raw_unicode_escape',
+            'cp1252', 'iso-8859-1', 'iso-8859-2', 'iso-8859-15'
+        ]
+
+        for encoding in encodings:
+            try:
+                decoded_data = raw_data.decode(encoding)
+                return decoded_data
+            except UnicodeEncodeError as e:
+                pwarning(
+                    self.global_variables,
+                    f"The received data: '{raw_data}' is not of type: {encoding}\nError: '{e}'"
+                )
+                continue
+            except Exception as e:
+                pwarning(
+                    self.global_variables,
+                    f"Failed to decode data: '{raw_data}' with encoding: {encoding}\nError: '{e}'"
+                )
+                continue
+        pwarning(
+            self.global_variables,
+            f"Failed to decode data: '{raw_data}' with all tested encodings."
+        )
+        raise ValueError("No known encoding found.")
+
+    def _process_incoming(self, tcp_socket: socket) -> int:
         """_summary_
             Process incoming data from the server binary
         Args:
             tcp_socket (socket): _description_: The tcp connection
         """
-        data = tcp_socket.recv(self.global_variables.server_data.buffer_size)
+        try:
+            data = tcp_socket.recv(
+                self.global_variables.server_data.buffer_size
+            )
+        except Exception as e:
+            pwarning(
+                self.global_variables,
+                f"Failed to receive data\nRaised error: '{e}'"
+            )
+            return self.global_variables.error
         if not data:
             pinfo(self.global_variables, "No data received")
-        pinfo(self.global_variables, f"Received data: {data.decode()}")
-        if data.decode().lower() in ("exit\n", "dead\n"):
+            return self.global_variables.error
+        try:
+            decoded_data = self._hard_to_crash(data)
+        except Exception as e:
+            pwarning(
+                self.global_variables,
+                f"Failed to decode data: '{data}'\nRaised error: '{e}'"
+            )
+            return self.global_variables.error
+        pinfo(self.global_variables, f"Received data: {decoded_data}")
+        if decoded_data.lower() in ("exit\n", "dead\n"):
             pinfo(self.global_variables, "Exit message received")
             self.global_variables.continue_running = False
-            return
-        translated_data = ConvertData(
-            data,
-            self.global_variables.error,
-            self.global_variables.success
-        )
-        self.logistics.dispatcher(
-            translated_data.to_internal(self.current_query)
-        )
+            return self.global_variables.success
+        broadcast_item = "message"
+        if decoded_data.startswith(broadcast_item):
+            translated_data = ConvertData(
+                data,
+                self.global_variables.error,
+                self.global_variables.success
+            )
+            self.logistics.dispatcher(
+                translated_data.to_internal(broadcast_item)
+            )
+        else:
+            translated_data = ConvertData(
+                data,
+                self.global_variables.error,
+                self.global_variables.success
+            )
+            self.logistics.dispatcher(
+                translated_data.to_internal(self.current_query)
+            )
+        return self.global_variables.success
 
     def _send_output_data(self, tcp_socket: socket) -> bool:
         """_summary_
