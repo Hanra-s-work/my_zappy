@@ -180,7 +180,7 @@ void command_handling(server_handler_t *server, const int fd)
     read_bytes = read(fd, buffer, sizeof(buffer));
     if (read_bytes <= 0) {
         FD_CLR(fd, &server->current_fd);
-        delete_client(server->game_data.clients, fd);
+        delete_client(server, fd);
         printf("The client %d has been deconnected.\n", fd);
         return;
     }

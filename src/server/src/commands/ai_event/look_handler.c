@@ -158,7 +158,7 @@ static void look_right(server_handler_t *server, const int idx, int **pos,
     (*pos)[1] += 2;
 }
 
-static void generic_look(server_handler_t *server,
+void generic_look(server_handler_t *server,
     char str[INSANE_BUFFER_SIZE], const int idx, const int size)
 {
     direction_t direction = server->game_data.clients[idx].direction;
@@ -166,7 +166,7 @@ static void generic_look(server_handler_t *server,
 
     pos[0] = 2;
     pos[1] = 2;
-    strcpy(str, "[");
+    strcat(str, "[");
     for (int a = 0; a < size; a++) {
         if (a != 0)
             strcat(str, ", ");
@@ -188,6 +188,7 @@ void do_look(server_handler_t *server, event_t event)
     int idx = get_client(server->game_data.clients, event.fd);
     char str[INSANE_BUFFER_SIZE];
 
+    memset(str, '\0', INSANE_BUFFER_SIZE);
     if (server->game_data.clients->level == 1)
         generic_look(server, str, idx, 1);
     if (server->game_data.clients->level == 2)
@@ -200,10 +201,7 @@ void do_look(server_handler_t *server, event_t event)
         generic_look(server, str, idx, 5);
     if (server->game_data.clients->level == 6)
         generic_look(server, str, idx, 6);
-    if (server->game_data.clients->level == 7)
-        generic_look(server, str, idx, 7);
-    if (server->game_data.clients->level == 8)
-        generic_look(server, str, idx, 8);
+    do_other_look(server, str, idx);
     write_to_client(event.fd, str);
 }
 

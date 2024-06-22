@@ -27,15 +27,15 @@ int get_client(cli_t client[MAX_CLIENT], const int fd);
 /**
  * @brief The function to delete a specific client from the cli_t structure by
  * the fd
- * @param clint The cli_t structure
+ * @param server The server_handler_t structure
  * @param fd The file descriptor of the client
  * @return (0) if the client is founded and deleted successfully, (-1) if not
 */
-int delete_client(cli_t client[MAX_CLIENT], const int fd);
+int delete_client(server_handler_t *server, const int fd);
 
 /**
  * @brief The function to delete a every client from the cli_t structure
- * @param clint The cli_t structure
+ * @param client The cli_t structure
 */
 void delete_all_client(cli_t client[MAX_CLIENT]);
 

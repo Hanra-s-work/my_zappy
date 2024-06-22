@@ -6,6 +6,7 @@
 */
 
 #include "utils.h"
+#include "ai_event.h"
 #include "server_handler.h"
 
 void delete_event(event_t *event)
@@ -59,4 +60,13 @@ void go_in_good_direction(game_data_t *game, const int idx, int *x, int *y)
     }
     set_up_down(game, idx, y);
     game->map[*y][*x].player_nb++;
+}
+
+void do_other_look(server_handler_t *server, char str[INSANE_BUFFER_SIZE],
+    const int idx)
+{
+    if (server->game_data.clients->level == 7)
+        generic_look(server, str, idx, 7);
+    if (server->game_data.clients->level == 8)
+        generic_look(server, str, idx, 8);
 }
