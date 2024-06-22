@@ -129,6 +129,29 @@ sf::Vector2f Player::getPosition() const
     return _sprite.getPosition();
 }
 
+void Player::zoomIn(sf::RenderWindow &window)
+{
+    sf::View view = window.getView();
+    view.zoom(0.5f);
+    window.setView(view);
+    _isZoomed = true;
+}
+
+void Player::zoomOut(sf::RenderWindow &window)
+{
+    sf::View view = window.getView();
+    view.zoom(2.0f);
+    window.setView(view);
+    _isZoomed = false;
+}
+
+void Player::setView(sf::RenderWindow &window)
+{
+    sf::View view = window.getView();
+    view.setCenter(_sprite.getPosition());
+    window.setView(view);
+}
+
 Team::Team(int index, const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, Sound &sound)
 : Player(textureFile, startPosition, moveSpeed, animationSpeed, sound), _index(index), _incantationActive(false)
 {

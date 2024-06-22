@@ -30,25 +30,30 @@ class Player : public ISprite
         void draw(sf::RenderWindow &window) const override;
         void setPosition(const sf::Vector2f &position);
         sf::Vector2f getPosition() const;
+        void zoomIn(sf::RenderWindow &window);
+        void zoomOut(sf::RenderWindow &window);
+        void setView(sf::RenderWindow &window);
 
     private:
-    sf::Texture _texture;
-    sf::Texture _idleTexture;
-    sf::Sprite _sprite;
-    sf::IntRect _rect;
-    sf::Vector2f _direction;
-    sf::Vector2f _destPosition;
-    float _moveSpeed;
-    float _animationSpeed;
-    bool _reachedDest;
-    bool _usingIdleTexture = true;
-    sf::Time _elapsedTime;
-    Direction _currentDir;
-    Direction _lastDir;
-    Sound &_sound;
-    void updateDirection();
-    void updateAnimation();
-    void updateIdlePose();
+        sf::Texture _texture;
+        sf::Texture _idleTexture;
+        sf::Sprite _sprite;
+        sf::IntRect _rect;
+        sf::Vector2f _direction;
+        sf::Vector2f _destPosition;
+        float _moveSpeed;
+        float _animationSpeed;
+        bool _reachedDest;
+        bool _usingIdleTexture = true;
+        sf::Time _elapsedTime;
+        Direction _currentDir;
+        Direction _lastDir;
+        Sound &_sound;
+        bool _isZoomed = false;
+
+        void updateDirection();
+        void updateAnimation();
+        void updateIdlePose();
 };
 
 class Team : public Player
