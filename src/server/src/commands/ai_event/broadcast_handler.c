@@ -36,27 +36,36 @@ static int *direction_to_adjacent_tile(cli_t *sender, cli_t *receiver)
     return (adjacent_tile);
 }
 
+static void concat_msg(char **str, char *x, char *y, char *text)
+{
+    strcpy(*str, BROADCAST_MESSAGE);
+    strcat(*str, " ");
+    strcat(*str, x);
+    strcat(*str, " ");
+    strcat(*str, y);
+    strcat(*str, ", ");
+    strcat(*str, text);
+    strcat(*str, "\n");
+}
+
 static char *create_broadcast_message(char *text, int *direction)
 {
     char *msg;
     char *x;
     char *y;
 
-    if (asprintf(&x, "%d", direction[0]) == -1)
+    if (asprintf(&x, "%d", direction[0]) == -1) {
         return (NULL);
-    if (asprintf(&y, "%d", direction[1]) == -1)
+    }
+    if (asprintf(&y, "%d", direction[1]) == -1) {
         return (NULL);
-    msg = malloc(sizeof(char) * (strlen(text) + strlen(x) + strlen(y) + 10));
+    }
+    msg = malloc(sizeof(char) * (strlen(text) + strlen(x) + strlen(y) + 13));
     if (msg == NULL)
         return (NULL);
-    msg[0] = '\0';
-    strcat(msg, BROADCAST_MESSAGE);
-    strcat(msg, " ");
-    strcat(msg, x);
-    strcat(msg, " ");
-    strcat(msg, y);
-    strcat(msg, ", ");
-    strcat(msg, text);
+    concat_msg(&msg, x, y, text);
+    free(x);
+    free(y);
     return (msg);
 }
 
@@ -76,9 +85,8 @@ void do_broadcast(server_handler_t *server, event_t event)
             .clients[idx], &server->game_data.clients[i]);
         if (direction == NULL)
             continue;
-        msg = create_broadcast_message(event.args[1], direction);
-        write_to_client(i, msg);
-        write_to_client(i, "\n");
+        msg = create_broadcast_message(event.args[0], direction);
+        write_to_client(server->game_data.clients[i].fd, msg);
         free(msg);
         free(direction);
     }
