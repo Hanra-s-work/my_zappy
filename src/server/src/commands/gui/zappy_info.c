@@ -5,7 +5,6 @@
 ** zappy_info.c
 */
 
-#define _GNU_SOURCE
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -85,7 +84,9 @@ int time_unit_modification_request(server_handler_t *server, char **args,
     if (new_frequency <= 0)
         return (command_parameter_error(server, idx));
     server->game_data.frequence = new_frequency;
-    write(server->game_data.clients[idx].fd, TIME_UNIT_COMMAND,
+    server->game_data.time = (double)1 / (double)server->game_data.frequence;
+    server->game_data.time *= 1000000;
+    write(server->game_data.clients[idx].fd, TIME_UNIT_MODIFICATION_COMMAND,
         COMMAND_ID_LEN);
     write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
     write(server->game_data.clients[idx].fd, args[1], strlen(args[1]));

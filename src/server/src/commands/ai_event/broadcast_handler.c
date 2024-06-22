@@ -5,7 +5,6 @@
 ** broadcast_handler
 */
 
-#define _GNU_SOURCE
 #include <string.h>
 #include <stdio.h>
 
