@@ -38,7 +38,7 @@ static void set_up_down(game_data_t *game, const int idx, int *y)
         if (*y == game->map_size[1] - 1)
             *y = 0;
         else
-            (*y)--;
+            (*y)++;
     }
 }
 

@@ -13,6 +13,15 @@
 #include "server_handler.h"
 #include "client_management.h"
 
+static void delete_client_current_event(server_handler_t *server, const int fd)
+{
+    for (int i = 0; i < MAX_EVENT; i++) {
+        if (server->game_data.event[i].fd == fd) {
+            delete_event(&server->game_data.event[i]);
+        }
+    }
+}
+
 static void check_players_life(server_handler_t *server)
 {
     char str[MAX_BUFFER_SIZE];
@@ -26,6 +35,8 @@ static void check_players_life(server_handler_t *server)
             sprintf(str, "pdi %d\n", server->game_data.clients[i].client_num);
             write_to_graphics_clients(server->game_data.clients, str);
             FD_CLR(server->game_data.clients[i].fd, &server->current_fd);
+            delete_client_current_event(server,
+            server->game_data.clients[i].fd);
             delete_client(server->game_data.clients,
             server->game_data.clients[i].fd);
         }
