@@ -6,6 +6,10 @@
 */
 
 #include "Game.hpp"
+#include "Parsing.hpp"
+#include "NetworkManager.hpp"
+#include "CommandHandler.hpp"
+#include "GameState.hpp"
 
 /**
  * @brief This is the function the compiler calls to successfully compile the program
@@ -32,6 +36,12 @@ int main(int argc, char **argv)
 
     bool followPlayer = false;
 
+    Parsing parsing;
+    GameState gameState;
+    NetworkManager networkManager("127.0.0.1", "4242");
+    networkManager.send("GRAPHIC");
+    CommandHandler commandHandler(gameState);
+
     resource.addMaterial("food", "asset/pictures/resources/food.png");
     resource.addMaterial("linemate", "asset/pictures/resources/linemate.png");
     resource.addMaterial("deraumere", "asset/pictures/resources/deraumere.png");
@@ -57,6 +67,9 @@ int main(int argc, char **argv)
 
         sf::Time elapsed = clock.restart();
         team.updateTime(elapsed);
+
+        std::string command = networkManager.receive();
+        commandHandler.handleCommand(command);
 
         window.clear();
         resource.draw(window);
