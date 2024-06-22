@@ -5,6 +5,7 @@
 # logistics_thread.py
 ##
 
+import os
 import sys
 from datetime import datetime
 
@@ -33,14 +34,20 @@ class Logistics:
         self.nb_responses = 0
         self.tile_content = []
         self.random_seed = self._create_random_seed()
+        self.evolution_level = 1
         self.stall = False
-        self.sabotage = False
         self.direction_options_list = ["forward", "left", "right"]
         self.direction_options = {
             "forward": self._forward,
             "left": self._left,
             "right": self._right
         }
+        # Internal name
+        self.internal_name = 0
+        # Message vars
+        self.message_key: str = f"e56r4ze56r4ze56{self.global_variables.user_arguments.name}: "
+        self.nb_sent_messages: int = 0
+        self.message_sent: list = []
 
     def _create_random_seed(self) -> int:
         """_summary_
@@ -50,8 +57,22 @@ class Logistics:
         """
         c_time = datetime.now()
         final_seed = c_time.hour + c_time.minute + c_time.second + c_time.microsecond
+        final_seed += os.getpid()
         pinfo(self.global_variables, f"Generated seed: {final_seed}")
         return final_seed
+
+    def send_message(self, message: str) -> None:
+        """_summary_
+        This function is in charge of sending a message to the server
+        Args:
+            message (str): _description_: The message to be sent
+        """
+        self.global_variables.response_buffer.append(
+            f"{self.message_key} {self.message_sent} '{message}'\n"
+        )
+        self.nb_sent_messages += 1
+        self.message_sent.append(message)
+        self.global_variables.response_buffer.append(message)
 
     def _forward(self) -> None:
         """_summary_
@@ -232,7 +253,9 @@ class Logistics:
                 "(logistics) _can_evolve: The command is empty"
             )
             return False
-        if Items.LINEMATE in command or "linemate" in command or "Linemate" in command:
+        if self.evolution_level > 1:
+            return True
+        if Items.LINEMATE in command or (isinstance(command, str) is True and command.lower() == "linemate"):
             psuccess(
                 self.global_variables,
                 "The item Linemate was found on the ground"
@@ -297,14 +320,41 @@ class Logistics:
 
         pdebug(self.global_variables, f"Incoming response =  {response}")
 
-        if self.stall is True and Commands.UNKNOWN in response and response[Commands.UNKNOWN] == 'ok':
-            self.stall = False
-            self.sabotage = True
+        if Commands.MESSAGE in response:
+            pinfo(
+                self.global_variables,
+                f"Received message: {response[Commands.MESSAGE]}"
+            )
+            return status
 
-        if self.sabotage is True:
+        node = list(response)[0]
+
+        if self.stall is True and isinstance(response[node], str) is True and "Current level:" in response[node]:
+            self.stall = False
+            data: list[str] = response[node].split(" ")
+            while '' == data[-1]:
+                data.pop(-1)
+            if data[-1].isnumeric():
+                level = int(data[-1])
+                if self.evolution_level + 1 == level:
+                    self.evolution_level += 1
+                else:
+                    self.evolution_level = level
+                psuccess(
+                    self.global_variables,
+                    f"Evolution to level {self.evolution_level}"
+                )
+            else:
+                perror(
+                    self.global_variables,
+                    f"Evolution failed\nNumber not found in the response: '{response[node]}'"
+                )
             self._change_my_mind()
 
-        if response[list(response)[0]] in ("ko", "KO", "Ko", "kO"):
+        elif Commands.INCANTATION in response and response[Commands.INCANTATION].lower() == "ko" and self.evolution_level > 1:
+            self._change_my_mind()
+
+        elif isinstance(response[node], str) and response[node].lower() == "ko":
             perror(
                 self.global_variables,
                 f"Command = '{self._to_human_readable(list(response)[0])}' failed"
@@ -312,7 +362,7 @@ class Logistics:
             self._append_look_command()
             return self.global_variables.success
 
-        if Commands.LOOK in response:
+        elif Commands.LOOK in response:
             psuccess(self.global_variables, f"Look response = {response}")
             self.tile_content = response[Commands.LOOK]
             if self._can_evolve(response[Commands.LOOK]) is True:
@@ -336,7 +386,7 @@ class Logistics:
         elif Commands.FORWARD in response and response[Commands.FORWARD].lower() == "ok":
             self._append_look_command()
 
-        elif Commands.INCANTATION in response and response[Commands.INCANTATION] == "Elevation Underway":
+        elif Commands.INCANTATION in response and response[Commands.INCANTATION] == "Elevation underway":
             self.stall = True
 
         else:

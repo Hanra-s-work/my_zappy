@@ -5,6 +5,9 @@
 ** randomizer
 */
 
+#include <string.h>
+
+#include "utils.h"
 #include "server_handler.h"
 
 static void check_which_type(game_data_t *game_data, ressources_type_t type,
@@ -76,4 +79,24 @@ void fill_map(server_handler_t *server)
         server->game_data.map[player_y][player_x].player_nb++;
     }
     call_randomizer(&server->game_data);
+}
+
+char **fill_arg_in_event(char **src, const int index_start, size_t size)
+{
+    int x = 0;
+    char **to_fill = malloc(sizeof(char *) * size + 1);
+
+    if (to_fill == NULL) {
+        return (NULL);
+    }
+    for (int i = index_start; src[i] != NULL; i++) {
+        to_fill[x] = strdup(src[i]);
+        if (to_fill[x] == NULL) {
+            free_array(to_fill);
+            return (NULL);
+        }
+        x++;
+    }
+    to_fill[x] = NULL;
+    return (to_fill);
 }
