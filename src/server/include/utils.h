@@ -28,6 +28,23 @@ int write_error_msg(const char *str);
 */
 int write_to_client(const int fd, const char *str);
 
+/**
+ * @brief Write any message to every gui clients
+ * @param clients The cli_t structure
+ * @param str The string we want to write
+*/
+void write_to_graphics_clients(const cli_t clients[MAX_CLIENT],
+    const char *str);
+
+/**
+ * @brief Write unknown command to ai or gui client.
+ * It already check if the client is ai or gui.
+ * @param client The cli_t structure
+*/
+void write_unknown_command(const cli_t client);
+
+
+
 //!! FINDER !!
 
 /**
@@ -49,6 +66,8 @@ void *find_value_by_param(const struct arg_s **arguments, char *param);
 */
 int find_index_by_param(const struct arg_s **arguments, char *param);
 
+
+
 //!! GETTER !!
 
 /**
@@ -57,6 +76,8 @@ int find_index_by_param(const struct arg_s **arguments, char *param);
  * @return lenght of array or UNDEFINED if array not NULL terminated
  */
 size_t get_array_len(char **array);
+
+
 
 //!! FREE !!
 
@@ -73,6 +94,16 @@ void free_array(void *to_free);
  */
 void free_args(struct arg_s **args, const size_t size);
 
+/**
+ * @brief Free any ** array up to n
+ * @attention if n is superior to the array size the behaviour is undefined
+ * @param to_free
+ * @param n
+ */
+void free_array_size_n(void *to_free, const size_t n);
+
+
+
 // FILL
 
 /**
@@ -88,12 +119,17 @@ void refill_map(game_data_t *game_data);
 void fill_map(server_handler_t *server);
 
 /**
- * @brief Free any ** array up to n
- * @attention if n is superior to the array size the behaviour is undefined
- * @param to_free
- * @param n
- */
-void free_array_size_n(void *to_free, const size_t n);
+ * @brief Fill the 2 dimensions array in the event structure to store
+ * ai commands arguments
+ * @param src The 2 dimensions array to copy
+ * @param index_start The index where to start to copy
+ * @param size The size of the source 2 dimensions array
+*/
+char **fill_arg_in_event(char **src, const int index_start, size_t size);
+
+
+
+// CASTER
 
 /**
  * @brief Turn string to char **
