@@ -96,8 +96,12 @@ static int map_size_checker(const struct arg_s **arguments)
     x = atoi(str);
     strcpy(str, (char *)find_value_by_param(arguments, "-y"));
     y = atoi(str);
-    if (x * y < MINIMUM_MAP_SIZE) {
-        write_error_msg("Error: The map size must be bigger than 20.\n");
+    if (x < 15 || x > 300) {
+        write_error_msg("Error: The x value must be between 15 and 300.\n");
+        return (-1);
+    }
+    if (y < 10 || y > 300) {
+        write_error_msg("Error: The y value must be between 10 and 300.\n");
         return (-1);
     }
     return (0);
