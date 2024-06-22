@@ -10,16 +10,17 @@
 
     #include "server_handler.h"
 
-    #define COMMAND_ID_LEN          3
-    #define MAP_SIZE_COMMMAND           "msz"
-    #define ALL_TEAM_COMMAND            "tna"
-    #define PLAYER_POSITION_COMMAND     "ppo"
-    #define PLAYER_LEVEL_COMMAND        "plv"
-    #define PLAYER_INVENTORY_COMMAND    "pin"
-    #define TILE_CONTENT_COMMAND        "bct"
-    #define TIME_UNIT_COMMAND           "sgt"
-    #define COMMAND_PARAMETER_ERROR     "sbp"
-
+    #define COMMAND_ID_LEN                  3
+    #define MAP_SIZE_COMMMAND               "msz"
+    #define ALL_TEAM_COMMAND                "tna"
+    #define PLAYER_POSITION_COMMAND         "ppo"
+    #define PLAYER_LEVEL_COMMAND            "plv"
+    #define PLAYER_INVENTORY_COMMAND        "pin"
+    #define TILE_CONTENT_COMMAND            "bct"
+    #define TIME_UNIT_COMMAND               "sgt"
+    #define TIME_UNIT_MODIFICATION_COMMAND  "sst"
+    #define COMMAND_PARAMETER_ERROR         "sbp"
+    #define BROADCAST_MESSAGE               "message"
 
 int map_size_request(server_handler_t *server, char **args, const int idx);
 

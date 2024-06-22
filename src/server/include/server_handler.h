@@ -27,9 +27,9 @@ typedef enum ressources_type_s {
 typedef enum direction_s {
     UNDEFINED,
     UP,
-    LEFT,
+    RIGHT,
     DOWN,
-    RIGHT
+    LEFT
 } direction_t;
 
 // An enum type to enum every possible event in the game
