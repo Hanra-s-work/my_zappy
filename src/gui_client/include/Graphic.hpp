@@ -22,6 +22,8 @@ class Graphic
         void setMapSize(float width, float height);
         void zoomIn();
         void zoomOut();
+        void setCameraOffset(const sf::Vector2f &offset);
+        void updateView(float deltaTime);
 
     private:
         sf::RenderWindow window;
@@ -30,6 +32,9 @@ class Graphic
         float mapWidth;
         float mapHeight;
         bool isZoomed;
+        sf::Vector2f cameraOffset;
+        sf::Vector2f targetCenter;
+        const float smoothingFactor = 0.1f; // Adjust this value for smoother camera movement
 };
 
 class ISprite

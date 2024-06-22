@@ -7,7 +7,7 @@
 
 #include "Graphic.hpp"
 
-Graphic::Graphic() : scrollSpeed(500.0f), mapWidth(0), mapHeight(0)
+Graphic::Graphic() : scrollSpeed(500.0f), mapWidth(0), mapHeight(0), isZoomed(false), cameraOffset(-120.0f, -120.0f), targetCenter(-120.0f, -120.0f)
 {
 }
 
@@ -15,7 +15,8 @@ void Graphic::initWindow(unsigned int width, unsigned int height, const std::str
 {
     window.create(sf::VideoMode(width, height), title);
     view.setSize(sf::Vector2f(width, height));
-    view.setCenter(sf::Vector2f(width / 1.0f, height / 1.0f));
+    view.setCenter(sf::Vector2f(width / 2.0f, height / 2.0f));
+    targetCenter = view.getCenter();
     window.setView(view);
 }
 
@@ -42,6 +43,11 @@ void Graphic::zoomOut()
     view.zoom(2.0f);
     isZoomed = false;
     window.setView(view);
+}
+
+void Graphic::setCameraOffset(const sf::Vector2f &offset)
+{
+    cameraOffset = offset;
 }
 
 void Graphic::handleInput(bool &followPlayer, const sf::Vector2f &playerPosition)
@@ -88,20 +94,27 @@ void Graphic::handleInput(bool &followPlayer, const sf::Vector2f &playerPosition
         }
     }
 
-    sf::Vector2f newCenter = followPlayer ? playerPosition : view.getCenter() + viewMove;
+    sf::Vector2f adjustedPlayerPosition = playerPosition - cameraOffset;
+    targetCenter = followPlayer ? adjustedPlayerPosition : view.getCenter() + viewMove;
     sf::Vector2f halfSize = view.getSize() / 2.0f;
-    if (newCenter.x - halfSize.x < 0) {
-        newCenter.x = halfSize.x;
+    if (targetCenter.x - halfSize.x < 0) {
+        targetCenter.x = halfSize.x;
     }
-    if (newCenter.x + halfSize.x > mapWidth) {
-        newCenter.x = mapWidth - halfSize.x;
+    if (targetCenter.x + halfSize.x > mapWidth) {
+        targetCenter.x = mapWidth - halfSize.x;
     }
-    if (newCenter.y - halfSize.y < 0) {
-        newCenter.y = halfSize.y;
+    if (targetCenter.y - halfSize.y < 0) {
+        targetCenter.y = halfSize.y;
     }
-    if (newCenter.y + halfSize.y > mapHeight) {
-        newCenter.y = mapHeight - halfSize.y;
+    if (targetCenter.y + halfSize.y > mapHeight) {
+        targetCenter.y = mapHeight - halfSize.y;
     }
+}
+
+void Graphic::updateView(float deltaTime)
+{
+    sf::Vector2f currentCenter = view.getCenter();
+    sf::Vector2f newCenter = currentCenter + smoothingFactor * (targetCenter - currentCenter);
     view.setCenter(newCenter);
     window.setView(view);
 }
