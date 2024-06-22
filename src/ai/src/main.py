@@ -189,4 +189,8 @@ if __name__ == "__main__":
         error=ERROR,
         success=SUCCESS
     )
-    sys.exit(MI.main())
+    try:
+        sys.exit(MI.main())
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        sys.exit(ERROR)

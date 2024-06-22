@@ -25,7 +25,7 @@ class TCPServer:
         self.logistics: Logistics = None
         self.current_query = ""
 
-    def _process_incoming(self, tcp_socket: socket) -> None:
+    def _process_incoming(self, tcp_socket: socket) -> int:
         """_summary_
             Process incoming data from the server binary
         Args:
@@ -34,13 +34,22 @@ class TCPServer:
         data = tcp_socket.recv(self.global_variables.server_data.buffer_size)
         if not data:
             pinfo(self.global_variables, "No data received")
-        pinfo(self.global_variables, f"Received data: {data.decode()}")
-        if data.decode().lower() in ("exit\n", "dead\n"):
+            return self.global_variables.error
+        try:
+            decoded_data = data.decode()
+        except Exception as e:
+            pwarning(
+                self.global_variables,
+                f"Failed to decode data: '{data}'\nRaised error: '{e}'"
+            )
+            return self.global_variables.error
+        pinfo(self.global_variables, f"Received data: {decoded_data}")
+        if decoded_data.lower() in ("exit\n", "dead\n"):
             pinfo(self.global_variables, "Exit message received")
             self.global_variables.continue_running = False
-            return
+            return self.global_variables.success
         broadcast_item = "message"
-        if data.decode().startswith(broadcast_item):
+        if decoded_data.startswith(broadcast_item):
             translated_data = ConvertData(
                 data,
                 self.global_variables.error,
@@ -58,6 +67,7 @@ class TCPServer:
             self.logistics.dispatcher(
                 translated_data.to_internal(self.current_query)
             )
+        return self.global_variables.success
 
     def _send_output_data(self, tcp_socket: socket) -> bool:
         """_summary_
@@ -110,7 +120,8 @@ class TCPServer:
             int: _description_
         """
         while self.global_variables.continue_running is True:
-            self._process_incoming(tcp_socket)
+            status = self._process_incoming(tcp_socket)
+            # if status != self.global_variables.success:
             if self.global_variables.continue_running is not True:
                 self._send_output_data(tcp_socket)
                 break

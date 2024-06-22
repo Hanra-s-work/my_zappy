@@ -102,19 +102,34 @@ class ConvertData:
 
         processed_result = []
         temporary_result = []
-        for i in data:
-            if " " in i:
-                for j in i.split(" "):
-                    temporary_result.append(j)
+        if isinstance(data, str):
+            if " " in data:
+                temporary_result = data.split(" ")
+                for i in temporary_result:
+                    if i in self.item_string_to_class:
+                        processed_result.append(self.item_string_to_class[i])
+                    else:
+                        processed_result.append(i)
             else:
-                temporary_result.append(i)
-
-        for i in temporary_result:
-            tmp = i.strip()
-            if tmp in self.item_string_to_class:
-                processed_result.append(self.item_string_to_class[tmp])
-            else:
-                processed_result.append(Items.UNKNOWN)
+                if data in self.item_string_to_class:
+                    processed_result = [self.item_string_to_class[data]]
+                else:
+                    processed_result = [data]
+        elif isinstance(data, list):
+            for i in data:
+                if " " in i:
+                    processed_result = i.split(" ")
+                else:
+                    if i in self.item_string_to_class:
+                        temporary_result.append(self.item_string_to_class[i])
+                    else:
+                        temporary_result.append(i)
+                    processed_result.append(temporary_result)
+            for j in processed_result:
+                if j in self.item_string_to_class:
+                    temporary_result.append(self.item_string_to_class[j])
+        else:
+            return {Commands.LOOK: data}
         return {Commands.LOOK: processed_result}
 
     def _special_list_treatment(self, previous_command: Commands) -> dict[Commands, any]:
@@ -124,15 +139,19 @@ class ConvertData:
         Returns:
             dict[Commands, any]: _description_: The converted list
         """
+        data = self.data
         key = ","
-        if "[" == self.data[0]:
-            self.data = self.data[1:]
-        if "]" == self.data[-1]:
-            self.data = self.data[:-1]
-        if key not in self.data:
-            processed_list = {previous_command: [self.data]}
+        if "[" == data[0]:
+            data = data[1:]
+        if "]" == data[-1]:
+            data = data[:-1]
+        if key not in data:
+            if " " in data:
+                processed_look = self._process_look(data)
+                return processed_look
+            processed_list = {previous_command: [data]}
             return processed_list
-        data_list = self.data.split(key)
+        data_list = data.split(key)
         if data_list[-1] == "":
             data_list.pop(-1)
         if len(data_list) == 0:
@@ -141,7 +160,7 @@ class ConvertData:
         if " " in data_list[0] and data_list[0][-1].isnumeric():
             processed_inventory = self._process_inventory(data_list)
             return processed_inventory
-        processed_look = self._process_look(self.data)
+        processed_look = self._process_look(data_list[0])
         return processed_look
 
     def _get_launch_command(self, triger_command: str) -> Commands:
