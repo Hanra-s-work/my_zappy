@@ -32,15 +32,15 @@ int main(int argc, char **argv)
 
     sf::Clock clock;
     sf::Vector2f randomStartPosition(static_cast<float>(std::rand() % (200 * 128)), static_cast<float>(std::rand() % (200 * 128)));
-    Team team(1, "asset/pictures/character/walk.png", randomStartPosition, 200.0f, 16.0f, sound);
+    Team team(1, "asset/pictures/character/walk.png", randomStartPosition, 120.0f, 6.0f, sound);
 
     bool followPlayer = false;
 
-    Parsing parsing;
-    GameState gameState;
-    NetworkManager networkManager("127.0.0.1", "4242");
-    networkManager.send("GRAPHIC");
-    CommandHandler commandHandler(gameState);
+    // Parsing parsing;
+    // GameState gameState;
+    // NetworkManager networkManager("127.0.0.1", "4242");
+    // networkManager.send("GRAPHIC");
+    // CommandHandler commandHandler(gameState);
 
     resource.addMaterial("food", "asset/pictures/resources/food.png");
     resource.addMaterial("linemate", "asset/pictures/resources/linemate.png");
@@ -67,9 +67,10 @@ int main(int argc, char **argv)
 
         sf::Time elapsed = clock.restart();
         team.updateTime(elapsed);
+        graphic.updateView(elapsed.asSeconds());
 
-        std::string command = networkManager.receive();
-        commandHandler.handleCommand(command);
+        // std::string command = networkManager.receive();
+        // commandHandler.handleCommand(command);
 
         window.clear();
         resource.draw(window);
