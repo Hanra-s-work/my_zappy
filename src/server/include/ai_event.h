@@ -24,6 +24,14 @@ int check_incantation_condition(game_data_t *game, const int i, const int idx,
 
 void go_in_good_direction(game_data_t *game, const int idx, int *x, int *y);
 
+void do_other_look(server_handler_t *server, char str[INSANE_BUFFER_SIZE],
+    const int idx);
+
+void generic_look(server_handler_t *server,
+    char str[INSANE_BUFFER_SIZE], const int idx, const int size);
+
+void delete_client_current_event(server_handler_t *server, const int fd);
+
 
 
 // COMMAND ADDER
