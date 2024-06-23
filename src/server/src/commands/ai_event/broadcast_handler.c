@@ -64,8 +64,6 @@ static char *create_broadcast_message(char *text, int *direction)
     if (msg == NULL)
         return (NULL);
     concat_msg(&msg, x, y, text);
-    // free(x);
-    // free(y);
     return (msg);
 }
 
