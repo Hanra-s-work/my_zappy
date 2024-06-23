@@ -56,7 +56,8 @@ class GameState {
 
         void setMapSize(int x, int y);
         void setTeamName(std::vector<std::string> team);
-        void setTile(std::vector<std::string> tile, bool is_init);
+        void setTile(std::vector<std::string> tile);
+        void setAllTiles(std::vector<std::string> tiles);
 
         void addPlayer(std::vector<std::string> player);
         void removePlayer(std::vector<std::string> player);

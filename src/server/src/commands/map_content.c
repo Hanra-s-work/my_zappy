@@ -82,49 +82,47 @@ int tile_content_request(server_handler_t *server, char **args, const int idx)
     return (EXIT_SUCCESS);
 }
 
-static int get_x_tiles(server_handler_t *server, char **tile_command,
-    const int idx)
+static void get_tile(server_handler_t *server, char to_str[MAX_BUFFER_SIZE],
+    const int x, const int y)
 {
-    for (int j = 0; j < server->game_data.map_size[0]; ++j) {
-        if (asprintf(&tile_command[2], "%d", j) == -1)
-            return (EXIT_FAILURE);
-        if (tile_content_request(server, tile_command, idx) == EXIT_FAILURE) {
-            free(tile_command[2]);
-            return (EXIT_FAILURE);
-        }
-        free(tile_command[2]);
-    }
-    return (EXIT_SUCCESS);
+    memset(to_str, '\0', MAX_BUFFER_SIZE);
+    sprintf(to_str, "%d %d %d %d %d %d %d %d %d %d\n",
+    x, y, server->game_data.map[y][x].ressources.food_nb,
+    server->game_data.map[y][x].ressources.food_nb,
+    server->game_data.map[y][x].ressources.linemate_nb,
+    server->game_data.map[y][x].ressources.deraumere_nb,
+    server->game_data.map[y][x].ressources.sibur_nb,
+    server->game_data.map[y][x].ressources.mendiane_nb,
+    server->game_data.map[y][x].ressources.phiras_nb,
+    server->game_data.map[y][x].ressources.thystame_nb);
 }
 
-static int get_all_tiles(server_handler_t *server, char **tile_command,
-    const int idx)
+static void update_values(server_handler_t *server, int *x, int *y)
 {
-    for (int i = 0; i < server->game_data.map_size[1]; ++i) {
-        if (asprintf(&tile_command[1], "%d", i) == -1)
-            return (EXIT_FAILURE);
-        if (get_x_tiles(server, tile_command, idx) == EXIT_FAILURE)
-            return (EXIT_FAILURE);
-        free(tile_command[1]);
+    (*x)++;
+    if (*x == server->game_data.map_size[0]) {
+        *x = 0;
+        (*y)++;
     }
-    return (EXIT_SUCCESS);
 }
 
 int map_content_request(server_handler_t *server, char **args, const int idx)
 {
-    char **tile_command = NULL;
+    char str[MAP_BUFFER_SIZE];
+    char to_str[MAX_BUFFER_SIZE];
+    int x = 0;
+    int y = 0;
 
     if (get_array_len(args) != 1)
         return (command_parameter_error(server, idx));
-    tile_command = malloc(sizeof(char *) * 4);
-    if (tile_command == NULL)
-        return (EXIT_FAILURE);
-    tile_command[0] = strdup(TILE_CONTENT_COMMAND);
-    if (tile_command[0] == NULL)
-        return (EXIT_FAILURE);
-    tile_command[3] = NULL;
-    get_all_tiles(server, tile_command, idx);
-    free(tile_command[0]);
-    free(tile_command);
-    return (EXIT_SUCCESS);
+    memset(str, '\0', MAP_BUFFER_SIZE);
+    for (int i = 0; i < server->game_data.map_size[0] *
+    server->game_data.map_size[1]; i++) {
+        strcat(str, "bct ");
+        get_tile(server, to_str, x, y);
+        strcat(str, to_str);
+        update_values(server, &x, &y);
+    }
+    write_to_client(server->game_data.clients[idx].fd, str);
+    return (0);
 }

@@ -6,6 +6,8 @@
 */
 
 #include <iostream>
+#include <algorithm>
+
 #include "game/GameState.hpp"
 
 GameState::GameState()
@@ -75,7 +77,7 @@ void GameState::setTeamName(std::vector<std::string> teams)
     }
 }
 
-void GameState::setTile(std::vector<std::string> tile, bool is_init)
+void GameState::setTile(std::vector<std::string> tile)
 {
     Tile single_tile;
 
@@ -88,23 +90,24 @@ void GameState::setTile(std::vector<std::string> tile, bool is_init)
     single_tile.ressources.mendianeNb = std::stoi(tile[7]);
     single_tile.ressources.phirasNb = std::stoi(tile[8]);
     single_tile.ressources.thystameNb = std::stoi(tile[9]);
-    if (is_init == true) {
+    _tiles.push_back(single_tile);
+}
+
+void GameState::setAllTiles(std::vector<std::string> tiles)
+{
+    Tile single_tile;
+
+    for (std::size_t i = 1; i < tiles.size(); i += 9) {
+        single_tile.x = std::stoi(tiles[1]);
+        single_tile.y = std::stoi(tiles[2]);
+        single_tile.ressources.foodNb = std::stoi(tiles[3]);
+        single_tile.ressources.linemateNb = std::stoi(tiles[4]);
+        single_tile.ressources.deraumereNb = std::stoi(tiles[5]);
+        single_tile.ressources.siburNb = std::stoi(tiles[6]);
+        single_tile.ressources.mendianeNb = std::stoi(tiles[7]);
+        single_tile.ressources.phirasNb = std::stoi(tiles[8]);
+        single_tile.ressources.thystameNb = std::stoi(tiles[9]);
         _tiles.push_back(single_tile);
-    } else {
-        for (std::size_t i = 0; i < _tiles.size(); i++) {
-            if (single_tile.x == _tiles[i].x && single_tile.y == _tiles[i].y) {
-                _tiles[i].x = single_tile.x;
-                _tiles[i].y = single_tile.y;
-                _tiles[i].ressources.foodNb = single_tile.ressources.foodNb;
-                _tiles[i].ressources.deraumereNb = single_tile.ressources.deraumereNb;
-                _tiles[i].ressources.linemateNb = single_tile.ressources.linemateNb;
-                _tiles[i].ressources.siburNb = single_tile.ressources.siburNb;
-                _tiles[i].ressources.mendianeNb = single_tile.ressources.mendianeNb;
-                _tiles[i].ressources.phirasNb = single_tile.ressources.phirasNb;
-                _tiles[i].ressources.thystameNb = single_tile.ressources.thystameNb;
-                break;
-            }
-        }
     }
 }
 
@@ -133,19 +136,25 @@ void GameState::addPlayer(std::vector<std::string> player)
 
 void GameState::removePlayer(std::vector<std::string> player)
 {
-    for (auto &p : _players) {
-        if (p.id == std::stoi(player[1])) {
-            _players.erase(p);
+    std::size_t i = 0;
+
+    std::cout << "Here\n" << std::endl;
+    for (; i < _players.size(); i++) {
+        if (_players[i].id == std::stoi(player[1])) {
             break;
         }
     }
+    for (std::size_t x = i; x < _players.size() - 1; x++) {
+        _players[x] = _players[x + 1];
+    }
+    _players.pop_back();
 }
 
 void GameState::startIncantation(std::vector<std::string> incantation)
 {
-    for (int i = 4; i < incantation.size(); i++) {
+    for (std::size_t i = 4; i < incantation.size(); i++) {
         for (auto p : _players) {
-            if (p.id == std::stoi(player[i])) {
+            if (p.id == std::stoi(incantation[i])) {
                 p.is_incantation_active = true;
             }
         }

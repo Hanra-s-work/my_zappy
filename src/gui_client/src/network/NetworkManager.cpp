@@ -67,5 +67,6 @@ std::string NetworkManager::receive(int timeout)
         throw std::runtime_error(e.what());
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-    return boost::asio::buffer_cast<const char*>(buffer.data());
+    std::cout << boost::asio::buffer_cast<const char *>(buffer.data()) << std::endl;
+    return boost::asio::buffer_cast<const char *>(buffer.data());
 }

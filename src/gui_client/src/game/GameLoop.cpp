@@ -14,8 +14,6 @@ GameLoop::GameLoop(const std::string &host, const std::string &port)
     std::string str;
     std::string copy;
     std::vector<std::string> vec;
-    int x = 0;
-    int y = 0;
 
     _gameState = std::make_unique<GameState>();
     try {
@@ -23,14 +21,12 @@ GameLoop::GameLoop(const std::string &host, const std::string &port)
         while (str != "WELCOME\n") {
             str = _networkManager->receive(1);
         }
-        std::cout << str;
         str.clear();
         _networkManager->send("GRAPHIC", 1);
         while (str.empty()) {
             _networkManager->send("msz", 1);
             str = _networkManager->receive(1);
         }
-        std::cout << str;
         vec = _parseMessage(str);
         str.clear();
         _gameState->setMapSize(std::stoi(vec[1]), std::stoi(vec[2]));
@@ -43,25 +39,14 @@ GameLoop::GameLoop(const std::string &host, const std::string &port)
         _gameState->setTeamName(vec);
         str.clear();
         vec.clear();
-        for (int i = 0; i < _gameState->getMapSize().first * _gameState->getMapSize().second; i++) {
-            std::string msg("bct ");
-            msg.append(std::to_string(x) + " ");
-            msg.append(std::to_string(y));
-            while(str.empty()) {
-                _networkManager->send(msg, 1);
-                str = _networkManager->receive(1);
-            }
-            vec = _parseMessage(str);
-            std::cout << str;
-            _gameState->setTile(vec, true);
-            x++;
-            if (x == _gameState->getMapSize().first) {
-                x = 0;
-                y++;
-            }
-            str.clear();
-            vec.clear();
+        while (str.empty()) {
+            _networkManager->send("mct", 1);
+            str = _networkManager->receive(1);
         }
+        vec = _parseMessage(str);
+        _gameState->setAllTiles(vec);
+        str.clear();
+        vec.clear();
     } catch (const std::runtime_error &e) {
         throw std::runtime_error(e.what());
     }
@@ -79,8 +64,9 @@ void GameLoop::runGame()
     std::vector<std::string> vec;
 
     while (true) {
-        msg = _networkManager->receive(1);
+        msg = _networkManager->receive(10);
         if (!msg.empty()) {
+            std::cout << "Yoloooooo\n" << std::endl;
             vec = _parseMessage(msg);
             _whichMessage(vec);
         } else {
@@ -128,8 +114,8 @@ void GameLoop::_whichMessage(const std::vector<std::string> vec)
             sendMsg.append(std::to_string(_gameState->getSinglePlayer(std::stoi(vec[1])).x) + " ");
             sendMsg.append(std::to_string(_gameState->getSinglePlayer(std::stoi(vec[1])).y));
             while (msg.empty()) {
-                _networkManager->send(sendMsg, 1);
-                msg = _networkManager->receive(1);
+                _networkManager->send(sendMsg, 10);
+                msg = _networkManager->receive(10);
             }
             parsed_msg = _parseMessage(msg);
             _gameState->updateTile(parsed_msg);
@@ -139,13 +125,13 @@ void GameLoop::_whichMessage(const std::vector<std::string> vec)
             sendMsg.assign("pin ");
             sendMsg.append(vec[1]);
             while (msg.empty()) {
-                _networkManager->send(sendMsg, 1);
-                msg = _networkManager->receive(1);
+                _networkManager->send(sendMsg, 10);
+                msg = _networkManager->receive(10);
             }
             parsed_msg = _parseMessage(msg);
             _gameState->updatePlayerInventory(parsed_msg);
         } catch (const std::runtime_error &e) {
-            std::cerr(e.what());
+            std::cerr << e.what() << std::endl;
         }
     }
 }
@@ -156,14 +142,20 @@ void GameLoop::_retrieveInformations()
     std::string sendMsg;
     std::vector<std::string> parsed_msg;
 
-    for (int i = 0; i < _gameState->getPlayers().size(); i++) {
+    if (_gameState->getPlayers().size() == 0) {
+        return;
+    }
+    for (std::size_t i = 0; i < _gameState->getPlayers().size(); i++) {
         sendMsg.assign("ppo ");
         sendMsg.append(std::to_string(_gameState->getPlayers()[i].id));
         while (msg.empty()) {
-            _networkManager->send(sendMsg, 1);
-            msg = _networkManager->receive(1);
+            _networkManager->send(sendMsg, 10);
+            msg = _networkManager->receive(10);
         }
         parsed_msg = _parseMessage(msg);
+        if (parsed_msg[0] == "sbp") {
+            return;
+        }
         _gameState->updatePlayerPosition(parsed_msg);
         sendMsg.clear();
         msg.clear();
