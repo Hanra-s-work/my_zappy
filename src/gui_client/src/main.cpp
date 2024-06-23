@@ -5,6 +5,8 @@
 ** main.cpp
 */
 
+#include <iostream>
+
 #include "Game.hpp"
 #include "Parsing.hpp"
 #include "NetworkManager.hpp"
@@ -18,7 +20,6 @@
  * @param argv
  * @return int
  */
-
 int main(int argc, char **argv)
 {
     Graphic graphic;
@@ -30,10 +31,12 @@ int main(int argc, char **argv)
     sound.playMusic();
     sound.loadSound("footsteps", "asset/sound/footstep.ogg");
 
+    VolumeVisualizer volumeVisualizer(200.0f, 20.0f);
+    volumeVisualizer.setVolume(sound.getMusicVolume());
+
     sf::Clock clock;
     sf::Vector2f randomStartPosition(static_cast<float>(std::rand() % (200 * 128)), static_cast<float>(std::rand() % (200 * 128)));
-    Team team(1, "asset/pictures/character/walk.png", randomStartPosition, 120.0f, 6.0f, sound);
-
+    Team team(1, "asset/pictures/character/walk.png", randomStartPosition, 200.0f, 8.0f, sound);
     bool followPlayer = false;
 
     // Parsing parsing;
@@ -55,23 +58,24 @@ int main(int argc, char **argv)
     graphic.setMapSize(resource.getMapWidth(), resource.getMapHeight());
     sf::RenderWindow &window = graphic.getWindow();
 
-    while (window.isOpen()) {
+    while (window.isOpen())
+    {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::V)) {
+            volumeVisualizer.manageVolume(sound);
+        }
         graphic.handleInput(followPlayer, team.getPosition());
         team.handleInput();
-
         sf::Time elapsed = clock.restart();
         team.updateTime(elapsed);
         graphic.updateView(elapsed.asSeconds());
-
         // std::string command = networkManager.receive();
         // commandHandler.handleCommand(command);
-
         window.clear();
         resource.draw(window);
         team.draw(window);
@@ -83,7 +87,4 @@ int main(int argc, char **argv)
 /*
 rajouter la condition "si le player passe sur une ressource alors elle disparait et réaparait ailleurs"
 rajouter des bordures sur la map au extremité pour ne pas laissé passer le player
-rajouter un pitit zoom quand on passe sur la cam d'un player
-gérer le volume de la musique avec + et -
-gérer le zoom de la cam libre avec + et -
 */
