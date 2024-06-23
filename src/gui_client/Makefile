@@ -10,7 +10,6 @@ SRC_MAIN	=	./src/main.cpp
 SRC	=	./src/sub_main.cpp	\
 		./src/ArgumentHandling.cpp	\
 		./src/Parsing.cpp	\
-		./src/NetworkClient.cpp	\
 		./src/CommandHandler.cpp	\
 		./src/GameState.cpp	\
 		./src/NetworkManager.cpp	\
