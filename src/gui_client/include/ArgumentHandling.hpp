@@ -5,7 +5,8 @@
 ** Exception.hpp
 */
 
-#pragma once
+#ifndef ARGUMENTHANDLING_HPP
+    #define ARGUMENTHANDLING_HPP
 
 #include <iostream>
 #include <stdexcept>
@@ -23,3 +24,5 @@ namespace Exception
             std::string _msg;
     };
 }
+
+#endif

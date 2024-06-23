@@ -7,18 +7,19 @@
 
 SRC_MAIN	=	./src/main.cpp
 
-SRC	=	./src/sub_main.cpp	\
-		./src/ArgumentHandling.cpp	\
-		./src/Parsing.cpp	\
-		./src/CommandHandler.cpp	\
-		./src/GameState.cpp	\
-		./src/NetworkManager.cpp	\
+SRC	=	./src/sub_main.cpp					\
+		./src/ArgumentHandling.cpp			\
+		./src/Parsing.cpp					\
 \
-		./src/Graphic.cpp	\
-		./src/Player.cpp	\
-		./src/Resource.cpp	\
-		./src/Sound.cpp	\
-#		./src/Game.cpp	\
+		./src/game/GameLoop.cpp				\
+		./src/game/GameState.cpp			\
+\
+		./src/network/NetworkManager.cpp	\
+\
+		# ./src/graphic/Graphic.cpp			\
+		# ./src/graphic/Player.cpp			\
+		# ./src/graphic/Resource.cpp			\
+		# ./src/graphic/Sound.cpp				\
 \
 
 CXX	=	g++

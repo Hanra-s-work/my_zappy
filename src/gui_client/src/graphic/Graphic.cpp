@@ -5,7 +5,7 @@
 ** Graphic
 */
 
-#include "Graphic.hpp"
+#include "graphic/Graphic.hpp"
 
 Graphic::Graphic() : scrollSpeed(500.0f), mapWidth(0), mapHeight(0), isZoomed(false), cameraOffset(-120.0f, -120.0f), targetCenter(-120.0f, -120.0f)
 {

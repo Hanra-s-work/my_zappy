@@ -5,7 +5,7 @@
 ** Sound
 */
 
-#include "Sound.hpp"
+#include "graphic/Sound.hpp"
 
 Sound::Sound()
 {

@@ -40,17 +40,19 @@ int map_size_request(server_handler_t *server, char **args, const int idx)
 
 int all_team_name_request(server_handler_t *server, char **args, const int idx)
 {
+    char str[MAX_BUFFER_SIZE];
+
+    str[0] = '\0';
     if (get_array_len(args) != 1) {
         return (command_parameter_error(server, idx));
     }
     for (int i = 0; server->game_data.teams[i].team_name != NULL; ++i) {
-        write(server->game_data.clients[idx].fd, ALL_TEAM_COMMAND,
-            COMMAND_ID_LEN);
-        write(server->game_data.clients[idx].fd, COMMAND_DELIMITER_STR, 1);
-        write(server->game_data.clients[idx].fd, server->game_data.teams[i]
-            .team_name, strlen(server->game_data.teams->team_name));
-        write(server->game_data.clients[idx].fd, COMMAND_SEPARATOR_STR, 1);
+        strcat(str, ALL_TEAM_COMMAND);
+        strcat(str, COMMAND_DELIMITER_STR);
+        strcat(str, server->game_data.teams[i].team_name);
+        strcat(str, COMMAND_SEPARATOR_STR);
     }
+    write_to_client(server->game_data.clients[idx].fd, str);
     return (EXIT_SUCCESS);
 }
 
