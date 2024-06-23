@@ -34,7 +34,7 @@ class Graphic
         bool isZoomed;
         sf::Vector2f cameraOffset;
         sf::Vector2f targetCenter;
-        const float smoothingFactor = 0.1f; // Adjust this value for smoother camera movement
+        const float smoothingFactor = 0.1f;
 };
 
 class ISprite
