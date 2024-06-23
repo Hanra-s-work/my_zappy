@@ -11,6 +11,10 @@ Graphic::Graphic() : scrollSpeed(500.0f), mapWidth(0), mapHeight(0), isZoomed(fa
 {
 }
 
+Graphic::~Graphic()
+{
+}
+
 void Graphic::initWindow(unsigned int width, unsigned int height, const std::string &title)
 {
     window.create(sf::VideoMode(width, height), title);

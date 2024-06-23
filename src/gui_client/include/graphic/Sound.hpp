@@ -12,11 +12,13 @@
     #include <SFML/Graphics.hpp>
     #include <map>
     #include <string>
+    #include <memory>
 
 class Sound
 {
     public:
         Sound();
+        ~Sound();
         bool loadSound(const std::string &name, const std::string &filename);
         void playSound(const std::string &name, bool loop);
         void stopSound(const std::string &name);
@@ -46,7 +48,7 @@ class VolumeVisualizer
 
         void setVolume(float volume);
         void draw(sf::RenderWindow &window);
-        void manageVolume(Sound &sound);
+        void manageVolume(std::unique_ptr<Sound> &sound);
 
     private:
         sf::RectangleShape backgroundBar;

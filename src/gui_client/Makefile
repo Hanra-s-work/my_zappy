@@ -16,10 +16,10 @@ SRC	=	./src/sub_main.cpp					\
 \
 		./src/network/NetworkManager.cpp	\
 \
-		# ./src/graphic/Graphic.cpp			\
-		# ./src/graphic/Player.cpp			\
-		# ./src/graphic/Resource.cpp			\
-		# ./src/graphic/Sound.cpp				\
+		./src/graphic/Graphic.cpp			\
+		./src/graphic/Player.cpp			\
+		./src/graphic/Resource.cpp			\
+		./src/graphic/Sound.cpp				\
 \
 
 CXX	=	g++

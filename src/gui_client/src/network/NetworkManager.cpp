@@ -61,6 +61,7 @@ std::string NetworkManager::receive(int timeout)
     if (ec) {
         throw std::runtime_error("Error checking available bytes: " + ec.message());
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
     try {
         boost::asio::read_until(_socket, buffer, "\n");
     } catch (boost::system::system_error &e) {

@@ -16,6 +16,7 @@ class Graphic
 {
     public:
         Graphic();
+        ~Graphic();
         void initWindow(unsigned int width, unsigned int height, const std::string &title);
         sf::RenderWindow &getWindow();
         void handleInput(bool &followPlayer, const sf::Vector2f &playerPosition);
@@ -43,7 +44,7 @@ class ISprite
         ISprite(const std::string& textureFile);
         ~ISprite() = default;
         bool loadTexture(const std::string& textureFile);
-        virtual void draw(sf::RenderWindow& wwindow) const = 0;
+        virtual void draw(sf::RenderWindow& window) const = 0;
 
     protected:
         sf::Sprite sprite;

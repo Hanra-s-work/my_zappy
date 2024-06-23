@@ -11,6 +11,10 @@ Sound::Sound()
 {
 }
 
+Sound::~Sound()
+{
+}
+
 bool Sound::loadSound(const std::string &name, const std::string &filename)
 {
     sf::SoundBuffer buffer;
@@ -157,7 +161,7 @@ void VolumeVisualizer::drawSoundVolumes(sf::RenderWindow &window)
     }
 }
 
-void VolumeVisualizer::manageVolume(Sound &sound)
+void VolumeVisualizer::manageVolume(std::unique_ptr<Sound> &sound)
 {
     sf::RenderWindow window(sf::VideoMode(600, 400), "Volume Control");
     window.setFramerateLimit(60);
@@ -172,20 +176,20 @@ void VolumeVisualizer::manageVolume(Sound &sound)
             }
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::O)) {
-            sound.decreaseMusicVolume(1.0f);
-            setVolume(sound.getMusicVolume());
+            sound->decreaseMusicVolume(1.0f);
+            setVolume(sound->getMusicVolume());
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
-            sound.increaseMusicVolume(1.0f);
-            setVolume(sound.getMusicVolume());
+            sound->increaseMusicVolume(1.0f);
+            setVolume(sound->getMusicVolume());
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
-            sound.decreaseSoundVolume("footsteps", 1.0f);
-            soundVolumes["footsteps"] = sound.getSoundVolume("footsteps");
+            sound->decreaseSoundVolume("footsteps", 1.0f);
+            soundVolumes["footsteps"] = sound->getSoundVolume("footsteps");
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::M)) {
-            sound.increaseSoundVolume("footsteps", 1.0f);
-            soundVolumes["footsteps"] = sound.getSoundVolume("footsteps");
+            sound->increaseSoundVolume("footsteps", 1.0f);
+            soundVolumes["footsteps"] = sound->getSoundVolume("footsteps");
         }
         window.clear();
         draw(window);

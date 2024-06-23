@@ -12,6 +12,10 @@
 
     #include "GameState.hpp"
     #include "network/NetworkManager.hpp"
+    #include "graphic/Graphic.hpp"
+    #include "graphic/Player.hpp"
+    #include "graphic/Resource.hpp"
+    #include "graphic/Sound.hpp"
 
 class GameLoop {
     public:
@@ -27,16 +31,14 @@ class GameLoop {
 
         std::unique_ptr<NetworkManager> _networkManager;
         std::unique_ptr<GameState> _gameState;
-        // void processEvents();
-        // void update(sf::Time deltaTime);
-        // void render();
-
-        // Graphic graphic;
-        // Player player;
-        // Resource resource;
-        // Sound sound;
-
-        // bool followPlayer;
+        std::unique_ptr<Graphic> graphic;
+        std::unique_ptr<Resource> resource;
+        std::unique_ptr<Sound> sound;
+        std::unique_ptr<VolumeVisualizer> volumeVisualizer;
+        std::vector<std::unique_ptr<Team>> teams;
+        sf::Event event;
+        sf::Clock clock;
+        bool followPlayer;
 };
 
 #endif

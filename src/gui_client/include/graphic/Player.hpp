@@ -11,20 +11,23 @@
 #include <SFML/Graphics.hpp>
 #include "Graphic.hpp"
 #include "Sound.hpp"
+#include "game/GameState.hpp"
 
 enum class Direction
 {
-    Right,
-    Left,
+    Idle,
     Up,
+    Right,
     Down,
-    Idle
+    Left
 };
+
+struct PlayerState;
 
 class Player : public ISprite
 {
     public:
-        Player(const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, Sound &sound);
+        Player(const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, std::unique_ptr<Sound> &sound);
         void handleInput();
         void updateTime(sf::Time elapsed);
         void draw(sf::RenderWindow &window) const override;
@@ -36,7 +39,7 @@ class Player : public ISprite
 
         sf::FloatRect getPlayerBounds() const;
 
-    private:
+    protected:
         sf::Texture _texture;
         sf::Texture _idleTexture;
         sf::Sprite _sprite;
@@ -50,7 +53,7 @@ class Player : public ISprite
         sf::Time _elapsedTime;
         Direction _currentDir;
         Direction _lastDir;
-        Sound &_sound;
+        std::unique_ptr<Sound> &_sound;
         bool _isZoomed = false;
 
         void updateDirection();
@@ -61,11 +64,14 @@ class Player : public ISprite
 class Team : public Player
 {
     public:
-        Team(int index, const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, Sound &sound);
+        Team(int index, const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, std::unique_ptr<Sound> &sound);
+        ~Team();
         void performIncantation();
+        int getIndex() const;
         void spawnEgg();
         void hatchEgg();
         void draw(sf::RenderWindow &window) const override;
+        void updatePosition(std::vector<PlayerState> states);
 
     private:
         int _index;

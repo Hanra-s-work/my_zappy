@@ -8,13 +8,6 @@
 #include <iostream>
 
 #include "main.hpp"
-// #include "Parsing.hpp"
-// #include "network/NetworkManager.hpp"
-// #include "game/GameState.hpp"
-// #include "graphic/Graphic.hpp"
-// #include "graphic/Resource.hpp"
-// #include "graphic/Sound.hpp"
-// #include "graphic/Player.hpp"
 
 /**
  * @brief This is the function the compiler calls to successfully compile the program
@@ -23,6 +16,7 @@
  * @param argv
  * @return int
  */
+
 // int main(int argc, char **argv)
 // {
 //     Graphic graphic;

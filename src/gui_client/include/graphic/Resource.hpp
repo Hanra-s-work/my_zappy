@@ -25,6 +25,7 @@ class Resource : public ISprite
 {
     public:
         Resource(const std::string &textureFile);
+        ~Resource();
         void generateMap(unsigned int width, unsigned int height);
         void addMaterial(const std::string &type, const std::string &textureFile);
         void generateMaterials();
@@ -34,6 +35,7 @@ class Resource : public ISprite
         unsigned int getMapHeight() const;
 
         void addResourceAt(const std::string &type, int x, int y);
+        // bool checkCollision(const sf::Vector2f &playerPosition);
 
     private:
         std::vector<sf::Sprite> mapSprites;
