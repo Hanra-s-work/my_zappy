@@ -5,22 +5,26 @@
 ** Parsing.hpp
 */
 
-#pragma once
+#ifndef PARSING_HPP
+    #define PARSING_HPP
 
-#include <iostream>
+class Parsing {
+    public:
+        Parsing();
+        ~Parsing();
 
-    class Parsing {
-        public:
-            Parsing();
-            void help() const;
-            bool parse_args(int ac, char **av);
-            bool validate_args() const;
-            void print_args() const;
-            const std::string& get_machine() const;
-            const std::string& get_port() const;
+        void help() const;
+        void parse_args(int ac, char **av);
+        void print_args() const;
+        const std::string &get_machine() const;
+        const std::string &get_port() const;
 
-        private:
-            std::string _port;
-            std::string _machine;
-            bool check_valid_port(const std::string &port);
-    };
+    private:
+        void _validate_args() const;
+        bool _check_valid_port(const std::string &port);
+
+        std::string _port;
+        std::string _machine;
+};
+
+#endif

@@ -51,21 +51,21 @@ static void concat_msg(char **str, char *x, char *y, char *text)
 static char *create_broadcast_message(char *text, int *direction)
 {
     char *msg;
-    char *x;
-    char *y;
+    char x[MAX_BUFFER_SIZE];
+    char y[MAX_BUFFER_SIZE];
 
-    if (asprintf(&x, "%d", direction[0]) == -1) {
+    if (sprintf(x, "%d", direction[0]) == -1) {
         return (NULL);
     }
-    if (asprintf(&y, "%d", direction[1]) == -1) {
+    if (sprintf(y, "%d", direction[1]) == -1) {
         return (NULL);
     }
     msg = malloc(sizeof(char) * (strlen(text) + strlen(x) + strlen(y) + 13));
     if (msg == NULL)
         return (NULL);
     concat_msg(&msg, x, y, text);
-    free(x);
-    free(y);
+    // free(x);
+    // free(y);
     return (msg);
 }
 

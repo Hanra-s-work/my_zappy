@@ -5,7 +5,7 @@
 ** Resources
 */
 
-#include "Resource.hpp"
+#include "graphic/Resource.hpp"
 
 Resource::Resource(const std::string &textureFile) : ISprite(textureFile), mapWidth(0), mapHeight(0)
 {

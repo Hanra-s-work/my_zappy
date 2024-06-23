@@ -34,6 +34,8 @@ class Player : public ISprite
         void zoomOut(sf::RenderWindow &window);
         void setView(sf::RenderWindow &window);
 
+        sf::FloatRect getPlayerBounds() const;
+
     private:
         sf::Texture _texture;
         sf::Texture _idleTexture;

@@ -5,7 +5,8 @@
 ** src.hpp
 */
 
-#pragma once
+#ifndef MAIN_HPP
+    #define MAIN_HPP
 
 /**
  * @brief This is the main function of the program (this is the function called by the main used for compiling)
@@ -15,3 +16,5 @@
  * @return int
  */
 int sub_main(int argc, char **argv);
+
+#endif

@@ -6,7 +6,7 @@
 */
 
 #include <iostream>
-#include "Player.hpp"
+#include "graphic/Player.hpp"
 
 Player::Player(const std::string &textureFile, const sf::Vector2f &startPosition, float moveSpeed, float animationSpeed, Sound &sound)
     : ISprite(textureFile), _direction(0, 0), _destPosition(startPosition), _moveSpeed(moveSpeed), _animationSpeed(animationSpeed), _reachedDest(false), _sound(sound)
@@ -184,4 +184,9 @@ void Team::draw(sf::RenderWindow &window) const
     for (const auto& egg : _eggs) {
         window.draw(egg);
     }
+}
+
+sf::FloatRect Player::getPlayerBounds() const
+{
+    return _sprite.getGlobalBounds();
 }
