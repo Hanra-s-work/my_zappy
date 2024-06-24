@@ -1,15 +1,17 @@
 /*
 ** EPITECH PROJECT, 2024
-** Visual Studio Live Share (Workspace)
+** my_zappy
 ** File description:
 ** GameLoop
 */
 
 #include <sstream>
 
+#include <SFML/Graphics.hpp>
 #include "game/GameLoop.hpp"
 
 GameLoop::GameLoop(const std::string &host, const std::string &port)
+: followPlayer(false)
 {
     std::string str;
     std::string copy;
@@ -40,7 +42,7 @@ GameLoop::GameLoop(const std::string &host, const std::string &port)
         str.clear();
         vec.clear();
         while (str.empty()) {
-            _networkManager->send("mct", 1);
+            _networkManager->send("mct", 10);
             str = _networkManager->receive(1);
         }
         vec = _parseMessage(str);
@@ -50,23 +52,54 @@ GameLoop::GameLoop(const std::string &host, const std::string &port)
     } catch (const std::runtime_error &e) {
         throw std::runtime_error(e.what());
     }
+    graphic = std::make_unique<Graphic>();
+    graphic->initWindow(1920, 1080, "My Zappy");
+    resource = std::make_unique<Resource>("src/gui_client/asset/pictures/resources/flower_grass.png");
+    resource->addMaterial("food", "src/gui_client/asset/pictures/resources/food.png");
+    resource->addMaterial("linemate", "src/gui_client/asset/pictures/resources/linemate.png");
+    resource->addMaterial("deraumere", "src/gui_client/asset/pictures/resources/deraumere.png");
+    resource->addMaterial("sibur", "src/gui_client/asset/pictures/resources/sibur.png");
+    resource->addMaterial("mendiane", "src/gui_client/asset/pictures/resources/mendiane.png");
+    resource->addMaterial("phiras", "src/gui_client/asset/pictures/resources/phiras.png");
+    resource->addMaterial("thystame", "src/gui_client/asset/pictures/resources/thystame.png");
+    sound = std::make_unique<Sound>();
+    sound->loadMusic("src/gui_client/asset/sound/C418 - Moog City.ogg");
+    sound->loadSound("footsteps", "src/gui_client/asset/sound/footstep.ogg");
+    volumeVisualizer = std::make_unique<VolumeVisualizer>(200.0f, 20.0f);
+    volumeVisualizer->setVolume(sound->getMusicVolume());
+    resource->generateMap(_gameState->getMapSize().first, _gameState->getMapSize().second);
+    resource->generateMaterials();
+    graphic->setMapSize(resource->getMapWidth(), resource->getMapHeight());
+    sf::Vector2f pos = { 10.0, 10.0 };
+    teams.push_back(std::make_unique<Team>(0, "src/gui_client/asset/pictures/character/walk.png", pos, 120.0f, 6.0f, sound ));
 }
 
 GameLoop::~GameLoop()
 {
     _gameState.reset();
     _networkManager.reset();
+    sound.reset();
+    volumeVisualizer.reset();
+    resource.reset();
+    graphic.reset();
 }
 
 void GameLoop::runGame()
 {
     std::string msg;
     std::vector<std::string> vec;
+    sf::RenderWindow &window = graphic->getWindow();
 
-    while (true) {
-        msg = _networkManager->receive(10);
+    sound->playMusic();
+    while (window.isOpen() == true) {
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                break;
+            }
+        }
+        msg = _networkManager->receive(30);
         if (!msg.empty()) {
-            std::cout << "Yoloooooo\n" << std::endl;
             vec = _parseMessage(msg);
             _whichMessage(vec);
         } else {
@@ -74,7 +107,21 @@ void GameLoop::runGame()
         }
         msg.clear();
         vec.clear();
-        // Put sfml here
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::V)) {
+            volumeVisualizer->manageVolume(sound);
+        }
+        sf::Time elapsed = clock.restart();
+        graphic->handleInput(followPlayer, teams[0]->getPosition());
+        teams[0]->handleInput();
+        graphic->updateView(elapsed.asSeconds());
+        // resource.checkCollision(team.getPosition());
+        window.clear();
+        resource->draw(window);
+        for (std::size_t i = 0; i < teams.size(); i++) {
+            teams[i]->updateTime(elapsed);
+            teams[i]->draw(window);
+        }
+        window.display();
     }
 }
 
@@ -97,7 +144,7 @@ void GameLoop::_whichMessage(const std::vector<std::string> vec)
     std::vector<std::string> parsed_msg;
 
     if (vec[0] == "pnw") { // New player connected
-        _gameState->addPlayer(vec);
+        _gameState->addPlayer(vec, teams, sound);
     }
     if (vec[0] == "pic") { // Incantation start
         _gameState->startIncantation(vec);
@@ -106,7 +153,7 @@ void GameLoop::_whichMessage(const std::vector<std::string> vec)
         _gameState->endIncantation(vec);
     }
     if (vec[0] == "pdi") { // Player death
-        _gameState->removePlayer(vec);
+        _gameState->removePlayer(vec, teams);
     }
     if (vec[0] == "pdr" || vec[0] == "pgt") { // Ressource dropping and collecting
         try {
@@ -154,9 +201,9 @@ void GameLoop::_retrieveInformations()
         }
         parsed_msg = _parseMessage(msg);
         if (parsed_msg[0] == "sbp") {
-            return;
+            continue;
         }
-        _gameState->updatePlayerPosition(parsed_msg);
+        _gameState->updatePlayerPosition(parsed_msg, teams);
         sendMsg.clear();
         msg.clear();
         parsed_msg.clear();

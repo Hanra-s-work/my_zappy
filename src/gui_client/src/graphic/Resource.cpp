@@ -11,6 +11,10 @@ Resource::Resource(const std::string &textureFile) : ISprite(textureFile), mapWi
 {
 }
 
+Resource::~Resource()
+{
+}
+
 void Resource::generateMap(unsigned int width, unsigned int height)
 {
     mapWidth = width;
@@ -93,3 +97,17 @@ void Resource::addResourceAt(const std::string &type, int x, int y)
 
     materials.push_back({materialSprite, type});
 }
+
+// bool Resource::checkCollision(const sf::Vector2f &playerPosition)
+// {
+//     for (auto &material : materials) {
+//         sf::FloatRect materialBounds = material.sprite.getGlobalBounds();
+//         if (materialBounds.contains(playerPosition)) {
+//             float newX = static_cast<float>(std::rand() % (mapWidth * 128));
+//             float newY = static_cast<float>(std::rand() % (mapHeight * 128));
+//             material.sprite.setPosition(newX, newY);
+//             return true;
+//         }
+//     }
+//     return false;
+// }

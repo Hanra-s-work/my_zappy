@@ -8,7 +8,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "game/GameState.hpp"
+#include "game/GameLoop.hpp"
 
 GameState::GameState()
 {
@@ -111,7 +111,7 @@ void GameState::setAllTiles(std::vector<std::string> tiles)
     }
 }
 
-void GameState::addPlayer(std::vector<std::string> player)
+void GameState::addPlayer(std::vector<std::string> player, std::vector<std::unique_ptr<Team>> &teams, std::unique_ptr<Sound> &sound)
 {
     PlayerState p;
     p.id = std::stoi(player[1]);
@@ -132,22 +132,35 @@ void GameState::addPlayer(std::vector<std::string> player)
     p.orientation = std::stoi(player[4]);
     p.teamName = player[6];
     _players.push_back(p);
+    sf::Vector2f startPosition(static_cast<float>(_mapSize.first * 128), static_cast<float>(_mapSize.second * 128));
+    teams.push_back(std::make_unique<Team>(p.id, "gui_client/asset/pictures/character/walk.png", startPosition, 200.0f, 8.0f, sound));
 }
 
-void GameState::removePlayer(std::vector<std::string> player)
+void GameState::removePlayer(std::vector<std::string> player, std::vector<std::unique_ptr<Team>> &teams)
 {
     std::size_t i = 0;
 
-    std::cout << "Here\n" << std::endl;
     for (; i < _players.size(); i++) {
         if (_players[i].id == std::stoi(player[1])) {
             break;
         }
     }
     for (std::size_t x = i; x < _players.size() - 1; x++) {
-        _players[x] = _players[x + 1];
+        std::swap(_players[i], _players[i + 1]);
     }
     _players.pop_back();
+    i = 0;
+    for (; i < teams.size(); i++) {
+        if (teams[i]->getIndex() == std::stoi(player[1])) {
+            teams[i].reset();
+            break;
+        }
+    }
+    for (std::size_t x = i; x < teams.size() - 1; x++) {
+        std::swap(teams[i], teams[i + 1]);
+    }
+    teams.pop_back();
+    teams.pop_back();
 }
 
 void GameState::startIncantation(std::vector<std::string> incantation)
@@ -176,7 +189,7 @@ void GameState::endIncantation(std::vector<std::string> incantation)
     }
 }
 
-void GameState::updatePlayerPosition(std::vector<std::string> player)
+void GameState::updatePlayerPosition(std::vector<std::string> player, std::vector<std::unique_ptr<Team>> &teams)
 {
     for (auto &p : _players) {
         if (p.id == std::stoi(player[1])) {
@@ -185,6 +198,12 @@ void GameState::updatePlayerPosition(std::vector<std::string> player)
             p.x = std::stoi(player[2]);
             p.y = std::stoi(player[3]);
             p.orientation = std::stoi(player[4]);
+            break;
+        }
+    }
+    for (std::size_t i = 0; i < teams.size(); i++) {
+        if (teams[i]->getIndex() == std::stoi(player[1])) {
+            teams[i]->updatePosition(_players);
             break;
         }
     }

@@ -12,6 +12,9 @@
     #include <vector>
     #include <istream>
 
+    #include "graphic/Sound.hpp"
+    #include "graphic/Player.hpp"
+
 struct Ressources {
     int foodNb;
     int linemateNb;
@@ -59,11 +62,11 @@ class GameState {
         void setTile(std::vector<std::string> tile);
         void setAllTiles(std::vector<std::string> tiles);
 
-        void addPlayer(std::vector<std::string> player);
-        void removePlayer(std::vector<std::string> player);
+        void addPlayer(std::vector<std::string> player, std::vector<std::unique_ptr<Team>> &teams, std::unique_ptr<Sound> &sound);
+        void removePlayer(std::vector<std::string> player, std::vector<std::unique_ptr<Team>> &teams);
         void startIncantation(std::vector<std::string> incantation);
         void endIncantation(std::vector<std::string> incantation);
-        void updatePlayerPosition(std::vector<std::string> player);
+        void updatePlayerPosition(std::vector<std::string> player, std::vector<std::unique_ptr<Team>> &teams);
         void updateTile(std::vector<std::string> tile);
         void updatePlayerInventory(std::vector<std::string> inventory);
 
