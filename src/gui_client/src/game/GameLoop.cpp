@@ -54,22 +54,24 @@ GameLoop::GameLoop(const std::string &host, const std::string &port)
     }
     graphic = std::make_unique<Graphic>();
     graphic->initWindow(1920, 1080, "My Zappy");
-    resource = std::make_unique<Resource>("gui_client/asset/pictures/resources/flower_grass.png");
-    resource->addMaterial("food", "gui_client/asset/pictures/resources/food.png");
-    resource->addMaterial("linemate", "gui_client/asset/pictures/resources/linemate.png");
-    resource->addMaterial("deraumere", "gui_client/asset/pictures/resources/deraumere.png");
-    resource->addMaterial("sibur", "gui_client/asset/pictures/resources/sibur.png");
-    resource->addMaterial("mendiane", "gui_client/asset/pictures/resources/mendiane.png");
-    resource->addMaterial("phiras", "gui_client/asset/pictures/resources/phiras.png");
-    resource->addMaterial("thystame", "gui_client/asset/pictures/resources/thystame.png");
+    resource = std::make_unique<Resource>("src/gui_client/asset/pictures/resources/flower_grass.png");
+    resource->addMaterial("food", "src/gui_client/asset/pictures/resources/food.png");
+    resource->addMaterial("linemate", "src/gui_client/asset/pictures/resources/linemate.png");
+    resource->addMaterial("deraumere", "src/gui_client/asset/pictures/resources/deraumere.png");
+    resource->addMaterial("sibur", "src/gui_client/asset/pictures/resources/sibur.png");
+    resource->addMaterial("mendiane", "src/gui_client/asset/pictures/resources/mendiane.png");
+    resource->addMaterial("phiras", "src/gui_client/asset/pictures/resources/phiras.png");
+    resource->addMaterial("thystame", "src/gui_client/asset/pictures/resources/thystame.png");
     sound = std::make_unique<Sound>();
-    sound->loadMusic("gui_client/asset/sound/C418 - Moog City.ogg");
-    sound->loadSound("footsteps", "gui_client/asset/sound/footstep.ogg");
+    sound->loadMusic("src/gui_client/asset/sound/C418 - Moog City.ogg");
+    sound->loadSound("footsteps", "src/gui_client/asset/sound/footstep.ogg");
     volumeVisualizer = std::make_unique<VolumeVisualizer>(200.0f, 20.0f);
     volumeVisualizer->setVolume(sound->getMusicVolume());
     resource->generateMap(_gameState->getMapSize().first, _gameState->getMapSize().second);
     resource->generateMaterials();
     graphic->setMapSize(resource->getMapWidth(), resource->getMapHeight());
+    sf::Vector2f pos = { 10.0, 10.0 };
+    teams.push_back(std::make_unique<Team>(0, "src/gui_client/asset/pictures/character/walk.png", pos, 120.0f, 6.0f, sound ));
 }
 
 GameLoop::~GameLoop()
@@ -90,9 +92,11 @@ void GameLoop::runGame()
 
     sound->playMusic();
     while (window.isOpen() == true) {
-        if (event.type == sf::Event::Closed) {
-            window.close();
-            continue;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+                break;
+            }
         }
         msg = _networkManager->receive(30);
         if (!msg.empty()) {
@@ -107,6 +111,8 @@ void GameLoop::runGame()
             volumeVisualizer->manageVolume(sound);
         }
         sf::Time elapsed = clock.restart();
+        graphic->handleInput(followPlayer, teams[0]->getPosition());
+        teams[0]->handleInput();
         graphic->updateView(elapsed.asSeconds());
         // resource.checkCollision(team.getPosition());
         window.clear();

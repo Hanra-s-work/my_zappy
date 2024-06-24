@@ -16,7 +16,7 @@ Player::Player(const std::string &textureFile, const sf::Vector2f &startPosition
     if (!_texture.loadFromFile(textureFile)) {
         throw std::runtime_error("Failed to load texture");
     }
-    if (!_idleTexture.loadFromFile("gui_client/asset/pictures/character/idle.png")) {
+    if (!_idleTexture.loadFromFile("src/gui_client/asset/pictures/character/idle.png")) {
         throw std::runtime_error("Failed to load idle texture");
     }
     _sprite.setTexture(_texture);
